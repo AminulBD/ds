@@ -262,6 +262,40 @@ covers and which mode is in force is printed before the results.
 This is how you reach a registry that is missing from the bootstrap, test a
 staging RDAP server, or serve an internal zone that has no public entry at all.
 
+### Your own WHOIS servers
+
+The same thing for WHOIS, in the same format as the bundled `whois.json` — a
+list of extensions, a server and the text that marks a free domain:
+
+```json
+[
+  { "extensions": ".internal,.corp",
+    "uri": "socket://whois.corp.example",
+    "available": "not registered" },
+  { "extensions": ".de",
+    "uri": "socket://whois.denic.de",
+    "available": "Status: free" }
+]
+```
+
+`uri` is `socket://host[:port]` for classic port-43 WHOIS, or an `http(s)://`
+prefix the domain is appended to. `available` is matched against the response
+to decide the name is free; matching is negation-aware, so a needle of
+"Available" is not triggered by "Not Available".
+
+```sh
+ds apple --tld de,ch --whois-file servers.json                 # merged
+ds apple --tld internal --whois-file servers.json --whois-mode only
+```
+
+| Mode | Effect |
+| --- | --- |
+| `merge` (default) | your entries win for the TLDs they name, the rest of the bundled table still applies |
+| `only` | the bundled table is ignored entirely |
+
+`./whois.json` and `~/.config/ds/whois.json` are picked up automatically, and
+the run says which file it loaded — exactly as for `rdap.json`.
+
 ## Pacing
 
 | Flag | Default | Meaning |

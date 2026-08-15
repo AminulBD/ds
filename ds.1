@@ -152,6 +152,25 @@ from the IANA bootstrap.
 .B only
 uses the custom list alone and never downloads the bootstrap.
 .TP
+.BR \-\-whois\-file " " \fIPATH\fR
+Custom WHOIS server table, in the same format as the bundled
+.IR whois.json :
+a list of entries with the keys extensions, uri and available, where uri is
+.I socket://host[:port]
+for classic port-43 WHOIS or an http(s) prefix the domain is appended to, and
+available is the text that marks a free domain. Without this option
+.I ./whois.json
+and
+.I ~/.config/ds/whois.json
+are used when they exist.
+.TP
+.BR \-\-whois\-mode " " \fImerge\fR|\fIonly\fR
+.B merge
+(default) lets the custom entries win for the TLDs they name and keeps the rest
+of the bundled table.
+.B only
+uses the custom table alone.
+.TP
 .B \-\-no\-iana
 Never query whois.iana.org: no referral when a bundled WHOIS host is stale, and
 no registry names for
@@ -196,6 +215,10 @@ Honours
 .IR ./rdap.json ", " ~/.config/ds/rdap.json
 Custom RDAP server lists, used automatically when present. See
 .BR \-\-rdap\-file .
+.TP
+.IR ./whois.json ", " ~/.config/ds/whois.json
+Custom WHOIS server tables, used automatically when present. See
+.BR \-\-whois\-file .
 .TP
 .IR available.txt ", " unavailable.txt ", " unknown.txt
 Written in the working directory, or

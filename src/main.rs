@@ -13,7 +13,7 @@ mod whois;
 
 use std::collections::BTreeSet;
 use std::io::IsTerminal;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
 use std::time::{Duration, Instant};
@@ -149,8 +149,19 @@ struct Args {
 
     /// What to do with that list: merge it over the IANA bootstrap (custom
     /// entries win) or use only it.
-    #[arg(long = "rdap-mode", value_enum, default_value_t = RdapMode::Merge)]
-    rdap_mode: RdapMode,
+    #[arg(long = "rdap-mode", value_enum, default_value_t = ListMode::Merge)]
+    rdap_mode: ListMode,
+
+    /// Custom WHOIS server table, in the same format as the bundled
+    /// whois.json. Without this, ./whois.json and ~/.config/ds/whois.json are
+    /// picked up automatically when they exist.
+    #[arg(long = "whois-file", value_name = "PATH")]
+    whois_file: Option<PathBuf>,
+
+    /// What to do with that table: merge it over the bundled one (custom
+    /// entries win) or use only it.
+    #[arg(long = "whois-mode", value_enum, default_value_t = ListMode::Merge)]
+    whois_mode: ListMode,
 
     /// Never query whois.iana.org: no referral when a bundled WHOIS host is
     /// stale, and no registry names for --where.
@@ -237,10 +248,10 @@ impl LenRange {
     }
 }
 
-/// How a custom RDAP server list relates to the IANA bootstrap.
+/// How a custom server list relates to the built-in one.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, ValueEnum)]
-enum RdapMode {
-    /// Custom entries win, everything else still comes from IANA.
+enum ListMode {
+    /// Custom entries win, everything else comes from the built-in list.
     Merge,
     /// Use the custom list alone.
     Only,
@@ -333,14 +344,36 @@ async fn run() -> Result<()> {
         .build()
         .context("building HTTP client")?;
 
-    let registry = Registry::load().context("loading whois.json")?;
+    let whois_path = args
+        .whois_file
+        .clone()
+        .or_else(|| discover_config("whois.json"));
+    let custom_whois = match &whois_path {
+        Some(path) => Some(Registry::from_file(path)?),
+        None => None,
+    };
+    let whois_only = custom_whois.is_some() && args.whois_mode == ListMode::Only;
 
-    let custom_path = args.rdap_file.clone().or_else(discover_rdap_file);
+    let mut registry = if whois_only {
+        Registry::default()
+    } else {
+        Registry::load().context("loading the bundled whois.json")?
+    };
+    if let (Some(custom), Some(path)) = (custom_whois, &whois_path) {
+        let count = custom.len();
+        registry.merge(custom);
+        list_note("whois:", count, path, whois_only, &args);
+    }
+
+    let custom_path = args
+        .rdap_file
+        .clone()
+        .or_else(|| discover_config("rdap.json"));
     let custom = match &custom_path {
         Some(path) => Some(Bootstrap::from_file(path)?),
         None => None,
     };
-    let custom_only = custom.is_some() && args.rdap_mode == RdapMode::Only;
+    let custom_only = custom.is_some() && args.rdap_mode == ListMode::Only;
 
     let mut bootstrap = if args.source == Source::Whois || custom_only {
         Bootstrap::default()
@@ -360,16 +393,7 @@ async fn run() -> Result<()> {
     if let (Some(custom), Some(path)) = (custom, &custom_path) {
         let count = custom.len();
         bootstrap.merge(custom);
-        if !args.quiet && !args.json {
-            println!(
-                "{} {} TLD{} from {} ({})",
-                paint("rdap:", Color::Dim),
-                count,
-                if count == 1 { "" } else { "s" },
-                path.display(),
-                if custom_only { "only" } else { "merged" }
-            );
-        }
+        list_note("rdap:", count, path, custom_only, &args);
     }
     if bootstrap.is_empty() && args.source == Source::Rdap {
         bail!("no RDAP bootstrap data and --source rdap was given: nothing to query with");
@@ -513,10 +537,10 @@ fn build_targets(args: &Args, registry: &Registry, bootstrap: &Bootstrap) -> Res
     Ok(targets)
 }
 
-/// Look for an `rdap.json` the user did not name explicitly: first in the
+/// Look for a config file the user did not name explicitly: first in the
 /// working directory, then in the config directory.
-fn discover_rdap_file() -> Option<PathBuf> {
-    let cwd = PathBuf::from("rdap.json");
+fn discover_config(name: &str) -> Option<PathBuf> {
+    let cwd = PathBuf::from(name);
     if cwd.is_file() {
         return Some(cwd);
     }
@@ -525,9 +549,25 @@ fn discover_rdap_file() -> Option<PathBuf> {
         .map(PathBuf::from)
         .or_else(|| std::env::var_os("HOME").map(|h| PathBuf::from(h).join(".config")))?
         .join("ds")
-        .join("rdap.json");
+        .join(name);
 
     config.is_file().then_some(config)
+}
+
+/// Say which custom list was loaded, so a stray file in the working directory
+/// cannot quietly change the results.
+fn list_note(kind: &str, count: usize, path: &Path, only: bool, args: &Args) {
+    if args.quiet || args.json {
+        return;
+    }
+    println!(
+        "{} {} TLD{} from {} ({})",
+        paint(kind, Color::Dim),
+        count,
+        if count == 1 { "" } else { "s" },
+        path.display(),
+        if only { "only" } else { "merged" }
+    );
 }
 
 /// Expand the positional arguments into the list of names to check.
@@ -692,6 +732,11 @@ async fn check(ctx: &Ctx, domain: String, tld: String) -> CheckResult {
         }
 
         let may_ask_iana = args.source == Source::Auto && !args.no_iana;
+        // Without a bundled server and without IANA to ask, say so rather than
+        // reporting an unknown with no reason attached.
+        if !settled && status == Status::Unknown && !may_ask_iana && bundled.is_none() {
+            notes.push(format!("no WHOIS server known for .{tld}"));
+        }
         if !settled && status == Status::Unknown && may_ask_iana {
             match ctx.tld_info(&tld).await.and_then(|i| i.whois_host.clone()) {
                 Some(host) => {
