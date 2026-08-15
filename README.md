@@ -141,6 +141,26 @@ registrars carry the TLD; their pages will say.
 Exit code: `0` if at least one domain is available, `1` if none are, `2` on a
 startup error.
 
+## Second-level vs third-level names
+
+`--level` filters the `--tld` list by where the name would actually sit:
+
+| Value | Keeps | Count under `--tld all` |
+| --- | --- | --- |
+| `any` (default) | everything | 1659 |
+| `second` | plain TLDs — `apple.com`, `apple.de` | 1274 |
+| `third` | multi-label suffixes — `apple.co.uk`, `apple.com.au` | 385 |
+
+```sh
+dc apple --tld all --level second        # skip co.uk, com.au, ac.bd, ...
+dc apple --tld all --level third         # only those
+```
+
+Handy for `--tld all`, which otherwise sweeps hundreds of restricted
+second-level zones (`gov.bd`, `ernet.in`, `edu.gt`) that you cannot register
+under anyway. A full domain typed out by hand (`dc apple.co.uk`) is always
+checked as given — `--level` only filters TLD lists.
+
 ## Choosing the source
 
 By default a lookup falls through three sources: RDAP, then the bundled
@@ -172,7 +192,12 @@ depend on nothing but the bundled table and the registries themselves.
 * Some registries answer nobody: `.li` and `.qa` refuse public WHOIS and have no
   RDAP, and a few bundled WHOIS hosts no longer exist. Those come back
   `UNKNOWN` with the reason attached.
-* Three registry quirks are handled explicitly, because each one otherwise
+* Needle matching is negation-aware. auDA's availability service answers
+  `Available` or `Not Available` and the bundled needle for `.au` is
+  "Available", so a plain substring test reports every taken `.au` domain as
+  free. Matches preceded by "not"/"no", or attached as in "unavailable", do not
+  count.
+* Three more registry quirks are handled explicitly, because each one otherwise
   reads as a registration: answers that echo the queried name back before
   saying "no object found" (`.sr`, `.fj`), answers for a TLD the server does
   not serve (`.tattoo`, `.photo`), and answers that describe the *parent* zone

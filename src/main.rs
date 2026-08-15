@@ -42,6 +42,7 @@ const USER_AGENT: &str = concat!("dc/", env!("CARGO_PKG_VERSION"), " (domain-che
                   dc apple --tld com,net --details\n  \
                   dc apple,orange,bangla,english --tld com,net\n  \
                   dc @names.txt --tld popular --available-only\n  \
+                  dc apple --tld all --level second\n  \
                   dc apple --tld com,io --where\n  \
                   dc apple google --tld popular --whois --dns-records\n  \
                   dc apple.com --details --registry"
@@ -117,6 +118,11 @@ struct Args {
     #[arg(long)]
     append: bool,
 
+    /// Which level the name is registered at: second (`apple.com`), third
+    /// (`apple.co.uk`), or any. Filters the --tld list.
+    #[arg(long, value_enum, default_value_t = Level::Any)]
+    level: Level,
+
     /// Where to look: auto (RDAP, then the bundled WHOIS table, then an IANA
     /// referral), rdap (RDAP only), or whois (bundled dist.whois.json only).
     #[arg(long, value_enum, default_value_t = Source::Auto)]
@@ -138,6 +144,36 @@ struct Args {
     /// Disable coloured output.
     #[arg(long = "no-color")]
     no_color: bool,
+}
+
+/// Which level of the tree a name is registered at.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, ValueEnum)]
+enum Level {
+    /// Both.
+    Any,
+    /// Straight under the TLD: `apple.com`, `apple.de`.
+    Second,
+    /// Under a multi-label suffix: `apple.co.uk`, `apple.com.au`.
+    Third,
+}
+
+impl Level {
+    fn as_str(self) -> &'static str {
+        match self {
+            Level::Any => "any",
+            Level::Second => "second-level",
+            Level::Third => "third-level",
+        }
+    }
+
+    /// `com` is a second-level registration, `co.uk` a third-level one.
+    fn allows(self, tld: &str) -> bool {
+        match self {
+            Level::Any => true,
+            Level::Second => !tld.contains('.'),
+            Level::Third => tld.contains('.'),
+        }
+    }
 }
 
 /// Which lookup source a run is allowed to use.
@@ -323,7 +359,23 @@ struct Target {
 
 fn build_targets(args: &Args, registry: &Registry, bootstrap: &Bootstrap) -> Result<Vec<Target>> {
     let tld_list: Option<Vec<String>> = match &args.tld {
-        Some(spec) => Some(resolve_tlds(spec, registry, bootstrap)?),
+        Some(spec) => {
+            let all = resolve_tlds(spec, registry, bootstrap)?;
+            let kept: Vec<String> = all
+                .iter()
+                .filter(|t| args.level.allows(t))
+                .cloned()
+                .collect();
+            if kept.is_empty() {
+                bail!(
+                    "--level {} left nothing to check: all {} TLDs were dropped",
+                    args.level.as_str(),
+                    all.len()
+                );
+            }
+            Some(kept)
+        }
+        // A full domain typed out by hand is checked as given.
         None => None,
     };
 

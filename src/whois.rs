@@ -270,13 +270,43 @@ const ERROR_MARKERS: &[&str] = &[
     "blocked",
 ];
 
+/// Does `haystack` contain `needle` somewhere it is not being negated?
+///
+/// auDA's availability service answers `Available` or `Not Available`, and the
+/// needle for `.au` is "Available" — a plain substring test calls every taken
+/// `.au` domain free. The same trap exists for "unavailable" and for
+/// "not available for registration".
+fn contains_unnegated(haystack: &str, needle: &str) -> bool {
+    let mut from = 0;
+    while let Some(offset) = haystack[from..].find(needle) {
+        let at = from + offset;
+        let before = &haystack[..at];
+        let last_word = before
+            .trim_end()
+            .rsplit(|c: char| !c.is_alphanumeric() && c != '\'')
+            .next()
+            .unwrap_or("");
+
+        let negated = matches!(last_word, "not" | "no" | "isn't" | "cannot" | "never")
+            // Attached negation: "unavailable" contains "available".
+            || before.ends_with("un")
+            || before.ends_with("non");
+
+        if !negated {
+            return true;
+        }
+        from = at + needle.len().max(1);
+    }
+    false
+}
+
 fn classify(raw: &str, needle: &str, domain: &str) -> (Status, Option<String>) {
     // Registries pad keys with tabs and runs of spaces; normalise so that
     // `Status:\tNOT ALLOWED` matches the same marker as `Status: not allowed`.
     let lower = normalize(raw);
     let needle_lower = normalize(needle);
 
-    if !needle_lower.is_empty() && lower.contains(&needle_lower) {
+    if !needle_lower.is_empty() && contains_unnegated(&lower, &needle_lower) {
         return (Status::Available, None);
     }
 
@@ -291,7 +321,10 @@ fn classify(raw: &str, needle: &str, domain: &str) -> (Status, Option<String>) {
         }
     }
 
-    if STRONG_FREE_MARKERS.iter().any(|m| lower.contains(m)) {
+    if STRONG_FREE_MARKERS
+        .iter()
+        .any(|m| contains_unnegated(&lower, m))
+    {
         return (Status::Available, None);
     }
 
@@ -307,11 +340,20 @@ fn classify(raw: &str, needle: &str, domain: &str) -> (Status, Option<String>) {
         }
     }
 
+    // Availability services answer in a few words ("Available" / "Not
+    // Available"), so a negated marker in a terse reply is a definite yes.
+    // The length guard keeps this away from full WHOIS records, where
+    // "not available" usually refers to withheld contact data.
+    let terse = lower.trim().len() < 40;
+    if terse && (lower.contains("not available") || lower.contains("unavailable")) {
+        return (Status::Taken, None);
+    }
+
     if TAKEN_MARKERS.iter().any(|m| lower.contains(m)) {
         return (Status::Taken, None);
     }
 
-    if FREE_MARKERS.iter().any(|m| lower.contains(m)) {
+    if FREE_MARKERS.iter().any(|m| contains_unnegated(&lower, m)) {
         return (Status::Available, None);
     }
 
@@ -618,6 +660,37 @@ mod tests {
         let info = parse_tld_info("domain: X\nwhois: whois.nic.x\nremarks: Some other note\n");
         assert_eq!(info.whois_host.as_deref(), Some("whois.nic.x"));
         assert!(info.registration_url.is_none());
+    }
+
+    #[test]
+    fn negated_needle_does_not_mean_available() {
+        // auDA answers "Available" / "Not Available"; the needle is "Available".
+        assert_eq!(
+            classify("Available", "Available", "x.com.au").0,
+            Status::Available
+        );
+        assert_eq!(
+            classify("Not Available", "Available", "x.com.au").0,
+            Status::Taken
+        );
+        assert_eq!(
+            classify("Domain is unavailable", "available", "x.test").0,
+            Status::Taken
+        );
+        // ...but a long record whose boilerplate mentions withheld data is not
+        // turned into a registration by that phrase alone.
+        let long = "Domain Name: x.test\nRegistrar: Someone\n\
+                    Registrant contact information is not available for privacy reasons.\n";
+        assert_eq!(classify(long, "no match", "x.test").0, Status::Taken);
+    }
+
+    #[test]
+    fn negation_detection_is_word_aware() {
+        assert!(contains_unnegated("status: available", "available"));
+        assert!(!contains_unnegated("not available", "available"));
+        assert!(!contains_unnegated("unavailable", "available"));
+        // A word merely ending in "no" is not a negation.
+        assert!(contains_unnegated("domino available", "available"));
     }
 
     #[test]
