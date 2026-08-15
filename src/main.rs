@@ -25,8 +25,9 @@ use hickory_resolver::TokioAsyncResolver;
 
 use bootstrap::Bootstrap;
 use limit::HostLimiter;
-use model::{CheckResult, Details, Method, Status};
+use model::{CheckResult, Details, Method, Register, Status};
 use tlds::Registry;
+use whois::TldInfo;
 
 const USER_AGENT: &str = concat!("dc/", env!("CARGO_PKG_VERSION"), " (domain-checker)");
 
@@ -41,6 +42,7 @@ const USER_AGENT: &str = concat!("dc/", env!("CARGO_PKG_VERSION"), " (domain-che
                   dc apple --tld com,net --details\n  \
                   dc apple,orange,bangla,english --tld com,net\n  \
                   dc @names.txt --tld popular --available-only\n  \
+                  dc apple --tld com,io --where\n  \
                   dc apple google --tld popular --whois --dns-records\n  \
                   dc apple.com --details --registry"
 )]
@@ -71,7 +73,11 @@ struct Args {
     #[arg(long = "dns-records")]
     dns_records: bool,
 
-    /// Shorthand for --details --registry --whois --dns-records.
+    /// For available domains, show the registry and where to register them.
+    #[arg(long = "where")]
+    show_where: bool,
+
+    /// Shorthand for --details --registry --whois --dns-records --where.
     #[arg(long = "all-info")]
     all_info: bool,
 
@@ -142,22 +148,24 @@ struct Ctx {
     registry: Registry,
     resolver: Option<TokioAsyncResolver>,
     timeout: Duration,
-    /// TLD -> current WHOIS host, as reported by IANA. One lookup per TLD.
-    referrals: tokio::sync::Mutex<std::collections::HashMap<String, Option<String>>>,
+    /// TLD -> what IANA says about it. One lookup per TLD, failures cached
+    /// too: IANA's WHOIS rate-limits hard, and asking it again for every
+    /// domain under the same TLD only makes that worse.
+    tld_info: tokio::sync::Mutex<std::collections::HashMap<String, Option<Arc<TldInfo>>>>,
 }
 
 impl Ctx {
-    async fn referral(&self, tld: &str) -> Result<Option<String>> {
+    async fn tld_info(&self, tld: &str) -> Option<Arc<TldInfo>> {
         let apex = tld.rsplit('.').next().unwrap_or(tld).to_string();
-        if let Some(cached) = self.referrals.lock().await.get(&apex) {
-            return Ok(cached.clone());
+        if let Some(cached) = self.tld_info.lock().await.get(&apex) {
+            return cached.clone();
         }
-        // Cache failures too: IANA's WHOIS rate-limits hard, and asking it
-        // again for every domain under the same TLD only makes that worse.
-        let result = whois::iana_referral(&self.limiter, &apex, self.timeout).await;
-        let found = result.as_ref().ok().cloned().flatten();
-        self.referrals.lock().await.insert(apex, found);
-        result
+        let info = whois::iana_tld_info(&self.limiter, &apex, self.timeout)
+            .await
+            .ok()
+            .map(Arc::new);
+        self.tld_info.lock().await.insert(apex, info.clone());
+        info
     }
 }
 
@@ -176,6 +184,7 @@ async fn run() -> Result<()> {
         args.registry = true;
         args.whois = true;
         args.dns_records = true;
+        args.show_where = true;
     }
     if args.concurrency == 0 {
         args.concurrency = 1;
@@ -242,7 +251,7 @@ async fn run() -> Result<()> {
         registry,
         resolver,
         timeout,
-        referrals: tokio::sync::Mutex::new(std::collections::HashMap::new()),
+        tld_info: tokio::sync::Mutex::new(std::collections::HashMap::new()),
     });
 
     let started = Instant::now();
@@ -489,8 +498,8 @@ async fn check(ctx: &Ctx, domain: String, tld: String) -> CheckResult {
         }
 
         if !settled && status == Status::Unknown {
-            match ctx.referral(&tld).await {
-                Ok(Some(host)) => {
+            match ctx.tld_info(&tld).await.and_then(|i| i.whois_host.clone()) {
+                Some(host) => {
                     let already = bundled.as_ref().map(|s| s.endpoint.label());
                     if already.as_deref() != Some(host.as_str()) {
                         let server = whois::referred_server(host);
@@ -524,11 +533,10 @@ async fn check(ctx: &Ctx, domain: String, tld: String) -> CheckResult {
                         }
                     }
                 }
-                Ok(None) if bundled.is_none() => {
+                None if bundled.is_none() => {
                     notes.push(format!("no WHOIS server known for .{tld}"));
                 }
-                Ok(None) => {}
-                Err(e) => notes.push(format!("iana: {e:#}")),
+                None => {}
             }
         }
     }
@@ -537,6 +545,18 @@ async fn check(ctx: &Ctx, domain: String, tld: String) -> CheckResult {
     let dns = match &ctx.resolver {
         Some(r) => Some(dns::lookup(r, &domain).await),
         None => None,
+    };
+
+    // 4. Where to register — only meaningful for a name that is still free.
+    let register = if args.show_where && status == Status::Available {
+        let info = ctx.tld_info(&tld).await;
+        Some(Register {
+            registry: info.as_ref().and_then(|i| i.organisation.clone()),
+            info_url: info.as_ref().and_then(|i| i.registration_url.clone()),
+            search: registrar_searches(&domain),
+        })
+    } else {
+        None
     };
 
     CheckResult {
@@ -551,8 +571,23 @@ async fn check(ctx: &Ctx, domain: String, tld: String) -> CheckResult {
         whois_raw,
         rdap_raw,
         dns,
+        register,
         elapsed_ms: started.elapsed().as_millis() as u64,
     }
+}
+
+/// Registrar searches with the domain filled in. Deliberately not a claim that
+/// a given registrar sells the TLD — that is for the registrar's page to say.
+fn registrar_searches(domain: &str) -> Vec<String> {
+    [
+        "https://porkbun.com/checkout/search?q=",
+        "https://www.namecheap.com/domains/registration/results/?domain=",
+        "https://www.dynadot.com/domain/search?domain=",
+        "https://www.namesilo.com/domain/search-domains?query=",
+    ]
+    .iter()
+    .map(|prefix| format!("{prefix}{domain}"))
+    .collect()
 }
 
 fn print_result(args: &Args, r: &CheckResult) {
@@ -642,6 +677,22 @@ fn print_result(args: &Args, r: &CheckResult) {
                         }
                     }
                 }
+            }
+        }
+    }
+
+    if let Some(reg) = &r.register {
+        if let Some(registry) = &reg.registry {
+            println!("    {:<12} {registry}", paint("registry", Color::Dim));
+        }
+        if let Some(url) = &reg.info_url {
+            println!("    {:<12} {url}", paint("registry url", Color::Dim));
+        }
+        for (i, url) in reg.search.iter().enumerate() {
+            if i == 0 {
+                println!("    {:<12} {url}", paint("register at", Color::Dim));
+            } else {
+                println!("    {:<12} {url}", "");
             }
         }
     }
@@ -798,6 +849,14 @@ mod tests {
     fn normalises_and_deduplicates() {
         let names = expand_names(&args(&["Apple.", ".apple", "APPLE", "orange"])).unwrap();
         assert_eq!(names, ["apple", "orange"]);
+    }
+
+    #[test]
+    fn builds_registrar_searches_for_the_full_domain() {
+        let links = registrar_searches("apple.io");
+        assert_eq!(links.len(), 4);
+        assert!(links.iter().all(|l| l.ends_with("apple.io")));
+        assert!(links[0].starts_with("https://porkbun.com/"));
     }
 
     #[test]

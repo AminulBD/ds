@@ -1,1 +1,6 @@
 /target
+
+# output written by dc when run in this directory
+/available.txt
+/unavailable.txt
+/unknown.txt

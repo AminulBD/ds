@@ -76,6 +76,21 @@ impl Details {
     }
 }
 
+/// Where an available domain can actually be registered.
+#[derive(Debug, Clone, Serialize)]
+pub struct Register {
+    /// Registry operator, per IANA.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub registry: Option<String>,
+    /// The registry's own "registration information" page, per IANA. For
+    /// ccTLDs this is usually the list of accredited registrars.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub info_url: Option<String>,
+    /// Registrar searches with the domain filled in. Whether a given registrar
+    /// sells this TLD is for the registrar to say.
+    pub search: Vec<String>,
+}
+
 #[derive(Debug, Clone, Serialize)]
 pub struct DnsRecords {
     pub records: Vec<(String, Vec<String>)>,
@@ -101,5 +116,7 @@ pub struct CheckResult {
     pub rdap_raw: Option<serde_json::Value>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub dns: Option<DnsRecords>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub register: Option<Register>,
     pub elapsed_ms: u64,
 }

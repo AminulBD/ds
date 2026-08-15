@@ -74,8 +74,9 @@ wrote: ./unknown.txt (1 entry)
 | `--registry` | which RDAP endpoint and/or WHOIS server answered |
 | `--whois` | queries WHOIS as well and prints the raw record |
 | `--dns-records` | A, AAAA, NS, MX, TXT, CNAME and SOA records |
+| `--where` | for available domains: the registry, its official registration page, and registrar searches with the name filled in |
 | `--raw` | raw RDAP JSON |
-| `--all-info` | `--details --registry --whois --dns-records` |
+| `--all-info` | `--details --registry --whois --dns-records --where` |
 
 ```sh
 dc apple --tld com --details --registry --dns-records
@@ -95,6 +96,31 @@ dc apple --tld com --details --registry --dns-records
     a            17.253.144.10
     mx           10 mx-in.g.apple.com., 20 mx-in-hfd.apple.com., ...
 ```
+
+### Where to register
+
+```sh
+dc mynewbrand --tld com,de --where
+```
+
+```
++ mynewbrand.de                    AVAILABLE  whois     858ms
+    registry     DENIC eG
+    registry url http://www.denic.de/
+    register at  https://porkbun.com/checkout/search?q=mynewbrand.de
+                 https://www.namecheap.com/domains/registration/results/?domain=mynewbrand.de
+                 https://www.dynadot.com/domain/search?domain=mynewbrand.de
+                 https://www.namesilo.com/domain/search-domains?query=mynewbrand.de
+```
+
+The registry name and URL come from IANA's record for the TLD, looked up once
+per TLD and shown only for domains that are actually available. For ccTLDs that
+page is usually the registry's list of accredited registrars, which matters
+because most ccTLDs are not sold by every registrar — `.de` and `.fr` have
+residency or trustee requirements, for instance.
+
+The four registrar links are prefilled searches, not a claim that those
+registrars carry the TLD; their pages will say.
 
 ## Other options
 

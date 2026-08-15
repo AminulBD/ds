@@ -103,31 +103,65 @@ async fn socket_query(host: &str, port: u16, domain: &str, timeout: Duration) ->
     Ok(String::from_utf8_lossy(&buf).replace("\r\n", "\n"))
 }
 
-/// Ask IANA which WHOIS server currently serves a TLD.
+/// What IANA knows about a TLD: who runs it, where to register under it, and
+/// which WHOIS server currently serves it.
 ///
 /// `dist.whois.json` is a snapshot and some of its hosts no longer resolve
-/// (`whois.nic.co`, `whois.nic.tr`, ...); IANA's own WHOIS knows the current
-/// one. Only the last label is meaningful to IANA, so `co.za` is asked as `za`.
-pub async fn iana_referral(
-    limiter: &HostLimiter,
-    tld: &str,
-    timeout: Duration,
-) -> Result<Option<String>> {
+/// (`whois.nic.co`, `whois.nic.tr`, ...); IANA's record knows the current one.
+#[derive(Debug, Clone, Default)]
+pub struct TldInfo {
+    pub whois_host: Option<String>,
+    pub organisation: Option<String>,
+    pub registration_url: Option<String>,
+}
+
+/// Only the last label is meaningful to IANA, so `co.za` is asked as `za`.
+pub async fn iana_tld_info(limiter: &HostLimiter, tld: &str, timeout: Duration) -> Result<TldInfo> {
     let apex = tld.rsplit('.').next().unwrap_or(tld);
     let permit = limiter.acquire("whois.iana.org").await;
     let raw = socket_query("whois.iana.org", 43, apex, timeout).await;
     drop(permit);
+    Ok(parse_tld_info(&raw?))
+}
 
-    let raw = raw?;
+fn parse_tld_info(raw: &str) -> TldInfo {
+    let mut info = TldInfo::default();
+
     for line in raw.lines() {
-        if let Some(value) = line.trim().strip_prefix("whois:") {
-            let host = value.trim();
-            if !host.is_empty() {
-                return Ok(Some(host.to_ascii_lowercase()));
+        let (key, value) = match line.trim().split_once(':') {
+            Some((k, v)) => (k.trim().to_ascii_lowercase(), v.trim()),
+            None => continue,
+        };
+        if value.is_empty() {
+            continue;
+        }
+
+        match key.as_str() {
+            "whois" if info.whois_host.is_none() => {
+                info.whois_host = Some(value.to_ascii_lowercase())
             }
+            // The first `organisation` is the registry; later ones are its
+            // administrative and technical contacts.
+            "organisation" | "organization" if info.organisation.is_none() => {
+                info.organisation = Some(value.to_string())
+            }
+            // `remarks: Registration information: https://www.denic.de/`
+            "remarks"
+                if info.registration_url.is_none()
+                    && value
+                        .to_ascii_lowercase()
+                        .contains("registration information") =>
+            {
+                info.registration_url = value
+                    .split_whitespace()
+                    .find(|t| t.starts_with("http"))
+                    .map(|u| u.trim_end_matches(['.', ',']).to_string());
+            }
+            _ => {}
         }
     }
-    Ok(None)
+
+    info
 }
 
 /// A WHOIS server discovered through IANA, judged by generic markers only.
@@ -556,6 +590,34 @@ mod tests {
                    % It is not permitted to use this data for advertising.\n\
                    Domain: apple.de\nStatus: connect\n";
         assert_eq!(classify(raw, "Status: free", "apple.de").0, Status::Taken);
+    }
+
+    #[test]
+    fn parses_the_iana_tld_record() {
+        let raw = "domain:       DE\n\
+                   organisation: DENIC eG\n\
+                   address:      Frankfurt am Main\n\
+                   contact:      administrative\n\
+                   organisation: DENIC eG contact desk\n\
+                   whois:        whois.denic.de\n\
+                   status:       ACTIVE\n\
+                   remarks:      Registration information: http://www.denic.de/\n\
+                   source:       IANA\n";
+        let info = parse_tld_info(raw);
+        assert_eq!(info.whois_host.as_deref(), Some("whois.denic.de"));
+        // The first organisation is the registry, not its contact desk.
+        assert_eq!(info.organisation.as_deref(), Some("DENIC eG"));
+        assert_eq!(
+            info.registration_url.as_deref(),
+            Some("http://www.denic.de/")
+        );
+    }
+
+    #[test]
+    fn tld_record_without_registration_remarks() {
+        let info = parse_tld_info("domain: X\nwhois: whois.nic.x\nremarks: Some other note\n");
+        assert_eq!(info.whois_host.as_deref(), Some("whois.nic.x"));
+        assert!(info.registration_url.is_none());
     }
 
     #[test]
