@@ -19,7 +19,7 @@ use std::sync::Arc;
 use std::time::{Duration, Instant};
 
 use anyhow::{bail, Context, Result};
-use clap::Parser;
+use clap::{Parser, ValueEnum};
 use futures::stream::StreamExt;
 use hickory_resolver::TokioAsyncResolver;
 
@@ -117,13 +117,15 @@ struct Args {
     #[arg(long)]
     append: bool,
 
-    /// Skip RDAP and use WHOIS only.
-    #[arg(long = "whois-only")]
-    whois_only: bool,
+    /// Where to look: auto (RDAP, then the bundled WHOIS table, then an IANA
+    /// referral), rdap (RDAP only), or whois (bundled dist.whois.json only).
+    #[arg(long, value_enum, default_value_t = Source::Auto)]
+    source: Source,
 
-    /// Skip the WHOIS fallback (RDAP only).
-    #[arg(long = "no-whois")]
-    no_whois: bool,
+    /// Never query whois.iana.org: no referral when a bundled WHOIS host is
+    /// stale, and no registry names for --where.
+    #[arg(long = "no-iana")]
+    no_iana: bool,
 
     /// Re-download the IANA RDAP bootstrap file.
     #[arg(long = "refresh")]
@@ -136,6 +138,17 @@ struct Args {
     /// Disable coloured output.
     #[arg(long = "no-color")]
     no_color: bool,
+}
+
+/// Which lookup source a run is allowed to use.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, ValueEnum)]
+enum Source {
+    /// RDAP, then the bundled WHOIS table, then an IANA referral.
+    Auto,
+    /// RDAP only.
+    Rdap,
+    /// The bundled dist.whois.json table only.
+    Whois,
 }
 
 static COLOR: AtomicBool = AtomicBool::new(false);
@@ -204,7 +217,7 @@ async fn run() -> Result<()> {
 
     let registry = Registry::load().context("loading dist.whois.json")?;
 
-    let bootstrap = if args.whois_only {
+    let bootstrap = if args.source == Source::Whois {
         Bootstrap::default()
     } else {
         match Bootstrap::load(&client, args.refresh).await {
@@ -218,8 +231,14 @@ async fn run() -> Result<()> {
             }
         }
     };
-    if bootstrap.is_empty() && args.no_whois {
-        bail!("no RDAP bootstrap data and --no-whois was given: nothing to query with");
+    if bootstrap.is_empty() && args.source == Source::Rdap {
+        bail!("no RDAP bootstrap data and --source rdap was given: nothing to query with");
+    }
+    if args.whois && args.source == Source::Rdap {
+        eprintln!(
+            "{} --whois is ignored with --source rdap",
+            paint("warning:", Color::Yellow)
+        );
     }
 
     let resolver = args.dns_records.then(|| dns::resolver(timeout));
@@ -431,7 +450,7 @@ async fn check(ctx: &Ctx, domain: String, tld: String) -> CheckResult {
     let mut whois_raw = None;
 
     // 1. RDAP
-    if !args.whois_only {
+    if args.source != Source::Whois {
         match ctx.bootstrap.servers_for(&tld) {
             Some(servers) => {
                 match rdap::query(
@@ -464,7 +483,7 @@ async fn check(ctx: &Ctx, domain: String, tld: String) -> CheckResult {
     // 2. WHOIS — as a fallback, or because the user asked for the raw record.
     //    The bundled server is tried first; if it is gone or says nothing
     //    useful, IANA is asked who serves the TLD today.
-    let need_whois = !args.no_whois && (status == Status::Unknown || args.whois);
+    let need_whois = args.source != Source::Rdap && (status == Status::Unknown || args.whois);
     if need_whois {
         let bundled = ctx.registry.lookup(&tld).cloned();
         let mut settled = false;
@@ -497,7 +516,8 @@ async fn check(ctx: &Ctx, domain: String, tld: String) -> CheckResult {
             }
         }
 
-        if !settled && status == Status::Unknown {
+        let may_ask_iana = args.source == Source::Auto && !args.no_iana;
+        if !settled && status == Status::Unknown && may_ask_iana {
             match ctx.tld_info(&tld).await.and_then(|i| i.whois_host.clone()) {
                 Some(host) => {
                     let already = bundled.as_ref().map(|s| s.endpoint.label());
@@ -549,7 +569,11 @@ async fn check(ctx: &Ctx, domain: String, tld: String) -> CheckResult {
 
     // 4. Where to register — only meaningful for a name that is still free.
     let register = if args.show_where && status == Status::Available {
-        let info = ctx.tld_info(&tld).await;
+        let info = if args.no_iana {
+            None
+        } else {
+            ctx.tld_info(&tld).await
+        };
         Some(Register {
             registry: info.as_ref().and_then(|i| i.organisation.clone()),
             info_url: info.as_ref().and_then(|i| i.registration_url.clone()),
@@ -849,6 +873,27 @@ mod tests {
     fn normalises_and_deduplicates() {
         let names = expand_names(&args(&["Apple.", ".apple", "APPLE", "orange"])).unwrap();
         assert_eq!(names, ["apple", "orange"]);
+    }
+
+    #[test]
+    fn parses_the_source_option() {
+        assert_eq!(
+            Args::try_parse_from(["dc", "apple"]).unwrap().source,
+            Source::Auto
+        );
+        assert_eq!(
+            Args::try_parse_from(["dc", "apple", "--source", "whois"])
+                .unwrap()
+                .source,
+            Source::Whois
+        );
+        assert_eq!(
+            Args::try_parse_from(["dc", "apple", "--source", "rdap"])
+                .unwrap()
+                .source,
+            Source::Rdap
+        );
+        assert!(Args::try_parse_from(["dc", "apple", "--source", "nope"]).is_err());
     }
 
     #[test]

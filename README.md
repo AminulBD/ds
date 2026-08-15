@@ -135,12 +135,33 @@ registrars carry the TLD; their pages will say.
 | `--available-only` | | print only available domains (files still complete) |
 | `--json` | | print a JSON array instead of the text report |
 | `-q, --quiet` | | summary only |
-| `--whois-only` / `--no-whois` | | restrict to one protocol |
 | `--refresh` | | re-download the IANA RDAP bootstrap (cached 7 days in `~/.cache/dc/`) |
 | `--no-color` | | plain output (also honours `NO_COLOR`) |
 
 Exit code: `0` if at least one domain is available, `1` if none are, `2` on a
 startup error.
+
+## Choosing the source
+
+By default a lookup falls through three sources: RDAP, then the bundled
+`dist.whois.json` table, then a WHOIS server that IANA says currently serves
+the TLD. `--source` restricts that:
+
+| Value | Uses |
+| --- | --- |
+| `auto` (default) | RDAP -> `dist.whois.json` -> IANA referral |
+| `rdap` | RDAP only. TLDs with no RDAP service return `UNKNOWN` immediately, with no network traffic |
+| `whois` | `dist.whois.json` only. No RDAP, no IANA referral — exactly what the bundled file says |
+
+```sh
+dc apple --tld com,co,de --source rdap     # .co and .de have no RDAP -> UNKNOWN
+dc apple --tld com,co,de --source whois    # all three over port 43
+```
+
+`--no-iana` is the narrower switch: keep the default RDAP-then-WHOIS order but
+never talk to `whois.iana.org`, so a stale bundled WHOIS host is not repaired
+and `--where` shows only the registrar links. Useful when you want the run to
+depend on nothing but the bundled table and the registries themselves.
 
 ## Accuracy notes
 
