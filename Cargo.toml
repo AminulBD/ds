@@ -2,7 +2,11 @@
 name = "ds"
 version = "0.1.0"
 edition = "2021"
+authors = ["Aminul Islam <me@aminul.net>"]
 description = "Domain search: check domain availability over RDAP with a WHOIS fallback"
+readme = "README.md"
+keywords = ["domain", "rdap", "whois", "dns", "cli"]
+categories = ["command-line-utilities"]
 license = "MIT"
 
 [[bin]]
@@ -28,3 +32,33 @@ libc = "0.2"
 opt-level = 3
 lto = true
 strip = true
+
+# .deb and .rpm are built from the musl targets, so the binary is static and
+# the packages carry no runtime dependencies at all.
+[package.metadata.deb]
+maintainer = "Aminul Islam <me@aminul.net>"
+copyright = "2026 Aminul Islam"
+license-file = ["LICENSE", "0"]
+extended-description = """
+ds checks whether domain names are registered, across many TLDs at once.
+It asks RDAP first, using the IANA bootstrap, and falls back to WHOIS on
+port 43 for TLDs with no RDAP service. Lookups that cannot be answered are
+reported as unknown rather than guessed."""
+section = "utils"
+priority = "optional"
+depends = ""
+assets = [
+    ["target/release/ds", "usr/bin/", "755"],
+    ["ds.1", "usr/share/man/man1/ds.1", "644"],
+    ["README.md", "usr/share/doc/ds/README.md", "644"],
+]
+
+[package.metadata.generate-rpm]
+summary = "Domain search: check domain availability over RDAP with a WHOIS fallback"
+auto-req = "disabled"
+assets = [
+    { source = "target/release/ds", dest = "/usr/bin/ds", mode = "755" },
+    { source = "ds.1", dest = "/usr/share/man/man1/ds.1", mode = "644", doc = true },
+    { source = "LICENSE", dest = "/usr/share/doc/ds/LICENSE", mode = "644", doc = true },
+    { source = "README.md", dest = "/usr/share/doc/ds/README.md", mode = "644", doc = true },
+]

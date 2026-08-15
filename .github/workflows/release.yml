@@ -24,18 +24,23 @@ jobs:
           - target: x86_64-unknown-linux-gnu
             os: ubuntu-latest
             test: true
+          # .deb and .rpm are built from the musl targets: the binary is
+          # static, so the packages depend on nothing and install anywhere.
           - target: x86_64-unknown-linux-musl
             os: ubuntu-latest
             cross: true
-          - target: i686-unknown-linux-gnu
-            os: ubuntu-latest
-            cross: true
+            linux_pkg: true
           - target: aarch64-unknown-linux-gnu
             os: ubuntu-latest
             cross: true
           - target: aarch64-unknown-linux-musl
             os: ubuntu-latest
             cross: true
+            linux_pkg: true
+          - target: i686-unknown-linux-musl
+            os: ubuntu-latest
+            cross: true
+            linux_pkg: true
           # macos-latest is arm64, so the Intel build is a cross-compile
           # against the same SDK and needs no extra tooling.
           - target: aarch64-apple-darwin
@@ -61,7 +66,7 @@ jobs:
           rustup target add ${{ matrix.target }}
 
       # Docker-based cross-compilation: brings its own linker and C toolchain,
-      # which the vendored crypto in rustls needs for musl/arm/i686.
+      # which the vendored crypto in rustls needs for musl, arm and i686.
       - name: Install cross
         if: matrix.cross
         run: cargo install cross --locked
@@ -73,7 +78,7 @@ jobs:
       - name: Build
         run: ${{ matrix.cross && 'cross' || 'cargo' }} build --release --locked --target ${{ matrix.target }}
 
-      - name: Package (unix)
+      - name: Archive (unix)
         if: runner.os != 'Windows'
         shell: bash
         run: |
@@ -82,7 +87,7 @@ jobs:
           cp "target/${{ matrix.target }}/release/ds" README.md LICENSE ds.1 "staging/$name/"
           tar -czf "$name.tar.gz" -C staging "$name"
 
-      - name: Package (windows)
+      - name: Archive (windows)
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
@@ -93,12 +98,63 @@ jobs:
           Copy-Item "README.md","LICENSE" "staging/$name/"
           Compress-Archive -Path "staging/$name" -DestinationPath "$name.zip"
 
+      - name: Package .deb and .rpm
+        if: matrix.linux_pkg
+        shell: bash
+        run: |
+          cargo install cargo-deb cargo-generate-rpm --locked
+          cargo deb --no-build --target ${{ matrix.target }} --output .
+          cargo generate-rpm --target ${{ matrix.target }} --output .
+
+      - name: Package .dmg
+        if: runner.os == 'macOS'
+        shell: bash
+        run: |
+          name="ds-${GITHUB_REF_NAME:-dev}-${{ matrix.target }}"
+          mkdir -p dmg
+          cp "target/${{ matrix.target }}/release/ds" ds.1 README.md LICENSE dmg/
+          cp packaging/macos-install.sh dmg/install.sh
+          chmod +x dmg/install.sh
+          hdiutil create -volname "ds ${GITHUB_REF_NAME:-dev}" \
+            -srcfolder dmg -ov -format UDZO "$name.dmg"
+
+      # The runner images ship WiX 3, but do not always put it on PATH.
+      - name: Ensure WiX
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          if (Get-Command candle.exe -ErrorAction SilentlyContinue) { exit 0 }
+          $wix = Get-ChildItem "C:\Program Files (x86)" -Filter "WiX Toolset*" -Directory -ErrorAction SilentlyContinue |
+                 Sort-Object Name -Descending | Select-Object -First 1
+          if (-not $wix) {
+            choco install wixtoolset --no-progress -y
+            $wix = Get-ChildItem "C:\Program Files (x86)" -Filter "WiX Toolset*" -Directory |
+                   Sort-Object Name -Descending | Select-Object -First 1
+          }
+          "$($wix.FullName)\bin" | Out-File -Append -Encoding utf8 $env:GITHUB_PATH
+
+      # wix/main.wxs is committed rather than generated: `cargo wix init`
+      # mints a fresh UpgradeCode each time, which would break upgrades
+      # between releases.
+      - name: Package .msi
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          cargo install cargo-wix --locked
+          $tag = if ($env:GITHUB_REF_NAME) { $env:GITHUB_REF_NAME } else { "dev" }
+          cargo wix --no-build --nocapture --target ${{ matrix.target }} `
+            --output "ds-$tag-${{ matrix.target }}.msi"
+
       - uses: actions/upload-artifact@v4
         with:
           name: ds-${{ matrix.target }}
           path: |
             *.tar.gz
             *.zip
+            *.deb
+            *.rpm
+            *.dmg
+            *.msi
           if-no-files-found: error
 
   release:

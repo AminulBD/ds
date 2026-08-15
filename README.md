@@ -24,8 +24,22 @@ attached — never guessed as available.
 
 ## Install
 
-Download a binary from the [releases page](../../releases) — Linux, macOS and
-Windows, on x86_64, arm64 and 32-bit x86 — or build it:
+Every release ships installers and plain archives for Linux, macOS and Windows
+on x86_64, arm64 and 32-bit x86. Grab one from the
+[releases page](../../releases):
+
+| Platform | File | Install |
+| --- | --- | --- |
+| Debian, Ubuntu | `ds_<version>_amd64.deb` (also `arm64`, `i386`) | `sudo dpkg -i ds_*.deb` |
+| Fedora, RHEL, openSUSE | `ds-<version>.x86_64.rpm` (also `aarch64`, `i686`) | `sudo rpm -i ds-*.rpm` |
+| macOS | `ds-<version>-aarch64-apple-darwin.dmg` (also `x86_64`) | mount it, run `install.sh` |
+| Windows | `ds-<version>-x86_64-pc-windows-msvc.msi` (also `aarch64`, `i686`) | double-click; adds `ds` to `PATH` |
+| Anything else | `.tar.gz` / `.zip` | unpack and copy `ds` onto your `PATH` |
+
+The `.deb` and `.rpm` carry the binary, the man page and the licence, and are
+built from static musl binaries — they depend on nothing.
+
+Or build it yourself:
 
 ```sh
 cargo build --release
@@ -262,17 +276,21 @@ man ./ds.1                 # preview the manual page
 
 ## Releases
 
-Pushing a `v*` tag builds ten targets and publishes them with checksums:
+Pushing a `v*` tag builds ten targets, packages them and publishes everything
+with a `SHA256SUMS` file:
 
 ```sh
 git tag v0.1.0 && git push origin v0.1.0
 ```
 
-| OS | Targets |
-| --- | --- |
-| Linux | `x86_64` and `aarch64` (gnu + musl), `i686` |
-| macOS | `aarch64`, `x86_64` |
-| Windows | `x86_64`, `aarch64`, `i686` |
+| OS | Targets | Artifacts |
+| --- | --- | --- |
+| Linux | `x86_64`, `aarch64` (gnu + musl), `i686` (musl) | `.tar.gz`, and `.deb` + `.rpm` from the musl builds |
+| macOS | `aarch64`, `x86_64` | `.tar.gz`, `.dmg` |
+| Windows | `x86_64`, `aarch64`, `i686` | `.zip`, `.msi` |
+
+`workflow_dispatch` runs the same matrix without publishing, which is the way
+to check the build before tagging.
 
 ## Licence
 
