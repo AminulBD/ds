@@ -121,5 +121,5 @@ fn cache_path() -> PathBuf {
         .map(PathBuf::from)
         .or_else(|| std::env::var_os("HOME").map(|h| PathBuf::from(h).join(".cache")))
         .unwrap_or_else(std::env::temp_dir);
-    base.join("dc").join("rdap-dns.json")
+    base.join("ds").join("rdap-dns.json")
 }

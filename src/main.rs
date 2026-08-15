@@ -1,7 +1,7 @@
-//! `dc` — a simple domain availability checker.
+//! `ds` — domain search: a simple domain availability checker.
 //!
 //! RDAP first (IANA bootstrap), WHOIS fallback for TLDs with no RDAP service,
-//! using the server/needle table in the bundled `dist.whois.json`.
+//! using the server/needle table in the bundled `whois.json`.
 
 mod bootstrap;
 mod dns;
@@ -29,23 +29,23 @@ use model::{CheckResult, Details, Method, Register, Status};
 use tlds::Registry;
 use whois::TldInfo;
 
-const USER_AGENT: &str = concat!("dc/", env!("CARGO_PKG_VERSION"), " (domain-checker)");
+const USER_AGENT: &str = concat!("ds/", env!("CARGO_PKG_VERSION"), " (domain-search)");
 
 #[derive(Parser, Debug)]
 #[command(
-    name = "dc",
+    name = "ds",
     version,
     about = "Check domain availability over RDAP with a WHOIS fallback",
     long_about = "Check domain availability over RDAP with a WHOIS fallback.\n\n\
                   Examples:\n  \
-                  dc apple --tld all\n  \
-                  dc apple --tld com,net --details\n  \
-                  dc apple,orange,bangla,english --tld com,net\n  \
-                  dc @names.txt --tld popular --available-only\n  \
-                  dc apple --tld all --level second\n  \
-                  dc apple --tld com,io --where\n  \
-                  dc apple google --tld popular --whois --dns-records\n  \
-                  dc apple.com --details --registry"
+                  ds apple --tld all\n  \
+                  ds apple --tld com,net --details\n  \
+                  ds apple,orange,bangla,english --tld com,net\n  \
+                  ds @names.txt --tld popular --available-only --save\n  \
+                  ds apple --tld all --level second\n  \
+                  ds apple --tld com,io --where\n  \
+                  ds apple google --tld popular --whois --dns-records\n  \
+                  ds apple.com --details --registry"
 )]
 struct Args {
     /// Name(s) to check: `apple`, `apple,orange,bangla`, `@names.txt`, or
@@ -90,7 +90,7 @@ struct Args {
     #[arg(long)]
     json: bool,
 
-    /// Only print available domains (both files are still written).
+    /// Only print available domains. Saved files still cover every result.
     #[arg(long = "available-only")]
     available_only: bool,
 
@@ -106,15 +106,17 @@ struct Args {
     #[arg(long, default_value_t = 10)]
     timeout: u64,
 
-    /// Directory for available.txt / unavailable.txt.
-    #[arg(short, long, default_value = ".")]
-    out_dir: PathBuf,
+    /// Write the results to available.txt, unavailable.txt and, if any
+    /// lookup failed, unknown.txt. Nothing is written without this.
+    #[arg(short, long)]
+    save: bool,
 
-    /// Do not write any output files.
-    #[arg(long = "no-save")]
-    no_save: bool,
+    /// Directory for those files (implies --save). Defaults to the working
+    /// directory.
+    #[arg(short, long, value_name = "DIR")]
+    out_dir: Option<PathBuf>,
 
-    /// Append to the output files instead of overwriting them.
+    /// Append to the output files instead of overwriting them (implies --save).
     #[arg(long)]
     append: bool,
 
@@ -135,7 +137,7 @@ struct Args {
     cctld: bool,
 
     /// Where to look: auto (RDAP, then the bundled WHOIS table, then an IANA
-    /// referral), rdap (RDAP only), or whois (bundled dist.whois.json only).
+    /// referral), rdap (RDAP only), or whois (bundled whois.json only).
     #[arg(long, value_enum, default_value_t = Source::Auto)]
     source: Source,
 
@@ -231,7 +233,7 @@ enum Source {
     Auto,
     /// RDAP only.
     Rdap,
-    /// The bundled dist.whois.json table only.
+    /// The bundled whois.json table only.
     Whois,
 }
 
@@ -311,7 +313,7 @@ async fn run() -> Result<()> {
         .build()
         .context("building HTTP client")?;
 
-    let registry = Registry::load().context("loading dist.whois.json")?;
+    let registry = Registry::load().context("loading whois.json")?;
 
     let bootstrap = if args.source == Source::Whois {
         Bootstrap::default()
@@ -392,10 +394,11 @@ async fn run() -> Result<()> {
         println!("{}", serde_json::to_string_pretty(&results)?);
     }
 
-    let written = if ctx.args.no_save {
-        Vec::new()
-    } else {
+    // Saving is opt-in; asking for a directory or an append is asking to save.
+    let written = if ctx.args.save || ctx.args.out_dir.is_some() || ctx.args.append {
         save(&ctx.args, &results)?
+    } else {
+        Vec::new()
     };
 
     if !json {
@@ -860,8 +863,8 @@ fn print_result(args: &Args, r: &CheckResult) {
 fn save(args: &Args, results: &[CheckResult]) -> Result<Vec<(PathBuf, usize)>> {
     use std::io::Write;
 
-    std::fs::create_dir_all(&args.out_dir)
-        .with_context(|| format!("creating {}", args.out_dir.display()))?;
+    let dir = args.out_dir.clone().unwrap_or_else(|| PathBuf::from("."));
+    std::fs::create_dir_all(&dir).with_context(|| format!("creating {}", dir.display()))?;
 
     let groups = [
         (Status::Available, "available.txt"),
@@ -882,7 +885,7 @@ fn save(args: &Args, results: &[CheckResult]) -> Result<Vec<(PathBuf, usize)>> {
             continue;
         }
 
-        let path = args.out_dir.join(filename);
+        let path = dir.join(filename);
         let mut file = std::fs::OpenOptions::new()
             .create(true)
             .write(true)
@@ -1014,7 +1017,7 @@ mod tests {
 
     #[test]
     fn cctld_is_shorthand_for_two_letters() {
-        let a = Args::try_parse_from(["dc", "apple", "--cctld"]).unwrap();
+        let a = Args::try_parse_from(["ds", "apple", "--cctld"]).unwrap();
         assert!(a.cctld && a.tld_len.is_none());
 
         let two = LenRange::parse("2").unwrap();
@@ -1030,29 +1033,29 @@ mod tests {
     #[test]
     fn accepts_open_ended_ranges_as_arguments() {
         // `-3` must not be parsed as a flag.
-        let a = Args::try_parse_from(["dc", "apple", "--tld-len", "-3"]).unwrap();
+        let a = Args::try_parse_from(["ds", "apple", "--tld-len", "-3"]).unwrap();
         assert_eq!(a.tld_len.as_deref(), Some("-3"));
     }
 
     #[test]
     fn parses_the_source_option() {
         assert_eq!(
-            Args::try_parse_from(["dc", "apple"]).unwrap().source,
+            Args::try_parse_from(["ds", "apple"]).unwrap().source,
             Source::Auto
         );
         assert_eq!(
-            Args::try_parse_from(["dc", "apple", "--source", "whois"])
+            Args::try_parse_from(["ds", "apple", "--source", "whois"])
                 .unwrap()
                 .source,
             Source::Whois
         );
         assert_eq!(
-            Args::try_parse_from(["dc", "apple", "--source", "rdap"])
+            Args::try_parse_from(["ds", "apple", "--source", "rdap"])
                 .unwrap()
                 .source,
             Source::Rdap
         );
-        assert!(Args::try_parse_from(["dc", "apple", "--source", "nope"]).is_err());
+        assert!(Args::try_parse_from(["ds", "apple", "--source", "nope"]).is_err());
     }
 
     #[test]
@@ -1070,7 +1073,7 @@ mod tests {
 
     #[test]
     fn reads_names_from_a_file() {
-        let path = std::env::temp_dir().join("dc-names-test.txt");
+        let path = std::env::temp_dir().join("ds-names-test.txt");
         std::fs::write(&path, "apple\norange, bangla  # two here\n\nenglish\n").unwrap();
         let names = expand_names(&args(&[&format!("@{}", path.display())])).unwrap();
         std::fs::remove_file(&path).ok();

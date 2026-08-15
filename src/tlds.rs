@@ -1,4 +1,4 @@
-//! TLD table built from the bundled `dist.whois.json`.
+//! TLD table built from the bundled `whois.json`.
 //!
 //! The file is embedded at compile time so the binary is self-contained.
 
@@ -6,7 +6,7 @@ use std::collections::{BTreeSet, HashMap};
 
 use serde::Deserialize;
 
-const WHOIS_JSON: &str = include_str!("../dist.whois.json");
+const WHOIS_JSON: &str = include_str!("../whois.json");
 
 #[derive(Debug, Deserialize)]
 struct RawEntry {

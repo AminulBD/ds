@@ -1,5 +1,5 @@
 //! WHOIS queries: port 43 sockets plus the handful of web-form registries
-//! that `dist.whois.json` lists with an http(s) URI.
+//! that `whois.json` lists with an http(s) URI.
 
 use std::time::Duration;
 
@@ -106,7 +106,7 @@ async fn socket_query(host: &str, port: u16, domain: &str, timeout: Duration) ->
 /// What IANA knows about a TLD: who runs it, where to register under it, and
 /// which WHOIS server currently serves it.
 ///
-/// `dist.whois.json` is a snapshot and some of its hosts no longer resolve
+/// `whois.json` is a snapshot and some of its hosts no longer resolve
 /// (`whois.nic.co`, `whois.nic.tr`, ...); IANA's record knows the current one.
 #[derive(Debug, Clone, Default)]
 pub struct TldInfo {

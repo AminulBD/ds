@@ -1,0 +1,236 @@
+.TH DS 1 "August 2026" "ds 0.1.0" "User Commands"
+.SH NAME
+ds \- domain search: check domain availability across many TLDs
+.SH SYNOPSIS
+.B ds
+.RI [ OPTIONS ]
+.IR NAME .\|.\|.
+.SH DESCRIPTION
+.B ds
+checks whether domain names are registered. Each name is checked against every
+TLD selected with
+.BR \-\-tld ,
+in parallel.
+.PP
+A lookup asks RDAP first, using the server list from the IANA bootstrap file
+(cached locally for seven days). TLDs with no RDAP service fall back to WHOIS
+over port 43, using the server and "available" needle table in
+.IR whois.json ,
+which is embedded in the binary at compile time. If a bundled WHOIS host is
+stale or missing, IANA is asked which server serves that TLD today.
+.PP
+A lookup that cannot be answered is reported as
+.B UNKNOWN
+with the reason attached, never guessed as available.
+.SH ARGUMENTS
+.TP
+.IR NAME .\|.\|.
+Names to check. A name may be a bare label
+.RB ( apple ),
+a comma separated list
+.RB ( apple,orange,bangla ),
+or
+.BI @ file
+to read one name per line (commas and
+.B #
+comments allowed). Several arguments may be given. A name containing a dot is
+treated as a whole domain and checked as given when
+.B \-\-tld
+is omitted.
+.SH OPTIONS
+.SS Selecting TLDs
+.TP
+.BR \-t ", " \-\-tld " " \fILIST\fR
+Comma separated TLDs, or one of
+.BR all " (every known TLD),"
+.BR popular " (a curated set),"
+.B rdap
+(only TLDs with an RDAP service), or
+.BI @ file
+for a list in a file. Without this option a bare label is checked as
+.IR NAME .com.
+.TP
+.BR \-\-level " " \fIany\fR|\fIsecond\fR|\fIthird\fR
+Which level the name would sit at.
+.B second
+keeps plain TLDs
+.RI ( apple.com ),
+.B third
+keeps multi-label suffixes
+.RI ( apple.co.uk ).
+Filters the
+.B \-\-tld
+list only; a whole domain typed out by hand is always checked.
+.TP
+.B \-\-cctld
+Only country-code TLDs, the two-letter ones. Shorthand for
+.BR "\-\-tld\-len 2" .
+.TP
+.BR \-\-tld\-len " " \fIN\fR|\fIMIN\-MAX\fR
+Keep TLDs of this length:
+.BR 2 ", " 2\-3 ", " \-3 " (at most three), " 4\- " (at least four)."
+Measured on the last label, so
+.I co.uk
+counts as two.
+.SS Showing more
+.TP
+.B \-\-details
+Registrar, IANA ID, creation, update and expiry dates, status codes,
+nameservers, DNSSEC and abuse contact.
+.TP
+.B \-\-registry
+Which RDAP endpoint and WHOIS server answered.
+.TP
+.B \-\-whois
+Query WHOIS as well and print the raw record.
+.TP
+.B \-\-dns\-records
+Look up A, AAAA, NS, MX, TXT, CNAME and SOA records.
+.TP
+.B \-\-where
+For available domains, print the registry operator, its official registration
+page (both from IANA's record for the TLD) and registrar searches with the name
+filled in.
+.TP
+.B \-\-raw
+Include the raw RDAP JSON.
+.TP
+.B \-\-all\-info
+Shorthand for
+.BR \-\-details " " \-\-registry " " \-\-whois " " \-\-dns\-records " " \-\-where .
+.TP
+.B \-\-json
+Print a JSON array instead of the text report.
+.TP
+.B \-\-available\-only
+Print only available domains. Saved files still cover every result.
+.TP
+.BR \-q ", " \-\-quiet
+Only print the summary.
+.SS Saving results
+.TP
+.BR \-s ", " \-\-save
+Write
+.IR available.txt ,
+.I unavailable.txt
+and, when a registry could not be reached,
+.IR unknown.txt .
+Nothing is written without this.
+.TP
+.BR \-o ", " \-\-out\-dir " " \fIDIR\fR
+Directory for those files. Implies
+.BR \-\-save .
+.TP
+.B \-\-append
+Append to the files instead of overwriting them. Implies
+.BR \-\-save .
+.SS Where to look
+.TP
+.BR \-\-source " " \fIauto\fR|\fIrdap\fR|\fIwhois\fR
+.B auto
+tries RDAP, then the bundled table, then an IANA referral.
+.B rdap
+uses RDAP alone.
+.B whois
+uses the bundled
+.I whois.json
+alone.
+.TP
+.B \-\-no\-iana
+Never query whois.iana.org: no referral when a bundled WHOIS host is stale, and
+no registry names for
+.BR \-\-where .
+.TP
+.B \-\-refresh
+Re-download the IANA RDAP bootstrap file.
+.SS Pacing
+.TP
+.BR \-c ", " \-\-concurrency " " \fIN\fR
+Parallel lookups. Default 20.
+.TP
+.BR \-\-per\-host " " \fIN\fR
+Parallel lookups against a single registry server. Default 4.
+.TP
+.BR \-\-timeout " " \fISECS\fR
+Per-request timeout. Default 10.
+.TP
+.B \-\-no\-color
+Plain output. Also honoured:
+.BR NO_COLOR .
+.SH EXIT STATUS
+.TP
+.B 0
+At least one domain is available.
+.TP
+.B 1
+None are.
+.TP
+.B 2
+A startup error, such as an unusable
+.B \-\-tld
+list.
+.SH FILES
+.TP
+.I ~/.cache/ds/rdap\-dns.json
+Cached copy of the IANA RDAP bootstrap, refreshed after seven days or on
+.BR \-\-refresh .
+Honours
+.BR XDG_CACHE_HOME .
+.TP
+.IR available.txt ", " unavailable.txt ", " unknown.txt
+Written in the working directory, or
+.BR \-\-out\-dir ,
+when
+.B \-\-save
+is given.
+.SH EXAMPLES
+.PP
+Check one name across a few TLDs:
+.PP
+.RS
+.EX
+ds apple \-\-tld com,net,io
+.EE
+.RE
+.PP
+Sweep every TLD where the name is registered at the second level, saving the
+results:
+.PP
+.RS
+.EX
+ds mybrand \-\-tld all \-\-level second \-\-available\-only \-\-save
+.EE
+.RE
+.PP
+Several names at once, read from a file, across the country-code TLDs:
+.PP
+.RS
+.EX
+ds @names.txt \-\-tld all \-\-cctld \-\-level second
+.EE
+.RE
+.PP
+Everything known about one domain:
+.PP
+.RS
+.EX
+ds apple.com \-\-all\-info
+.EE
+.RE
+.SH NOTES
+Large sweeps get rate-limited.
+.B ds
+paces itself per host, backs off on HTTP 403 and 429, and stops querying a
+server that has refused it six times in a row, retrying after thirty seconds.
+Identity Digital runs roughly 250 gTLDs behind one RDAP endpoint with a strict
+quota, so a single
+.B "\-\-tld all"
+sweep will leave some of those unresolved; the summary says how many, and they
+are worth re-running later.
+.SH SEE ALSO
+.BR whois (1),
+.BR dig (1)
+.PP
+RFC 9083 (RDAP responses), RFC 9224 (RDAP bootstrap), RFC 3912 (WHOIS).
+.SH LICENSE
+MIT.
