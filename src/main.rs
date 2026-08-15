@@ -141,9 +141,9 @@ struct Args {
     #[arg(long, value_enum, default_value_t = Source::Auto)]
     source: Source,
 
-    /// Custom RDAP server list. Either an IANA-style {"services": ...} file
-    /// or a {"tld": "url"} map. Without this, ./rdap.json and
-    /// ~/.config/ds/rdap.json are picked up automatically when they exist.
+    /// Custom RDAP server list, in the bootstrap format IANA publishes.
+    /// Without this, ./rdap.json and ~/.config/ds/rdap.json are picked up
+    /// automatically when they exist.
     #[arg(long = "rdap-file", value_name = "PATH")]
     rdap_file: Option<PathBuf>,
 

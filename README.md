@@ -227,18 +227,23 @@ shows only the registrar links.
 
 ### Your own RDAP servers
 
-Point TLDs at servers of your choosing with an `rdap.json`:
+Point TLDs at servers of your choosing with an `rdap.json`, written in the same
+RDAP bootstrap format IANA publishes (RFC 9224) — so you can start from a copy
+of `dns.json` and edit it:
 
 ```json
 {
-  "com": "https://rdap.verisign.com/com/v1/",
-  "io": "https://rdap.identitydigital.services/rdap/",
-  "internal": ["https://rdap.corp.example/", "https://rdap-backup.corp.example/"]
+  "version": "1.0",
+  "description": "my RDAP servers",
+  "services": [
+    [["com"], ["https://rdap.verisign.com/com/v1/"]],
+    [["io"], ["https://rdap.identitydigital.services/rdap/"]],
+    [["internal"], ["https://rdap.corp.example/", "https://rdap-backup.corp.example/"]]
+  ]
 }
 ```
 
-A list of URLs is tried in order. An IANA-shaped `{"services": [...]}` file is
-accepted too, so you can edit a copy of `dns.json` and hand it straight back.
+Each entry maps a list of TLDs to a list of servers, tried in order.
 
 ```sh
 ds apple --tld com,io --rdap-file servers.json              # merged over IANA

@@ -137,11 +137,9 @@ uses the bundled
 alone.
 .TP
 .BR \-\-rdap\-file " " \fIPATH\fR
-Custom RDAP server list, as either an IANA-style
-.I {"services": ...}
-file or a plain
-.I {"tld": "url"}
-map whose values may also be lists of URLs to try in order. Without this option
+Custom RDAP server list, in the RDAP bootstrap format IANA publishes (RFC
+9224): each entry maps a list of TLDs to a list of servers, tried in order.
+Without this option
 .I ./rdap.json
 and
 .I ~/.config/ds/rdap.json

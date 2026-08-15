@@ -8,7 +8,6 @@ use std::time::{Duration, SystemTime};
 
 use anyhow::{bail, Context, Result};
 use serde::Deserialize;
-use serde_json::Value;
 
 const BOOTSTRAP_URL: &str = "https://data.iana.org/rdap/dns.json";
 const MAX_AGE: Duration = Duration::from_secs(7 * 24 * 60 * 60);
@@ -113,57 +112,33 @@ impl Bootstrap {
         self.by_tld.len()
     }
 
-    /// Read a custom server list. Two shapes are accepted: the IANA bootstrap
-    /// layout, so a copy of `dns.json` can be edited and handed straight back,
-    /// and a plain `{"tld": "url"}` map, where the value may also be a list of
-    /// URLs to try in order.
+    /// Read a custom server list in the RDAP bootstrap format (RFC 9224),
+    /// the same shape as IANA's `dns.json`, so a copy of that file can be
+    /// edited and handed straight back.
     pub fn from_file(path: &Path) -> Result<Self> {
         let text = std::fs::read_to_string(path)
             .with_context(|| format!("reading RDAP servers from {}", path.display()))?;
-        let value: Value =
-            serde_json::from_str(&text).with_context(|| format!("parsing {}", path.display()))?;
 
-        if value.get("services").is_some() {
-            return Self::parse(&text).with_context(|| format!("parsing {}", path.display()));
-        }
-
-        let map = value.as_object().with_context(|| {
+        let parsed = Self::parse(&text).with_context(|| {
             format!(
-                "{}: expected either an IANA-style {{\"services\": ...}} file \
-                 or a {{\"tld\": \"url\"}} map",
+                "{}: expected an RDAP bootstrap file, as in \
+                 {{\"services\": [[[\"com\"], [\"https://rdap.example/\"]]]}}",
                 path.display()
             )
         })?;
 
-        let mut by_tld = HashMap::new();
-        for (tld, urls) in map {
-            let urls = match urls {
-                Value::String(u) => vec![u.clone()],
-                Value::Array(list) => list
-                    .iter()
-                    .filter_map(Value::as_str)
-                    .map(str::to_string)
-                    .collect(),
-                _ => bail!(
-                    "{}: {tld} must map to a URL or a list of URLs",
-                    path.display()
-                ),
-            };
-            if urls.is_empty() {
-                bail!("{}: {tld} has no URL", path.display());
-            }
-            for url in &urls {
+        for urls in parsed.by_tld.values() {
+            for url in urls {
                 if !url.starts_with("http://") && !url.starts_with("https://") {
-                    bail!("{}: {tld} -> {url} is not an http(s) URL", path.display());
+                    bail!("{}: {url} is not an http(s) URL", path.display());
                 }
             }
-            by_tld.insert(
-                tld.trim_matches('.').to_ascii_lowercase(),
-                urls.into_iter().map(normalize_url).collect(),
-            );
+        }
+        if parsed.by_tld.is_empty() {
+            bail!("{}: no services in the file", path.display());
         }
 
-        Ok(Self { by_tld })
+        Ok(parsed)
     }
 
     /// Overlay another list on this one; the other side wins per TLD.
@@ -200,32 +175,21 @@ mod tests {
     }
 
     #[test]
-    fn parses_a_plain_map() {
+    fn reads_the_bootstrap_format() {
         let path = write(
-            "ds-rdap-map.json",
-            r#"{ ".COM": "https://a.example/rdap", "xyz": ["https://b/", "https://c/"] }"#,
+            "ds-rdap-services.json",
+            r#"{"version":"1.0","services":[[["COM","net"],["https://a.example/rdap"]]]}"#,
         );
         let b = Bootstrap::from_file(&path).unwrap();
         std::fs::remove_file(&path).ok();
 
-        // Keys are normalised and base URLs get the trailing slash they need.
+        // Keys are lowercased and base URLs get the trailing slash they need.
         assert_eq!(
             b.servers_for("com"),
             Some(&["https://a.example/rdap/".to_string()][..])
         );
-        assert_eq!(b.servers_for("xyz").unwrap().len(), 2);
+        assert_eq!(b.servers_for("net").unwrap().len(), 1);
         assert_eq!(b.len(), 2);
-    }
-
-    #[test]
-    fn parses_an_iana_shaped_file() {
-        let path = write(
-            "ds-rdap-services.json",
-            r#"{"version":"1.0","services":[[["com","net"],["https://a/"]]]}"#,
-        );
-        let b = Bootstrap::from_file(&path).unwrap();
-        std::fs::remove_file(&path).ok();
-        assert_eq!(b.servers_for("net"), Some(&["https://a/".to_string()][..]));
     }
 
     #[test]
@@ -234,7 +198,10 @@ mod tests {
             r#"{"services":[[["com"],["https://iana/"]],[["net"],["https://iana/"]]]}"#,
         )
         .unwrap();
-        let path = write("ds-rdap-override.json", r#"{"com": "https://mine/"}"#);
+        let path = write(
+            "ds-rdap-override.json",
+            r#"{"services":[[["com"],["https://mine/"]]]}"#,
+        );
         let custom = Bootstrap::from_file(&path).unwrap();
         std::fs::remove_file(&path).ok();
 
