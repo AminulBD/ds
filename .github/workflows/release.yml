@@ -9,6 +9,12 @@ on:
 permissions:
   contents: write
 
+# Re-pushing a tag supersedes the run already going for it, rather than
+# racing it to publish the same release.
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: true
+
 env:
   CARGO_TERM_COLOR: always
 
@@ -178,9 +184,19 @@ jobs:
 
       - name: Checksums
         working-directory: dist
-        run: sha256sum * > SHA256SUMS
+        run: |
+          rm -f SHA256SUMS
+          sha256sum * > SHA256SUMS
 
+      # Idempotent, so a re-run or a re-pushed tag refreshes the assets of the
+      # existing release instead of failing on "release already exists".
       - name: Publish
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh release create "$GITHUB_REF_NAME" --generate-notes --verify-tag dist/*
+        run: |
+          if gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1; then
+            echo "updating the existing $GITHUB_REF_NAME release"
+          else
+            gh release create "$GITHUB_REF_NAME" --generate-notes --verify-tag
+          fi
+          gh release upload "$GITHUB_REF_NAME" dist/* --clobber
