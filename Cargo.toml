@@ -1,0 +1,25 @@
+[package]
+name = "dc"
+version = "0.1.0"
+edition = "2021"
+description = "Simple domain availability checker using RDAP with WHOIS fallback"
+
+[[bin]]
+name = "dc"
+path = "src/main.rs"
+
+[dependencies]
+anyhow = "1"
+clap = { version = "4", features = ["derive"] }
+futures = "0.3"
+hickory-resolver = "0.24"
+idna = "1"
+reqwest = { version = "0.12", default-features = false, features = ["rustls-tls", "json", "gzip"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+tokio = { version = "1", features = ["rt-multi-thread", "macros", "net", "io-util", "time", "sync", "fs"] }
+
+[profile.release]
+opt-level = 3
+lto = true
+strip = true
