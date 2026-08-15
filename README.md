@@ -317,7 +317,7 @@ Pushing a `v*` tag builds ten targets, packages them and publishes everything
 with a `SHA256SUMS` file:
 
 ```sh
-git tag v0.1.0 && git push origin v0.1.0
+git tag -a v0.1.1 -m "ds 0.1.1" && git push origin v0.1.1
 ```
 
 | OS | Targets | Artifacts |

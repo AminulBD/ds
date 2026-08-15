@@ -1,6 +1,6 @@
 [package]
 name = "ds"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 authors = ["Aminul Islam <me@aminul.net>"]
 description = "Domain search: check domain availability over RDAP with a WHOIS fallback"
