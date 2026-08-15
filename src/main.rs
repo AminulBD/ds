@@ -270,7 +270,7 @@ impl Ctx {
 
 #[tokio::main]
 async fn main() {
-    // Rust ignores SIGPIPE, which turns `dc ... | head` into a panic on the
+    // Rust ignores SIGPIPE, which turns `ds ... | head` into a panic on the
     // first write after the reader exits. Behave like every other CLI.
     #[cfg(unix)]
     unsafe {
