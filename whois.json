@@ -1426,11 +1426,6 @@
     "available": "No match for"
   },
   {
-    "extensions": ".aa",
-    "uri": "https://wdemo.ra7.net/modules/registrars/get_bd/checkavailability.php?search=",
-    "available": "Domain is available"
-  },
-  {
     "extensions": ".bd,.com.bd,.net.bd,.org.bd,.edu.bd,.gov.bd,.ac.bd,.mil.bd,.info.bd,.tv.bd,.co.bd,.ai.bd,.sch.bd,.id.bd,.বাংলা",
     "uri": "socket://whois.get.bd",
     "available": "Domain is available"
