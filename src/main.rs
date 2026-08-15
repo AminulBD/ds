@@ -123,6 +123,17 @@ struct Args {
     #[arg(long, value_enum, default_value_t = Level::Any)]
     level: Level,
 
+    /// Keep only TLDs of this length: `2` for the two-letter ccTLDs, or a
+    /// range like `2-3`, `-3`, `4-`. Measured on the last label, so `co.uk`
+    /// counts as 2.
+    #[arg(long = "tld-len", value_name = "N|MIN-MAX", allow_hyphen_values = true)]
+    tld_len: Option<String>,
+
+    /// Only country-code TLDs — the two-letter ones (`de`, `io`, `co.uk`).
+    /// Shorthand for --tld-len 2.
+    #[arg(long)]
+    cctld: bool,
+
     /// Where to look: auto (RDAP, then the bundled WHOIS table, then an IANA
     /// referral), rdap (RDAP only), or whois (bundled dist.whois.json only).
     #[arg(long, value_enum, default_value_t = Source::Auto)]
@@ -158,14 +169,6 @@ enum Level {
 }
 
 impl Level {
-    fn as_str(self) -> &'static str {
-        match self {
-            Level::Any => "any",
-            Level::Second => "second-level",
-            Level::Third => "third-level",
-        }
-    }
-
     /// `com` is a second-level registration, `co.uk` a third-level one.
     fn allows(self, tld: &str) -> bool {
         match self {
@@ -173,6 +176,51 @@ impl Level {
             Level::Second => !tld.contains('.'),
             Level::Third => tld.contains('.'),
         }
+    }
+}
+
+/// An inclusive length filter for TLDs: `2`, `2-3`, `-3`, `4-`.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+struct LenRange {
+    min: usize,
+    max: usize,
+}
+
+impl LenRange {
+    fn parse(spec: &str) -> Result<Self> {
+        let spec = spec.trim();
+        let bad = || anyhow::anyhow!("--tld-len wants `2`, `2-3`, `-3` or `4-`, not `{spec}`");
+
+        let (min, max) = match spec.split_once('-') {
+            None => {
+                let n: usize = spec.parse().map_err(|_| bad())?;
+                (n, n)
+            }
+            Some((lo, hi)) => {
+                let min = if lo.trim().is_empty() {
+                    1
+                } else {
+                    lo.trim().parse().map_err(|_| bad())?
+                };
+                let max = if hi.trim().is_empty() {
+                    usize::MAX
+                } else {
+                    hi.trim().parse().map_err(|_| bad())?
+                };
+                (min, max)
+            }
+        };
+
+        if min == 0 || min > max {
+            return Err(bad());
+        }
+        Ok(Self { min, max })
+    }
+
+    /// Measured on the last label: the TLD of `co.uk` is `uk`.
+    fn allows(&self, tld: &str) -> bool {
+        let apex = tld.rsplit('.').next().unwrap_or(tld);
+        (self.min..=self.max).contains(&apex.chars().count())
     }
 }
 
@@ -220,6 +268,13 @@ impl Ctx {
 
 #[tokio::main]
 async fn main() {
+    // Rust ignores SIGPIPE, which turns `dc ... | head` into a panic on the
+    // first write after the reader exits. Behave like every other CLI.
+    #[cfg(unix)]
+    unsafe {
+        libc::signal(libc::SIGPIPE, libc::SIG_DFL);
+    }
+
     if let Err(e) = run().await {
         eprintln!("{} {e:#}", paint("error:", Color::Red));
         std::process::exit(2);
@@ -234,6 +289,11 @@ async fn run() -> Result<()> {
         args.whois = true;
         args.dns_records = true;
         args.show_where = true;
+    }
+    if args.cctld && args.tld_len.is_none() {
+        // Two letters is exactly the ccTLD space: ICANN reserves them for
+        // ISO 3166-1 country codes.
+        args.tld_len = Some("2".into());
     }
     if args.concurrency == 0 {
         args.concurrency = 1;
@@ -361,15 +421,16 @@ fn build_targets(args: &Args, registry: &Registry, bootstrap: &Bootstrap) -> Res
     let tld_list: Option<Vec<String>> = match &args.tld {
         Some(spec) => {
             let all = resolve_tlds(spec, registry, bootstrap)?;
+            let len = args.tld_len.as_deref().map(LenRange::parse).transpose()?;
             let kept: Vec<String> = all
                 .iter()
                 .filter(|t| args.level.allows(t))
+                .filter(|t| len.is_none_or(|l| l.allows(t)))
                 .cloned()
                 .collect();
             if kept.is_empty() {
                 bail!(
-                    "--level {} left nothing to check: all {} TLDs were dropped",
-                    args.level.as_str(),
+                    "nothing left to check: all {} TLDs were dropped by --level/--tld-len",
                     all.len()
                 );
             }
@@ -925,6 +986,52 @@ mod tests {
     fn normalises_and_deduplicates() {
         let names = expand_names(&args(&["Apple.", ".apple", "APPLE", "orange"])).unwrap();
         assert_eq!(names, ["apple", "orange"]);
+    }
+
+    #[test]
+    fn parses_tld_length_specs() {
+        assert_eq!(LenRange::parse("2").unwrap(), LenRange { min: 2, max: 2 });
+        assert_eq!(LenRange::parse("2-3").unwrap(), LenRange { min: 2, max: 3 });
+        assert_eq!(LenRange::parse("-3").unwrap(), LenRange { min: 1, max: 3 });
+        assert_eq!(LenRange::parse("4-").unwrap().min, 4);
+        assert!(LenRange::parse("nope").is_err());
+        assert!(LenRange::parse("0").is_err());
+        assert!(LenRange::parse("5-2").is_err());
+    }
+
+    #[test]
+    fn tld_length_is_measured_on_the_last_label() {
+        let two = LenRange::parse("2").unwrap();
+        assert!(two.allows("io"));
+        assert!(two.allows("co.uk"), "the TLD of co.uk is uk");
+        assert!(!two.allows("com"));
+        assert!(!two.allows("xn--p1ai"));
+
+        let short = LenRange::parse("-3").unwrap();
+        assert!(short.allows("com") && short.allows("de"));
+        assert!(!short.allows("info"));
+    }
+
+    #[test]
+    fn cctld_is_shorthand_for_two_letters() {
+        let a = Args::try_parse_from(["dc", "apple", "--cctld"]).unwrap();
+        assert!(a.cctld && a.tld_len.is_none());
+
+        let two = LenRange::parse("2").unwrap();
+        // Every two-letter TLD is a country code, sub-zones included.
+        for tld in ["de", "io", "co.uk", "com.au"] {
+            assert!(two.allows(tld), "{tld}");
+        }
+        for tld in ["com", "app", "xn--p1ai"] {
+            assert!(!two.allows(tld), "{tld}");
+        }
+    }
+
+    #[test]
+    fn accepts_open_ended_ranges_as_arguments() {
+        // `-3` must not be parsed as a flag.
+        let a = Args::try_parse_from(["dc", "apple", "--tld-len", "-3"]).unwrap();
+        assert_eq!(a.tld_len.as_deref(), Some("-3"));
     }
 
     #[test]

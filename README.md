@@ -161,6 +161,26 @@ second-level zones (`gov.bd`, `ernet.in`, `edu.gt`) that you cannot register
 under anyway. A full domain typed out by hand (`dc apple.co.uk`) is always
 checked as given — `--level` only filters TLD lists.
 
+## Filtering by TLD length
+
+`--cctld` keeps only country-code TLDs — the two-letter ones, which is exactly
+what ICANN reserves for ISO 3166-1 country codes:
+
+```sh
+dc apple --tld all --cctld                  # 505 (includes co.uk, com.au, ...)
+dc apple --tld all --cctld --level second   # 140 bare ccTLDs: de, io, jp, ...
+```
+
+`--tld-len` is the general form, measured on the last label so `co.uk` counts
+as 2:
+
+| Spec | Keeps | Count under `--tld all` |
+| --- | --- | --- |
+| `--tld-len 2` | two-letter (same as `--cctld`) | 505 |
+| `--tld-len 3` | `com`, `net`, `xyz`, ... | 236 |
+| `--tld-len -3` | three characters or fewer | 741 |
+| `--tld-len 4-` | four or more | 918 |
+
 ## Choosing the source
 
 By default a lookup falls through three sources: RDAP, then the bundled

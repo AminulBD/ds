@@ -246,6 +246,7 @@ dependencies = [
  "futures",
  "hickory-resolver",
  "idna",
+ "libc",
  "reqwest",
  "serde",
  "serde_json",
