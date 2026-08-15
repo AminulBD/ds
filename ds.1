@@ -136,6 +136,24 @@ uses the bundled
 .I whois.json
 alone.
 .TP
+.BR \-\-rdap\-file " " \fIPATH\fR
+Custom RDAP server list, as either an IANA-style
+.I {"services": ...}
+file or a plain
+.I {"tld": "url"}
+map whose values may also be lists of URLs to try in order. Without this option
+.I ./rdap.json
+and
+.I ~/.config/ds/rdap.json
+are used when they exist.
+.TP
+.BR \-\-rdap\-mode " " \fImerge\fR|\fIonly\fR
+.B merge
+(default) lets the custom entries win for the TLDs they name and takes the rest
+from the IANA bootstrap.
+.B only
+uses the custom list alone and never downloads the bootstrap.
+.TP
 .B \-\-no\-iana
 Never query whois.iana.org: no referral when a bundled WHOIS host is stale, and
 no registry names for
@@ -176,6 +194,10 @@ Cached copy of the IANA RDAP bootstrap, refreshed after seven days or on
 .BR \-\-refresh .
 Honours
 .BR XDG_CACHE_HOME .
+.TP
+.IR ./rdap.json ", " ~/.config/ds/rdap.json
+Custom RDAP server lists, used automatically when present. See
+.BR \-\-rdap\-file .
 .TP
 .IR available.txt ", " unavailable.txt ", " unknown.txt
 Written in the working directory, or

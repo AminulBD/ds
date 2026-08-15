@@ -141,6 +141,17 @@ struct Args {
     #[arg(long, value_enum, default_value_t = Source::Auto)]
     source: Source,
 
+    /// Custom RDAP server list. Either an IANA-style {"services": ...} file
+    /// or a {"tld": "url"} map. Without this, ./rdap.json and
+    /// ~/.config/ds/rdap.json are picked up automatically when they exist.
+    #[arg(long = "rdap-file", value_name = "PATH")]
+    rdap_file: Option<PathBuf>,
+
+    /// What to do with that list: merge it over the IANA bootstrap (custom
+    /// entries win) or use only it.
+    #[arg(long = "rdap-mode", value_enum, default_value_t = RdapMode::Merge)]
+    rdap_mode: RdapMode,
+
     /// Never query whois.iana.org: no referral when a bundled WHOIS host is
     /// stale, and no registry names for --where.
     #[arg(long = "no-iana")]
@@ -224,6 +235,15 @@ impl LenRange {
         let apex = tld.rsplit('.').next().unwrap_or(tld);
         (self.min..=self.max).contains(&apex.chars().count())
     }
+}
+
+/// How a custom RDAP server list relates to the IANA bootstrap.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, ValueEnum)]
+enum RdapMode {
+    /// Custom entries win, everything else still comes from IANA.
+    Merge,
+    /// Use the custom list alone.
+    Only,
 }
 
 /// Which lookup source a run is allowed to use.
@@ -315,7 +335,14 @@ async fn run() -> Result<()> {
 
     let registry = Registry::load().context("loading whois.json")?;
 
-    let bootstrap = if args.source == Source::Whois {
+    let custom_path = args.rdap_file.clone().or_else(discover_rdap_file);
+    let custom = match &custom_path {
+        Some(path) => Some(Bootstrap::from_file(path)?),
+        None => None,
+    };
+    let custom_only = custom.is_some() && args.rdap_mode == RdapMode::Only;
+
+    let mut bootstrap = if args.source == Source::Whois || custom_only {
         Bootstrap::default()
     } else {
         match Bootstrap::load(&client, args.refresh).await {
@@ -329,6 +356,21 @@ async fn run() -> Result<()> {
             }
         }
     };
+
+    if let (Some(custom), Some(path)) = (custom, &custom_path) {
+        let count = custom.len();
+        bootstrap.merge(custom);
+        if !args.quiet && !args.json {
+            println!(
+                "{} {} TLD{} from {} ({})",
+                paint("rdap:", Color::Dim),
+                count,
+                if count == 1 { "" } else { "s" },
+                path.display(),
+                if custom_only { "only" } else { "merged" }
+            );
+        }
+    }
     if bootstrap.is_empty() && args.source == Source::Rdap {
         bail!("no RDAP bootstrap data and --source rdap was given: nothing to query with");
     }
@@ -469,6 +511,23 @@ fn build_targets(args: &Args, registry: &Registry, bootstrap: &Bootstrap) -> Res
     }
 
     Ok(targets)
+}
+
+/// Look for an `rdap.json` the user did not name explicitly: first in the
+/// working directory, then in the config directory.
+fn discover_rdap_file() -> Option<PathBuf> {
+    let cwd = PathBuf::from("rdap.json");
+    if cwd.is_file() {
+        return Some(cwd);
+    }
+
+    let config = std::env::var_os("XDG_CONFIG_HOME")
+        .map(PathBuf::from)
+        .or_else(|| std::env::var_os("HOME").map(|h| PathBuf::from(h).join(".config")))?
+        .join("ds")
+        .join("rdap.json");
+
+    config.is_file().then_some(config)
 }
 
 /// Expand the positional arguments into the list of names to check.

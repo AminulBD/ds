@@ -225,6 +225,38 @@ ds apple --tld com,co,de --source whois    # all three over port 43
 `whois.iana.org`, so a stale bundled WHOIS host is not repaired and `--where`
 shows only the registrar links.
 
+### Your own RDAP servers
+
+Point TLDs at servers of your choosing with an `rdap.json`:
+
+```json
+{
+  "com": "https://rdap.verisign.com/com/v1/",
+  "io": "https://rdap.identitydigital.services/rdap/",
+  "internal": ["https://rdap.corp.example/", "https://rdap-backup.corp.example/"]
+}
+```
+
+A list of URLs is tried in order. An IANA-shaped `{"services": [...]}` file is
+accepted too, so you can edit a copy of `dns.json` and hand it straight back.
+
+```sh
+ds apple --tld com,io --rdap-file servers.json              # merged over IANA
+ds apple --tld internal --rdap-file servers.json --rdap-mode only
+```
+
+| Mode | Effect |
+| --- | --- |
+| `merge` (default) | your entries win for the TLDs they name, everything else still comes from the IANA bootstrap |
+| `only` | the IANA bootstrap is not consulted or downloaded at all |
+
+Without `--rdap-file`, `./rdap.json` is picked up if it exists, then
+`~/.config/ds/rdap.json`. A line saying which file was loaded, how many TLDs it
+covers and which mode is in force is printed before the results.
+
+This is how you reach a registry that is missing from the bootstrap, test a
+staging RDAP server, or serve an internal zone that has no public entry at all.
+
 ## Pacing
 
 | Flag | Default | Meaning |
