@@ -28,6 +28,10 @@ tokio = { version = "1", features = ["rt-multi-thread", "macros", "net", "io-uti
 [target.'cfg(unix)'.dependencies]
 libc = "0.2"
 
+# Only for switching the console into ANSI mode.
+[target.'cfg(windows)'.dependencies]
+windows-sys = { version = "0.61", features = ["Win32_Foundation", "Win32_System_Console"] }
+
 [profile.release]
 opt-level = 3
 lto = true
