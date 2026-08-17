@@ -84,11 +84,18 @@ jobs:
       - name: Build
         run: ${{ matrix.cross && 'cross' || 'cargo' }} build --release --locked --target ${{ matrix.target }}
 
+      # A tag never holds a slash, but a branch does, and workflow_dispatch
+      # runs from branches: a name like "user/feature" would turn every archive
+      # name into a path under a directory that does not exist.
+      - name: Name the artifacts
+        shell: bash
+        run: echo "DS_TAG=$(echo "${GITHUB_REF_NAME:-dev}" | tr / -)" >> "$GITHUB_ENV"
+
       - name: Archive (unix)
         if: runner.os != 'Windows'
         shell: bash
         run: |
-          name="ds-${GITHUB_REF_NAME:-dev}-${{ matrix.target }}"
+          name="ds-${DS_TAG}-${{ matrix.target }}"
           mkdir -p "staging/$name"
           cp "target/${{ matrix.target }}/release/ds" README.md LICENSE ds.1 "staging/$name/"
           tar -czf "$name.tar.gz" -C staging "$name"
@@ -97,7 +104,7 @@ jobs:
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
-          $tag = if ($env:GITHUB_REF_NAME) { $env:GITHUB_REF_NAME } else { "dev" }
+          $tag = $env:DS_TAG
           $name = "ds-$tag-${{ matrix.target }}"
           New-Item -ItemType Directory -Path "staging/$name" -Force | Out-Null
           Copy-Item "target/${{ matrix.target }}/release/ds.exe" "staging/$name/"
@@ -116,12 +123,12 @@ jobs:
         if: runner.os == 'macOS'
         shell: bash
         run: |
-          name="ds-${GITHUB_REF_NAME:-dev}-${{ matrix.target }}"
+          name="ds-${DS_TAG}-${{ matrix.target }}"
           mkdir -p dmg
           cp "target/${{ matrix.target }}/release/ds" ds.1 README.md LICENSE dmg/
           cp packaging/macos-install.sh dmg/install.sh
           chmod +x dmg/install.sh
-          hdiutil create -volname "ds ${GITHUB_REF_NAME:-dev}" \
+          hdiutil create -volname "ds ${DS_TAG}" \
             -srcfolder dmg -ov -format UDZO "$name.dmg"
 
       # The runner images ship WiX 3, but do not always put it on PATH.
@@ -147,7 +154,7 @@ jobs:
         shell: pwsh
         run: |
           cargo install cargo-wix --locked
-          $tag = if ($env:GITHUB_REF_NAME) { $env:GITHUB_REF_NAME } else { "dev" }
+          $tag = $env:DS_TAG
           cargo wix --no-build --nocapture --target ${{ matrix.target }} `
             --output "ds-$tag-${{ matrix.target }}.msi"
 
