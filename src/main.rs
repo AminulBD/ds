@@ -276,7 +276,10 @@ struct Ctx {
     limiter: HostLimiter,
     bootstrap: Bootstrap,
     registry: Registry,
-    resolver: Option<TokioAsyncResolver>,
+    /// Used for every RDAP/WHOIS connection.
+    resolver: TokioAsyncResolver,
+    /// Only for `--dns-records`.
+    records: Option<TokioAsyncResolver>,
     timeout: Duration,
     /// TLD -> what IANA says about it. One lookup per TLD, failures cached
     /// too: IANA's WHOIS rate-limits hard, and asking it again for every
@@ -290,7 +293,7 @@ impl Ctx {
         if let Some(cached) = self.tld_info.lock().await.get(&apex) {
             return cached.clone();
         }
-        let info = whois::iana_tld_info(&self.limiter, &apex, self.timeout)
+        let info = whois::iana_tld_info(&self.resolver, &self.limiter, &apex, self.timeout)
             .await
             .ok()
             .map(Arc::new);
@@ -337,10 +340,12 @@ async fn run() -> Result<()> {
     );
 
     let timeout = Duration::from_secs(args.timeout.max(1));
+    let resolver = dns::connect_resolver(timeout);
     let client = reqwest::Client::builder()
         .user_agent(USER_AGENT)
         .timeout(timeout)
         .connect_timeout(timeout)
+        .dns_resolver(dns::Dns::new(&resolver))
         .build()
         .context("building HTTP client")?;
 
@@ -405,7 +410,7 @@ async fn run() -> Result<()> {
         );
     }
 
-    let resolver = args.dns_records.then(|| dns::resolver(timeout));
+    let records = args.dns_records.then(|| dns::resolver(timeout));
 
     let targets = build_targets(&args, &registry, &bootstrap)?;
     if targets.is_empty() {
@@ -433,6 +438,7 @@ async fn run() -> Result<()> {
         bootstrap,
         registry,
         resolver,
+        records,
         timeout,
         tld_info: tokio::sync::Mutex::new(std::collections::HashMap::new()),
     });
@@ -704,7 +710,16 @@ async fn check(ctx: &Ctx, domain: String, tld: String) -> CheckResult {
         let mut settled = false;
 
         if let Some(server) = &bundled {
-            match whois::query(&ctx.client, &ctx.limiter, server, &domain, ctx.timeout).await {
+            match whois::query(
+                &ctx.client,
+                &ctx.resolver,
+                &ctx.limiter,
+                server,
+                &domain,
+                ctx.timeout,
+            )
+            .await
+            {
                 Ok(resp) => {
                     settled = resp.status != Status::Unknown;
                     whois_server = Some(resp.server.clone());
@@ -743,8 +758,15 @@ async fn check(ctx: &Ctx, domain: String, tld: String) -> CheckResult {
                     let already = bundled.as_ref().map(|s| s.endpoint.label());
                     if already.as_deref() != Some(host.as_str()) {
                         let server = whois::referred_server(host);
-                        match whois::query(&ctx.client, &ctx.limiter, &server, &domain, ctx.timeout)
-                            .await
+                        match whois::query(
+                            &ctx.client,
+                            &ctx.resolver,
+                            &ctx.limiter,
+                            &server,
+                            &domain,
+                            ctx.timeout,
+                        )
+                        .await
                         {
                             Ok(resp) => {
                                 if resp.status != Status::Unknown {
@@ -782,7 +804,7 @@ async fn check(ctx: &Ctx, domain: String, tld: String) -> CheckResult {
     }
 
     // 3. DNS
-    let dns = match &ctx.resolver {
+    let dns = match &ctx.records {
         Some(r) => Some(dns::lookup(r, &domain).await),
         None => None,
     };

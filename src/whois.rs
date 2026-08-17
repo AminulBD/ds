@@ -1,9 +1,11 @@
 //! WHOIS queries: port 43 sockets plus the handful of web-form registries
 //! that `whois.json` lists with an http(s) URI.
 
+use std::net::SocketAddr;
 use std::time::Duration;
 
 use anyhow::{Context, Result};
+use hickory_resolver::TokioAsyncResolver;
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
 use tokio::net::TcpStream;
 
@@ -20,6 +22,7 @@ pub struct WhoisResponse {
 
 pub async fn query(
     client: &reqwest::Client,
+    resolver: &TokioAsyncResolver,
     limiter: &HostLimiter,
     server: &WhoisServer,
     domain: &str,
@@ -33,7 +36,7 @@ pub async fn query(
             let mut attempt = 0;
             loop {
                 let permit = limiter.acquire(host).await;
-                let result = socket_query(host, *port, domain, timeout).await;
+                let result = socket_query(resolver, host, *port, domain, timeout).await;
                 drop(permit);
                 match result {
                     Ok(raw) => {
@@ -82,12 +85,15 @@ pub async fn query(
     })
 }
 
-async fn socket_query(host: &str, port: u16, domain: &str, timeout: Duration) -> Result<String> {
+async fn socket_query(
+    resolver: &TokioAsyncResolver,
+    host: &str,
+    port: u16,
+    domain: &str,
+    timeout: Duration,
+) -> Result<String> {
     let addr = format!("{host}:{port}");
-    let mut stream = tokio::time::timeout(timeout, TcpStream::connect(&addr))
-        .await
-        .with_context(|| format!("connecting to {addr}: timed out"))?
-        .with_context(|| format!("connecting to {addr}"))?;
+    let mut stream = connect(resolver, host, port, timeout).await?;
 
     let query = format_query(host, domain);
     tokio::time::timeout(timeout, stream.write_all(query.as_bytes()))
@@ -103,6 +109,40 @@ async fn socket_query(host: &str, port: u16, domain: &str, timeout: Duration) ->
     Ok(String::from_utf8_lossy(&buf).replace("\r\n", "\n"))
 }
 
+/// Resolve and connect by hand instead of handing `host:port` to the platform
+/// resolver, which is unusable on some targets — see `dns::connect_resolver`.
+/// Every address the host has is tried, and the whole thing stays inside the
+/// single connect timeout it had before.
+async fn connect(
+    resolver: &TokioAsyncResolver,
+    host: &str,
+    port: u16,
+    timeout: Duration,
+) -> Result<TcpStream> {
+    let deadline = tokio::time::Instant::now() + timeout;
+
+    let addrs = tokio::time::timeout_at(deadline, resolver.lookup_ip(host))
+        .await
+        .with_context(|| format!("resolving {host}: timed out"))?
+        .with_context(|| format!("resolving {host}"))?;
+
+    let mut last = None;
+    for ip in addrs {
+        let addr = SocketAddr::new(ip, port);
+        match tokio::time::timeout_at(deadline, TcpStream::connect(addr)).await {
+            Ok(Ok(stream)) => return Ok(stream),
+            // Kept as an io::Error in the chain: the caller retries a reset
+            // connection by looking for its ErrorKind.
+            Ok(Err(e)) => {
+                last = Some(anyhow::Error::new(e).context(format!("connecting to {addr}")))
+            }
+            Err(_) => last = Some(anyhow::anyhow!("connecting to {addr}: timed out")),
+        }
+    }
+
+    Err(last.unwrap_or_else(|| anyhow::anyhow!("{host} resolves to no addresses")))
+}
+
 /// What IANA knows about a TLD: who runs it, where to register under it, and
 /// which WHOIS server currently serves it.
 ///
@@ -116,10 +156,15 @@ pub struct TldInfo {
 }
 
 /// Only the last label is meaningful to IANA, so `co.za` is asked as `za`.
-pub async fn iana_tld_info(limiter: &HostLimiter, tld: &str, timeout: Duration) -> Result<TldInfo> {
+pub async fn iana_tld_info(
+    resolver: &TokioAsyncResolver,
+    limiter: &HostLimiter,
+    tld: &str,
+    timeout: Duration,
+) -> Result<TldInfo> {
     let apex = tld.rsplit('.').next().unwrap_or(tld);
     let permit = limiter.acquire("whois.iana.org").await;
-    let raw = socket_query("whois.iana.org", 43, apex, timeout).await;
+    let raw = socket_query(resolver, "whois.iana.org", 43, apex, timeout).await;
     drop(permit);
     Ok(parse_tld_info(&raw?))
 }
