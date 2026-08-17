@@ -335,7 +335,10 @@ async fn run() -> Result<()> {
         args.concurrency = 1;
     }
     COLOR.store(
-        !args.no_color && std::env::var_os("NO_COLOR").is_none() && std::io::stdout().is_terminal(),
+        !args.no_color
+            && std::env::var_os("NO_COLOR").is_none()
+            && std::io::stdout().is_terminal()
+            && enable_ansi(),
         Ordering::Relaxed,
     );
 
@@ -1081,6 +1084,47 @@ enum Color {
     Yellow,
     Dim,
     Bold,
+}
+
+/// The Windows console prints escape sequences literally (`←[31m`) until
+/// virtual-terminal processing is switched on for the handle. Turn it on for
+/// stdout and stderr; if stdout refuses, the console is too old for ANSI and
+/// the caller drops colour entirely.
+#[cfg(windows)]
+fn enable_ansi() -> bool {
+    use windows_sys::Win32::Foundation::INVALID_HANDLE_VALUE;
+    use windows_sys::Win32::System::Console::{
+        GetConsoleMode, GetStdHandle, SetConsoleMode, CONSOLE_MODE,
+        ENABLE_VIRTUAL_TERMINAL_PROCESSING, STD_ERROR_HANDLE, STD_HANDLE, STD_OUTPUT_HANDLE,
+    };
+
+    fn enable(which: STD_HANDLE) -> bool {
+        unsafe {
+            let handle = GetStdHandle(which);
+            if handle.is_null() || handle == INVALID_HANDLE_VALUE {
+                return false;
+            }
+            let mut mode: CONSOLE_MODE = 0;
+            if GetConsoleMode(handle, &mut mode) == 0 {
+                // Not a console — a pipe or file, which never needed the flag.
+                return true;
+            }
+            if mode & ENABLE_VIRTUAL_TERMINAL_PROCESSING != 0 {
+                return true;
+            }
+            SetConsoleMode(handle, mode | ENABLE_VIRTUAL_TERMINAL_PROCESSING) != 0
+        }
+    }
+
+    let stdout_ok = enable(STD_OUTPUT_HANDLE);
+    // `error:` is painted on stderr, so that handle needs the flag as well.
+    enable(STD_ERROR_HANDLE);
+    stdout_ok
+}
+
+#[cfg(not(windows))]
+fn enable_ansi() -> bool {
+    true
 }
 
 fn paint(text: &str, color: Color) -> String {
