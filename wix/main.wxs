@@ -74,7 +74,7 @@
             InstallerVersion='450'
             Languages='1033'
             Compressed='yes'
-            InstallScope='perMachine'
+            InstallPrivileges='limited'
             SummaryCodepage='1252'
             />
 
@@ -84,6 +84,41 @@
 
         <Media Id='1' Cabinet='media1.cab' EmbedCab='yes' DiskPrompt='CD-ROM #1'/>
         <Property Id='DiskPrompt' Value='ds Installation'/>
+
+        <!--
+          The package installs either for everyone or for the current user, so
+          `Package` names no scope, and `InstallPrivileges='limited'` marks it
+          UAC-compliant; without that Windows asks for administrator rights
+          even when the install is going into one user's own profile.
+
+          ALLUSERS=2 means "for everyone when the install can elevate, for me
+          alone when it cannot", which is what an untouched install does. The
+          scope dialog overwrites it with 1 or with nothing once the choice is
+          made by hand, and `msiexec` takes those same two values on the
+          command line.
+        -->
+        <Property Id='ALLUSERS' Value='2' Secure='yes'/>
+        <Property Id='ApplicationFolderName' Value='ds'/>
+        <Property Id='WixAppFolder' Value='WixPerMachineFolder'/>
+
+        <!--
+          WixUI_Advanced offers `[ProgramFilesFolder]ds`, which is the 32-bit
+          Program Files in a 64-bit package. Point it at the one matching the
+          build instead. Scheduling this immediately before the action that
+          reads the property leaves the rest of that dance exactly as WiX
+          wrote it, including an APPLICATIONFOLDER given on the command line,
+          which still wins.
+        -->
+        <CustomAction Id='SetPerMachineFolder'
+            Property='WixPerMachineFolder'
+            Value='[$(var.PlatformProgramFilesFolder)][ApplicationFolderName]'
+            Execute='immediate'/>
+        <InstallUISequence>
+            <Custom Action='SetPerMachineFolder' Before='WixSetPerMachineFolder'>1</Custom>
+        </InstallUISequence>
+        <InstallExecuteSequence>
+            <Custom Action='SetPerMachineFolder' Before='WixSetPerMachineFolder'>1</Custom>
+        </InstallExecuteSequence>
 
         <Directory Id='TARGETDIR' Name='SourceDir'>
             <Directory Id='$(var.PlatformProgramFilesFolder)' Name='PFiles'>
@@ -103,7 +138,15 @@
                     </Component>
                     
                     <Directory Id='Bin' Name='bin'>
+                        <!--
+                          One component per scope, on conditions that match the
+                          ones WixUI_Advanced uses to pick the folder: an
+                          install for everyone writes the system PATH, an
+                          install for one user writes theirs. The conditions are
+                          exclusive, so exactly one of these is ever installed.
+                        -->
                         <Component Id='Path' Guid='0C638273-B469-4B6C-BF9E-3A777C39FFA1' KeyPath='yes'>
+                            <Condition>ALLUSERS=1 OR (ALLUSERS=2 AND Privileged)</Condition>
                             <Environment
                                 Id='PATH'
                                 Name='PATH'
@@ -112,6 +155,17 @@
                                 Part='last'
                                 Action='set'
                                 System='yes'/>
+                        </Component>
+                        <Component Id='PathPerUser' Guid='E135BEE8-5C6E-4214-8150-5229B3210A6C' KeyPath='yes'>
+                            <Condition>NOT (ALLUSERS=1 OR (ALLUSERS=2 AND Privileged))</Condition>
+                            <Environment
+                                Id='PATHPERUSER'
+                                Name='PATH'
+                                Value='[Bin]'
+                                Permanent='no'
+                                Part='last'
+                                Action='set'
+                                System='no'/>
                         </Component>
                         <Component Id='binary0' Guid='*'>
                             <File
@@ -150,6 +204,7 @@
                 Level='1'
                 Absent='allow'>
                 <ComponentRef Id='Path'/>
+                <ComponentRef Id='PathPerUser'/>
             </Feature>
         </Feature>
 
@@ -178,7 +233,11 @@
         <!--<Property Id='ARPHELPLINK' Value='ChangeMe'/>-->
 
         <UI>
-            <UIRef Id='WixUI_FeatureTree'/>
+            <!--
+              Advanced, rather than FeatureTree, for the one dialog that asks
+              whether to install for everyone or for this user alone.
+            -->
+            <UIRef Id='WixUI_Advanced'/>
             <!--
               Disabling the EULA dialog in the installer is a two step process:
 
