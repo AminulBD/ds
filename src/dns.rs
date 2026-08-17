@@ -39,7 +39,15 @@ pub fn resolver(timeout: Duration) -> TokioAsyncResolver {
 /// working; only when there is none do the public resolvers answer.
 pub fn connect_resolver(timeout: Duration) -> TokioAsyncResolver {
     let (config, mut opts) = connect_config(hickory_resolver::system_conf::read_system_conf().ok());
-    opts.timeout = timeout;
+    // A single DNS try has to fit inside the per-request budget with room left
+    // for another server and for the connection itself.
+    opts.timeout = (timeout / 4).max(Duration::from_secs(2));
+    opts.attempts = 2;
+    // Every server in the list is configured for UDP and TCP both, but the
+    // TCP entries are only ever reached with this on. Networks that black-hole
+    // UDP port 53 — and the Android emulator, which mangles it — resolve
+    // nothing without it.
+    opts.try_tcp_on_error = true;
     TokioAsyncResolver::tokio(config, opts)
 }
 
