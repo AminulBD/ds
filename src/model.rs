@@ -2,6 +2,8 @@
 
 use serde::Serialize;
 
+use crate::pricing::Price;
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
 #[serde(rename_all = "lowercase")]
 pub enum Status {
@@ -101,6 +103,9 @@ pub struct CheckResult {
     pub domain: String,
     pub tld: String,
     pub status: Status,
+    /// Average registration price for the TLD, per the bundled price table.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub price: Option<Price>,
     pub method: Method,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub registry: Option<String>,

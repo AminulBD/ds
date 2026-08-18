@@ -7,6 +7,7 @@ mod bootstrap;
 mod dns;
 mod limit;
 mod model;
+mod pricing;
 mod rdap;
 mod tlds;
 mod whois;
@@ -26,6 +27,7 @@ use hickory_resolver::TokioAsyncResolver;
 use bootstrap::Bootstrap;
 use limit::HostLimiter;
 use model::{CheckResult, Details, Method, Register, Status};
+use pricing::Prices;
 use tlds::Registry;
 use whois::TldInfo;
 
@@ -163,6 +165,17 @@ struct Args {
     #[arg(long = "whois-mode", value_enum, default_value_t = ListMode::Merge)]
     whois_mode: ListMode,
 
+    /// Custom price table, in the same format as the bundled pricing.json.
+    /// Without this, ./pricing.json and ~/.config/ds/pricing.json are picked
+    /// up automatically when they exist.
+    #[arg(long = "pricing-file", value_name = "PATH")]
+    pricing_file: Option<PathBuf>,
+
+    /// What to do with that table: merge it over the bundled one (custom
+    /// entries win) or use only it.
+    #[arg(long = "pricing-mode", value_enum, default_value_t = ListMode::Merge)]
+    pricing_mode: ListMode,
+
     /// Never query whois.iana.org: no referral when a bundled WHOIS host is
     /// stale, and no registry names for --where.
     #[arg(long = "no-iana")]
@@ -276,6 +289,7 @@ struct Ctx {
     limiter: HostLimiter,
     bootstrap: Bootstrap,
     registry: Registry,
+    prices: Prices,
     /// Used for every RDAP/WHOIS connection.
     resolver: TokioAsyncResolver,
     /// Only for `--dns-records`.
@@ -373,6 +387,27 @@ async fn run() -> Result<()> {
         list_note("whois:", count, path, whois_only, &args);
     }
 
+    let pricing_path = args
+        .pricing_file
+        .clone()
+        .or_else(|| discover_config("pricing.json"));
+    let custom_prices = match &pricing_path {
+        Some(path) => Some(Prices::from_file(path)?),
+        None => None,
+    };
+    let prices_only = custom_prices.is_some() && args.pricing_mode == ListMode::Only;
+
+    let mut prices = if prices_only {
+        Prices::default()
+    } else {
+        Prices::load().context("loading the bundled pricing.json")?
+    };
+    if let (Some(custom), Some(path)) = (custom_prices, &pricing_path) {
+        let count = custom.len();
+        prices.merge(custom);
+        list_note("pricing:", count, path, prices_only, &args);
+    }
+
     let custom_path = args
         .rdap_file
         .clone()
@@ -440,6 +475,7 @@ async fn run() -> Result<()> {
         client,
         bootstrap,
         registry,
+        prices,
         resolver,
         records,
         timeout,
@@ -829,6 +865,7 @@ async fn check(ctx: &Ctx, domain: String, tld: String) -> CheckResult {
     };
 
     CheckResult {
+        price: ctx.prices.lookup(&tld),
         domain,
         tld,
         status,
@@ -866,12 +903,20 @@ fn print_result(args: &Args, r: &CheckResult) {
         Status::Unknown => ("?", Color::Yellow),
     };
 
+    // The price is the TLD's, so it is printed whatever the status: it is what
+    // the name would cost, not a quote for this domain.
+    let price = match &r.price {
+        Some(p) => p.label(),
+        None => "-".into(),
+    };
+
     // Pad before painting: ANSI codes would otherwise count toward the width.
     println!(
-        "{} {} {} {:<6} {:>6}ms{}",
+        "{} {} {} {} {:<6} {:>6}ms{}",
         paint(mark, color),
         paint(&format!("{:<32}", r.domain), Color::Bold),
         paint(&format!("{:<10}", r.status.as_str()), color),
+        paint(&format!("{price:>8}"), Color::Dim),
         r.method.as_str(),
         r.elapsed_ms,
         match (&r.note, r.status) {

@@ -4,11 +4,11 @@ A small Rust CLI that checks domain availability across many TLDs at once.
 
 ```console
 $ ds mybrand --tld com,net,io,de,co.uk
-+ mybrand.io                      AVAILABLE  whois     512ms
-+ mybrand.de                      AVAILABLE  whois     331ms
-- mybrand.com                     TAKEN      rdap      504ms
-- mybrand.net                     TAKEN      rdap      503ms
-- mybrand.co.uk                   TAKEN      rdap      869ms
++ mybrand.io                       AVAILABLE    $65.98 whois     512ms
++ mybrand.de                       AVAILABLE     $6.98 whois     331ms
+- mybrand.com                      TAKEN        $14.98 rdap      504ms
+- mybrand.net                      TAKEN        $14.98 rdap      503ms
+- mybrand.co.uk                    TAKEN         $7.48 rdap      869ms
 
 summary: 2 available  3 taken  0 unknown   (5 checked in 1.1s)
 ```
@@ -21,6 +21,9 @@ server serves that TLD today.
 
 A lookup that cannot be answered is reported as `UNKNOWN` with the reason
 attached — never guessed as available.
+
+The column after the status is what the TLD costs to register for a year, in
+US dollars — see [Prices](#prices).
 
 ## Install
 
@@ -102,7 +105,8 @@ install -m755 target/release/ds ~/.local/bin/ds
 install -m644 ds.1 ~/.local/share/man/man1/ds.1     # then: man ds
 ```
 
-`whois.json` is embedded at compile time, so the binary runs from anywhere.
+`whois.json` and `pricing.json` are embedded at compile time, so the binary runs
+from anywhere.
 
 ## Usage
 
@@ -119,12 +123,15 @@ Results stream in as they arrive. `+` is available, `-` is taken, `?` could not
 be answered:
 
 ```
-+ mybrand.dev                     AVAILABLE  rdap      415ms
-- apple.com                       TAKEN      rdap      978ms
-? google.pt                       UNKNOWN    -        3548ms  whois: connecting to whois.dns.pt:43: timed out
++ mybrand.dev                      AVAILABLE    $15.98 rdap      415ms
+- apple.com                        TAKEN        $14.98 rdap      978ms
+? google.pt                        UNKNOWN           - -        3548ms  whois: connecting to whois.dns.pt:43: timed out
 
 summary: 1 available  1 taken  1 unknown   (3 checked in 3.5s)
 ```
+
+The fourth column is the average yearly registration price for the TLD; `-`
+means no price is on file for it.
 
 The exit code is `0` if anything is available, `1` if nothing is, `2` on a
 startup error — so `ds mybrand --tld com -q && echo free` works in a script.
@@ -220,7 +227,7 @@ ds apple --tld com --details --registry --dns-records
 ```
 
 ```
-- apple.com                       TAKEN      rdap      978ms
+- apple.com                        TAKEN        $14.98 rdap      978ms
     rdap: https://rdap.verisign.com/com/v1/
     registrar    Nom-iq Ltd. dba COM LAUDE
     created      1987-02-19T05:00:00Z
@@ -241,7 +248,7 @@ ds mynewbrand --tld com,de --where
 ```
 
 ```
-+ mynewbrand.de                   AVAILABLE  whois     858ms
++ mynewbrand.de                    AVAILABLE     $6.98 whois     858ms
     registry     DENIC eG
     registry url http://www.denic.de/
     register at  https://porkbun.com/checkout/search?q=mynewbrand.de
@@ -258,6 +265,38 @@ residency or trustee requirements, for instance.
 
 The four registrar links are prefilled searches, not a claim that those
 registrars carry the TLD; their pages will say.
+
+## Prices
+
+The price column is the average first-year registration price for the TLD, in
+**USD**, from the bundled `pricing.json` — 569 TLDs, from `$1.78` to `$2998.00`.
+The file lists one entry per registrar per TLD, so where several registrars
+quote a price the column is the mean of them:
+
+```json
+{
+  "com": [
+    { "register": "namecheap.com", "prices": { "regular": 14.98, "renew": 18.48, "transfer": 14.98 } }
+  ]
+}
+```
+
+Multi-label suffixes are looked up longest-first, as for WHOIS servers, so
+`.co.uk` gets its own price rather than `.uk`'s. A TLD nobody in the table
+prices — `.nu`, `.cn` and a handful of others — shows `-`.
+
+Treat these as list prices, not quotes. They are a snapshot of published
+registrar pricing: first-year promotions, ICANN fees, taxes and premium names
+all move the real number, and a registry may not sell the TLD to you at all
+(see [Where to register](#where-to-register)). `--json` carries the renewal
+price and the currency alongside the registration one:
+
+```json
+"price": { "register": 14.98, "renew": 18.48, "currency": "USD", "registrars": 1 }
+```
+
+Prices you have actually been quoted beat a bundled snapshot — see
+[Your own prices](#your-own-prices) for how to supply them.
 
 ## Choosing the source
 
@@ -350,6 +389,44 @@ ds apple --tld internal --whois-file servers.json --whois-mode only
 
 `./whois.json` and `~/.config/ds/whois.json` are picked up automatically, and
 the run says which file it loaded — exactly as for `rdap.json`.
+
+### Your own prices
+
+And the same again for the price column, in the format of the bundled
+`pricing.json` — a TLD mapped to what each registrar charges for it:
+
+```json
+{
+  "com": [
+    { "register": "porkbun.com",  "prices": { "regular": 9.13, "renew": 11.06 } },
+    { "register": "namesilo.com", "prices": { "regular": 9.95, "renew": 11.79 } }
+  ],
+  "internal": [
+    { "register": "corp.example", "prices": { "regular": 0.0 } }
+  ]
+}
+```
+
+Where several registrars quote a TLD the column shows the mean, so `.com` above
+reads `$9.54`. `register` is a label for your own benefit; only the prices are
+read, and each of them may be left out or set to `null` for "not sold". A TLD
+that ends up with no registration price at all shows `-`.
+
+```sh
+ds apple --tld com,io --pricing-file myprices.json                 # merged
+ds apple --tld internal --pricing-file myprices.json --pricing-mode only
+```
+
+| Mode | Effect |
+| --- | --- |
+| `merge` (default) | your prices win for the TLDs they name, the rest of the bundled table still applies |
+| `only` | the bundled table is ignored entirely; TLDs you did not price show `-` |
+
+`./pricing.json` and `~/.config/ds/pricing.json` are picked up automatically,
+and the run says which file it loaded — exactly as for `rdap.json`.
+
+This is how you put your registrar's real prices in the column, price a TLD the
+bundled table has never heard of, or hold a corporate zone at nothing.
 
 ## Pacing
 

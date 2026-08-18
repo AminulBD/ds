@@ -22,6 +22,19 @@ stale or missing, IANA is asked which server serves that TLD today.
 A lookup that cannot be answered is reported as
 .B UNKNOWN
 with the reason attached, never guessed as available.
+.PP
+The column after the status is what the TLD costs to register for a year, in
+US dollars: the average of the prices the bundled
+.I pricing.json
+lists for it, or
+.B \-
+for a TLD it does not price. Multi-label suffixes are matched longest-first, so
+.I co.uk
+gets its own price rather than
+.IR uk 's.
+These are published list prices, not quotes: promotions, taxes, registry fees
+and premium names all move the real figure; supply prices of your own with
+.BR \-\-pricing\-file .
 .SH ARGUMENTS
 .TP
 .IR NAME .\|.\|.
@@ -171,6 +184,26 @@ of the bundled table.
 .B only
 uses the custom table alone.
 .TP
+.BR \-\-pricing\-file " " \fIPATH\fR
+Custom price table, in the same format as the bundled
+.IR pricing.json :
+a TLD mapped to a list of registrar entries, each with a register label and a
+prices object holding regular and renew. Where several registrars quote a TLD,
+the column shows the mean. Any price may be omitted or null for "not sold".
+Without this option
+.I ./pricing.json
+and
+.I ~/.config/ds/pricing.json
+are used when they exist.
+.TP
+.BR \-\-pricing\-mode " " \fImerge\fR|\fIonly\fR
+.B merge
+(default) lets the custom prices win for the TLDs they name and keeps the rest
+of the bundled table.
+.B only
+uses the custom table alone, so TLDs it does not price show
+.BR \- .
+.TP
 .B \-\-no\-iana
 Never query whois.iana.org: no referral when a bundled WHOIS host is stale, and
 no registry names for
@@ -219,6 +252,10 @@ Custom RDAP server lists, used automatically when present. See
 .IR ./whois.json ", " ~/.config/ds/whois.json
 Custom WHOIS server tables, used automatically when present. See
 .BR \-\-whois\-file .
+.TP
+.IR ./pricing.json ", " ~/.config/ds/pricing.json
+Custom price tables, used automatically when present. See
+.BR \-\-pricing\-file .
 .TP
 .IR available.txt ", " unavailable.txt ", " unknown.txt
 Written in the working directory, or

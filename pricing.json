@@ -1,0 +1,5772 @@
+{
+  "com": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 14.98,
+        "renew": 18.48,
+        "transfer": 14.98
+      }
+    }
+  ],
+  "net": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 14.98,
+        "renew": 18.58,
+        "transfer": 14.98
+      }
+    }
+  ],
+  "org": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 14.48,
+        "renew": 18.98,
+        "transfer": 14.48
+      }
+    }
+  ],
+  "io": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 65.98,
+        "renew": 75.98,
+        "transfer": 65.98
+      }
+    }
+  ],
+  "co": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 38.48,
+        "renew": 45.48,
+        "transfer": 38.48
+      }
+    }
+  ],
+  "ai": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 79.98,
+        "renew": 114.98,
+        "transfer": 99.98
+      }
+    }
+  ],
+  "co.uk": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 7.48,
+        "renew": 9.98,
+        "transfer": 0.0
+      }
+    }
+  ],
+  "ca": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 11.98,
+        "renew": 14.98,
+        "transfer": 11.98
+      }
+    }
+  ],
+  "dev": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 15.98,
+        "renew": 20.98,
+        "transfer": 15.98
+      }
+    }
+  ],
+  "me": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 19.98,
+        "renew": 23.98,
+        "transfer": 19.98
+      }
+    }
+  ],
+  "us": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 8.48,
+        "renew": 10.98,
+        "transfer": 8.48
+      }
+    }
+  ],
+  "app": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 17.98,
+        "renew": 22.98,
+        "transfer": 17.98
+      }
+    }
+  ],
+  "in": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 11.98,
+        "renew": 11.98,
+        "transfer": 11.98
+      }
+    }
+  ],
+  "is": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 66.98,
+        "renew": 79.98,
+        "transfer": null
+      }
+    }
+  ],
+  "eu": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 8.98,
+        "renew": 10.98,
+        "transfer": null
+      }
+    }
+  ],
+  "gg": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 68.98,
+        "renew": 82.98,
+        "transfer": 68.98
+      }
+    }
+  ],
+  "to": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 39.98,
+        "renew": 39.98,
+        "transfer": 39.98
+      }
+    }
+  ],
+  "ph": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 52.98,
+        "renew": 56.98,
+        "transfer": 68.98
+      }
+    }
+  ],
+  "nl": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 7.48,
+        "renew": 8.98,
+        "transfer": 7.48
+      }
+    }
+  ],
+  "id": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 22.98,
+        "renew": 25.98,
+        "transfer": 22.98
+      }
+    }
+  ],
+  "inc": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 2098.0,
+        "renew": 2798.0,
+        "transfer": 2098.0
+      }
+    }
+  ],
+  "website": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 1.78,
+        "renew": 31.98,
+        "transfer": 27.98
+      }
+    }
+  ],
+  "xyz": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 19.48,
+        "renew": 19.48,
+        "transfer": 19.48
+      }
+    }
+  ],
+  "club": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 20.98,
+        "renew": 24.98,
+        "transfer": 20.98
+      }
+    }
+  ],
+  "online": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 2.88,
+        "renew": 43.98,
+        "transfer": 37.98
+      }
+    }
+  ],
+  "info": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 28.98,
+        "renew": 35.98,
+        "transfer": 28.98
+      }
+    }
+  ],
+  "store": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 2.88,
+        "renew": 66.98,
+        "transfer": 56.98
+      }
+    }
+  ],
+  "best": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 24.98,
+        "renew": 29.98,
+        "transfer": null
+      }
+    }
+  ],
+  "live": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 34.48,
+        "renew": 39.48,
+        "transfer": 34.48
+      }
+    }
+  ],
+  "de": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 6.98,
+        "renew": 9.88,
+        "transfer": null
+      }
+    }
+  ],
+  "tech": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 68.98,
+        "renew": 78.98,
+        "transfer": 68.98
+      }
+    }
+  ],
+  "pw": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 23.98,
+        "renew": 27.98,
+        "transfer": 23.98
+      }
+    }
+  ],
+  "pro": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 28.98,
+        "renew": 33.98,
+        "transfer": 28.98
+      }
+    }
+  ],
+  "uk": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 7.48,
+        "renew": 9.98,
+        "transfer": 0.0
+      }
+    }
+  ],
+  "tv": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 29.98,
+        "renew": 40.98,
+        "transfer": 28.98
+      }
+    }
+  ],
+  "cx": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 19.98,
+        "renew": 26.98,
+        "transfer": 19.98
+      }
+    }
+  ],
+  "mx": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 41.98,
+        "renew": 58.98,
+        "transfer": 46.98
+      }
+    }
+  ],
+  "fm": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 99.98,
+        "renew": 118.98,
+        "transfer": 99.98
+      }
+    }
+  ],
+  "cc": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 10.98,
+        "renew": 13.98,
+        "transfer": 10.98
+      }
+    }
+  ],
+  "world": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 43.98,
+        "renew": 52.98,
+        "transfer": 43.98
+      }
+    }
+  ],
+  "space": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 1.78,
+        "renew": 39.98,
+        "transfer": 34.98
+      }
+    }
+  ],
+  "vip": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 20.98,
+        "renew": 24.98,
+        "transfer": 20.98
+      }
+    }
+  ],
+  "life": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 38.48,
+        "renew": 46.48,
+        "transfer": 38.48
+      }
+    }
+  ],
+  "shop": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 38.98,
+        "renew": 48.98,
+        "transfer": 38.98
+      }
+    }
+  ],
+  "host": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 109.98,
+        "renew": 125.98,
+        "transfer": 109.98
+      }
+    }
+  ],
+  "fun": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 41.98,
+        "renew": 48.98,
+        "transfer": 41.98
+      }
+    }
+  ],
+  "biz": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 23.98,
+        "renew": 28.98,
+        "transfer": 23.98
+      }
+    }
+  ],
+  "icu": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 19.98,
+        "renew": 26.98,
+        "transfer": 19.98
+      }
+    }
+  ],
+  "design": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 58.98,
+        "renew": 68.98,
+        "transfer": 58.98
+      }
+    }
+  ],
+  "art": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 25.98,
+        "renew": 32.98,
+        "transfer": 25.98
+      }
+    }
+  ],
+  "ac": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 62.98,
+        "renew": 76.98,
+        "transfer": 62.98
+      }
+    }
+  ],
+  "academy": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 48.98,
+        "renew": 59.98,
+        "transfer": 48.98
+      }
+    }
+  ],
+  "accountant": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 25.98,
+        "renew": 31.98,
+        "transfer": 25.98
+      }
+    }
+  ],
+  "accountants": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 122.98,
+        "renew": 145.98,
+        "transfer": 122.98
+      }
+    }
+  ],
+  "actor": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 46.98,
+        "renew": 54.98,
+        "transfer": 46.98
+      }
+    }
+  ],
+  "ad": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 21.98,
+        "renew": 35.98,
+        "transfer": 21.98
+      }
+    }
+  ],
+  "adult": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 128.98,
+        "renew": 166.98,
+        "transfer": 128.98
+      }
+    }
+  ],
+  "ae.org": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 19.98,
+        "renew": 21.48,
+        "transfer": 19.98
+      }
+    }
+  ],
+  "africa": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 12.98,
+        "renew": 15.88,
+        "transfer": 12.98
+      }
+    }
+  ],
+  "agency": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 32.48,
+        "renew": 41.98,
+        "transfer": 32.48
+      }
+    }
+  ],
+  "airforce": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 109.98,
+        "renew": 134.98,
+        "transfer": 109.98
+      }
+    }
+  ],
+  "apartments": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 60.98,
+        "renew": 72.98,
+        "transfer": 60.98
+      }
+    }
+  ],
+  "archi": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 109.98,
+        "renew": 132.98,
+        "transfer": 109.98
+      }
+    }
+  ],
+  "army": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 41.98,
+        "renew": 48.98,
+        "transfer": 41.98
+      }
+    }
+  ],
+  "asia": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 14.48,
+        "renew": 18.98,
+        "transfer": 14.48
+      }
+    }
+  ],
+  "associates": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 41.98,
+        "renew": 49.98,
+        "transfer": 41.98
+      }
+    }
+  ],
+  "attorney": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 65.98,
+        "renew": 76.98,
+        "transfer": 65.98
+      }
+    }
+  ],
+  "auction": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 38.98,
+        "renew": 46.98,
+        "transfer": 38.98
+      }
+    }
+  ],
+  "audio": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 128.98,
+        "renew": 159.98,
+        "transfer": 128.98
+      }
+    }
+  ],
+  "auto": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 2298.0,
+        "renew": 2950.0,
+        "transfer": 2327.98
+      }
+    }
+  ],
+  "autos": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 19.98,
+        "renew": 19.98,
+        "transfer": 19.98
+      }
+    }
+  ],
+  "baby": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 64.98,
+        "renew": 81.98,
+        "transfer": 64.98
+      }
+    }
+  ],
+  "band": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 32.98,
+        "renew": 39.98,
+        "transfer": 32.98
+      }
+    }
+  ],
+  "bar": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 64.98,
+        "renew": 81.98,
+        "transfer": 64.98
+      }
+    }
+  ],
+  "barcelona": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 38.98,
+        "renew": 38.98,
+        "transfer": 38.98
+      }
+    }
+  ],
+  "bargains": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 29.98,
+        "renew": 37.98,
+        "transfer": 29.98
+      }
+    }
+  ],
+  "beauty": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 19.98,
+        "renew": 19.98,
+        "transfer": 19.98
+      }
+    }
+  ],
+  "beer": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 33.98,
+        "renew": 43.98,
+        "transfer": null
+      }
+    }
+  ],
+  "berlin": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 79.98,
+        "renew": 89.98,
+        "transfer": null
+      }
+    }
+  ],
+  "bet": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 26.98,
+        "renew": 35.98,
+        "transfer": 26.98
+      }
+    }
+  ],
+  "bid": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 25.98,
+        "renew": 27.98,
+        "transfer": 25.98
+      }
+    }
+  ],
+  "bike": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 39.98,
+        "renew": 48.98,
+        "transfer": 39.98
+      }
+    }
+  ],
+  "bingo": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 51.98,
+        "renew": 68.98,
+        "transfer": 51.98
+      }
+    }
+  ],
+  "bio": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 76.98,
+        "renew": 84.98,
+        "transfer": 76.98
+      }
+    }
+  ],
+  "black": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 68.98,
+        "renew": 82.98,
+        "transfer": 68.98
+      }
+    }
+  ],
+  "blackfriday": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 128.98,
+        "renew": 134.98,
+        "transfer": 128.98
+      }
+    }
+  ],
+  "blog": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 23.98,
+        "renew": 32.98,
+        "transfer": 23.98
+      }
+    }
+  ],
+  "blue": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 25.98,
+        "renew": 32.98,
+        "transfer": 25.98
+      }
+    }
+  ],
+  "boats": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 19.98,
+        "renew": 19.98,
+        "transfer": 19.98
+      }
+    }
+  ],
+  "bond": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 19.98,
+        "renew": 25.98,
+        "transfer": 19.98
+      }
+    }
+  ],
+  "boo": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 12.98,
+        "renew": 16.98,
+        "transfer": 12.98
+      }
+    }
+  ],
+  "boston": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 24.98,
+        "renew": 30.98,
+        "transfer": 24.98
+      }
+    }
+  ],
+  "bot": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 64.98,
+        "renew": 78.98,
+        "transfer": 64.98
+      }
+    }
+  ],
+  "boutique": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 31.98,
+        "renew": 41.98,
+        "transfer": 31.98
+      }
+    }
+  ],
+  "br.com": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 42.98,
+        "renew": 54.98,
+        "transfer": 42.98
+      }
+    }
+  ],
+  "broker": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 38.98,
+        "renew": 47.98,
+        "transfer": 38.98
+      }
+    }
+  ],
+  "build": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 32.98,
+        "renew": 39.98,
+        "transfer": null
+      }
+    }
+  ],
+  "builders": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 34.98,
+        "renew": 43.98,
+        "transfer": 34.98
+      }
+    }
+  ],
+  "business": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 19.98,
+        "renew": 25.98,
+        "transfer": 19.98
+      }
+    }
+  ],
+  "buzz": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 32.98,
+        "renew": 41.98,
+        "transfer": null
+      }
+    }
+  ],
+  "bz": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 21.98,
+        "renew": 26.98,
+        "transfer": 21.98
+      }
+    }
+  ],
+  "cab": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 33.98,
+        "renew": 41.98,
+        "transfer": 33.98
+      }
+    }
+  ],
+  "cafe": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 54.98,
+        "renew": 64.98,
+        "transfer": 54.98
+      }
+    }
+  ],
+  "cam": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 9.98,
+        "renew": 22.98,
+        "transfer": 19.98
+      }
+    }
+  ],
+  "camera": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 61.98,
+        "renew": 72.98,
+        "transfer": 61.98
+      }
+    }
+  ],
+  "camp": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 65.98,
+        "renew": 78.98,
+        "transfer": 65.98
+      }
+    }
+  ],
+  "capital": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 75.98,
+        "renew": 89.98,
+        "transfer": 75.98
+      }
+    }
+  ],
+  "car": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 2298.0,
+        "renew": 2400.0,
+        "transfer": 2298.0
+      }
+    }
+  ],
+  "cards": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 40.98,
+        "renew": 48.98,
+        "transfer": 40.98
+      }
+    }
+  ],
+  "care": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 46.98,
+        "renew": 59.98,
+        "transfer": 46.98
+      }
+    }
+  ],
+  "careers": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 75.98,
+        "renew": 89.98,
+        "transfer": 75.98
+      }
+    }
+  ],
+  "cars": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 2298.0,
+        "renew": 2950.0,
+        "transfer": 2327.98
+      }
+    }
+  ],
+  "casa": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 13.98,
+        "renew": 17.98,
+        "transfer": null
+      }
+    }
+  ],
+  "cash": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 40.98,
+        "renew": 50.98,
+        "transfer": 40.98
+      }
+    }
+  ],
+  "casino": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 171.98,
+        "renew": 191.98,
+        "transfer": 171.98
+      }
+    }
+  ],
+  "cat": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 38.98,
+        "renew": 38.98,
+        "transfer": 38.98
+      }
+    }
+  ],
+  "catering": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 40.98,
+        "renew": 48.98,
+        "transfer": 40.98
+      }
+    }
+  ],
+  "center": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 34.98,
+        "renew": 42.98,
+        "transfer": 34.98
+      }
+    }
+  ],
+  "ceo": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 124.98,
+        "renew": 124.98,
+        "transfer": null
+      }
+    }
+  ],
+  "cfd": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 19.98,
+        "renew": 26.98,
+        "transfer": 19.98
+      }
+    }
+  ],
+  "ch": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 18.98,
+        "renew": 26.98,
+        "transfer": null
+      }
+    }
+  ],
+  "channel": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 12.98,
+        "renew": 16.48,
+        "transfer": 12.98
+      }
+    }
+  ],
+  "charity": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 27.98,
+        "renew": 37.98,
+        "transfer": 27.98
+      }
+    }
+  ],
+  "chat": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 47.98,
+        "renew": 58.98,
+        "transfer": 47.98
+      }
+    }
+  ],
+  "cheap": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 38.48,
+        "renew": 49.98,
+        "transfer": 38.48
+      }
+    }
+  ],
+  "christmas": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 38.98,
+        "renew": 49.98,
+        "transfer": 38.98
+      }
+    }
+  ],
+  "church": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 61.98,
+        "renew": 78.98,
+        "transfer": 61.98
+      }
+    }
+  ],
+  "city": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 29.98,
+        "renew": 37.98,
+        "transfer": 29.98
+      }
+    }
+  ],
+  "claims": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 68.98,
+        "renew": 82.98,
+        "transfer": 68.98
+      }
+    }
+  ],
+  "cleaning": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 79.98,
+        "renew": 94.98,
+        "transfer": 79.98
+      }
+    }
+  ],
+  "click": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 12.98,
+        "renew": 17.98,
+        "transfer": 12.98
+      }
+    }
+  ],
+  "clinic": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 68.98,
+        "renew": 82.98,
+        "transfer": 68.98
+      }
+    }
+  ],
+  "clothing": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 31.98,
+        "renew": 35.68,
+        "transfer": 31.98
+      }
+    }
+  ],
+  "cloud": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 26.98,
+        "renew": 32.98,
+        "transfer": 26.98
+      }
+    }
+  ],
+  "cm": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 140.98,
+        "renew": 172.98,
+        "transfer": null
+      }
+    }
+  ],
+  "cn": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": null,
+        "renew": 23.98,
+        "transfer": null
+      }
+    }
+  ],
+  "cn.com": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 40.98,
+        "renew": 51.98,
+        "transfer": 38.98
+      }
+    }
+  ],
+  "co.bz": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 45.98,
+        "renew": 49.48,
+        "transfer": 45.98
+      }
+    }
+  ],
+  "co.com": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 25.98,
+        "renew": 35.98,
+        "transfer": 25.98
+      }
+    }
+  ],
+  "co.im": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 8.48,
+        "renew": 12.48,
+        "transfer": 0.0
+      }
+    }
+  ],
+  "co.in": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 9.48,
+        "renew": 9.48,
+        "transfer": 9.48
+      }
+    }
+  ],
+  "coach": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 81.98,
+        "renew": 95.98,
+        "transfer": 81.98
+      }
+    }
+  ],
+  "codes": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 74.98,
+        "renew": 92.98,
+        "transfer": 74.98
+      }
+    }
+  ],
+  "coffee": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 44.98,
+        "renew": 47.98,
+        "transfer": 44.98
+      }
+    }
+  ],
+  "college": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 62.98,
+        "renew": 81.98,
+        "transfer": 62.98
+      }
+    }
+  ],
+  "com.au": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 18.98,
+        "renew": 20.98,
+        "transfer": null
+      }
+    }
+  ],
+  "com.cn": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": null,
+        "renew": 23.98,
+        "transfer": null
+      }
+    }
+  ],
+  "com.co": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 19.48,
+        "renew": 26.48,
+        "transfer": 19.48
+      }
+    }
+  ],
+  "com.de": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 5.98,
+        "renew": 7.88,
+        "transfer": 5.98
+      }
+    }
+  ],
+  "com.es": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 18.98,
+        "renew": 25.98,
+        "transfer": null
+      }
+    }
+  ],
+  "com.im": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 8.48,
+        "renew": 12.48,
+        "transfer": 0.0
+      }
+    }
+  ],
+  "com.mx": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 13.98,
+        "renew": 34.98,
+        "transfer": 26.98
+      }
+    }
+  ],
+  "com.pe": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 88.98,
+        "renew": 99.98,
+        "transfer": 115.98
+      }
+    }
+  ],
+  "com.ph": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 52.98,
+        "renew": 58.98,
+        "transfer": 68.98
+      }
+    }
+  ],
+  "com.se": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 9.98,
+        "renew": 14.98,
+        "transfer": 9.98
+      }
+    }
+  ],
+  "com.sg": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 56.98,
+        "renew": 63.98,
+        "transfer": null
+      }
+    }
+  ],
+  "com.vc": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 32.98,
+        "renew": 41.98,
+        "transfer": 32.98
+      }
+    }
+  ],
+  "community": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 47.98,
+        "renew": 58.98,
+        "transfer": 47.98
+      }
+    }
+  ],
+  "company": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 21.98,
+        "renew": 27.98,
+        "transfer": 21.98
+      }
+    }
+  ],
+  "computer": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 41.98,
+        "renew": 48.98,
+        "transfer": 41.98
+      }
+    }
+  ],
+  "condos": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 61.98,
+        "renew": 72.98,
+        "transfer": 61.98
+      }
+    }
+  ],
+  "construction": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 40.98,
+        "renew": 50.98,
+        "transfer": 40.98
+      }
+    }
+  ],
+  "consulting": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 57.98,
+        "renew": 67.98,
+        "transfer": 57.98
+      }
+    }
+  ],
+  "contact": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 13.98,
+        "renew": 16.78,
+        "transfer": 13.98
+      }
+    }
+  ],
+  "contractors": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 36.98,
+        "renew": 39.98,
+        "transfer": 36.98
+      }
+    }
+  ],
+  "cooking": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 33.98,
+        "renew": 43.98,
+        "transfer": null
+      }
+    }
+  ],
+  "cool": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 47.98,
+        "renew": 50.98,
+        "transfer": 47.98
+      }
+    }
+  ],
+  "country": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 2298.0,
+        "renew": 2450.0,
+        "transfer": null
+      }
+    }
+  ],
+  "coupons": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 57.98,
+        "renew": 59.98,
+        "transfer": 57.98
+      }
+    }
+  ],
+  "courses": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 40.98,
+        "renew": 50.98,
+        "transfer": 40.98
+      }
+    }
+  ],
+  "credit": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 109.98,
+        "renew": 131.98,
+        "transfer": 109.98
+      }
+    }
+  ],
+  "creditcard": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 156.98,
+        "renew": 168.98,
+        "transfer": 156.98
+      }
+    }
+  ],
+  "cricket": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 25.98,
+        "renew": 31.98,
+        "transfer": 25.98
+      }
+    }
+  ],
+  "cruises": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 54.98,
+        "renew": 68.98,
+        "transfer": 54.98
+      }
+    }
+  ],
+  "cv": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 14.98,
+        "renew": 14.98,
+        "transfer": 19.98
+      }
+    }
+  ],
+  "cymru": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 12.98,
+        "renew": 18.98,
+        "transfer": null
+      }
+    }
+  ],
+  "cyou": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 19.98,
+        "renew": 25.98,
+        "transfer": 19.98
+      }
+    }
+  ],
+  "dad": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 12.98,
+        "renew": 16.98,
+        "transfer": 12.98
+      }
+    }
+  ],
+  "dance": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 28.98,
+        "renew": 36.98,
+        "transfer": 28.98
+      }
+    }
+  ],
+  "date": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 25.98,
+        "renew": 27.98,
+        "transfer": 25.98
+      }
+    }
+  ],
+  "dating": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 68.98,
+        "renew": 86.98,
+        "transfer": 68.98
+      }
+    }
+  ],
+  "day": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 12.98,
+        "renew": 16.98,
+        "transfer": 12.98
+      }
+    }
+  ],
+  "de.com": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 17.98,
+        "renew": 23.98,
+        "transfer": 17.98
+      }
+    }
+  ],
+  "deal": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 38.98,
+        "renew": 48.98,
+        "transfer": 38.98
+      }
+    }
+  ],
+  "dealer": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 2098.0,
+        "renew": 2348.0,
+        "transfer": 2098.0
+      }
+    }
+  ],
+  "deals": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 40.98,
+        "renew": 51.98,
+        "transfer": 40.98
+      }
+    }
+  ],
+  "degree": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 54.98,
+        "renew": 66.98,
+        "transfer": 54.98
+      }
+    }
+  ],
+  "delivery": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 65.98,
+        "renew": 79.98,
+        "transfer": 65.98
+      }
+    }
+  ],
+  "democrat": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 34.48,
+        "renew": 41.48,
+        "transfer": 34.48
+      }
+    }
+  ],
+  "dental": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 81.98,
+        "renew": 100.98,
+        "transfer": 81.98
+      }
+    }
+  ],
+  "dentist": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 63.98,
+        "renew": 81.98,
+        "transfer": 63.98
+      }
+    }
+  ],
+  "desi": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 19.98,
+        "renew": 22.98,
+        "transfer": null
+      }
+    }
+  ],
+  "diamonds": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 57.98,
+        "renew": 72.98,
+        "transfer": 57.98
+      }
+    }
+  ],
+  "diet": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 128.98,
+        "renew": 159.98,
+        "transfer": 128.98
+      }
+    }
+  ],
+  "digital": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 43.98,
+        "renew": 53.98,
+        "transfer": 43.98
+      }
+    }
+  ],
+  "direct": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 43.98,
+        "renew": 53.98,
+        "transfer": 43.98
+      }
+    }
+  ],
+  "directory": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 28.98,
+        "renew": 36.98,
+        "transfer": 28.98
+      }
+    }
+  ],
+  "discount": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 29.98,
+        "renew": 39.98,
+        "transfer": 29.98
+      }
+    }
+  ],
+  "diy": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 38.98,
+        "renew": 51.98,
+        "transfer": 38.98
+      }
+    }
+  ],
+  "doctor": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 122.98,
+        "renew": 154.98,
+        "transfer": 122.98
+      }
+    }
+  ],
+  "dog": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 68.98,
+        "renew": 86.98,
+        "transfer": 68.98
+      }
+    }
+  ],
+  "domains": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 44.98,
+        "renew": 53.98,
+        "transfer": 44.98
+      }
+    }
+  ],
+  "download": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 25.98,
+        "renew": 27.98,
+        "transfer": 25.98
+      }
+    }
+  ],
+  "earth": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 19.98,
+        "renew": 27.98,
+        "transfer": null
+      }
+    }
+  ],
+  "eco": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 72.98,
+        "renew": 101.98,
+        "transfer": 72.98
+      }
+    }
+  ],
+  "education": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 36.98,
+        "renew": 46.98,
+        "transfer": 36.98
+      }
+    }
+  ],
+  "email": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 32.98,
+        "renew": 40.98,
+        "transfer": 32.98
+      }
+    }
+  ],
+  "energy": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 122.98,
+        "renew": 155.98,
+        "transfer": 122.98
+      }
+    }
+  ],
+  "engineer": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 40.98,
+        "renew": 52.98,
+        "transfer": 40.98
+      }
+    }
+  ],
+  "engineering": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 68.98,
+        "renew": 85.98,
+        "transfer": 68.98
+      }
+    }
+  ],
+  "enterprises": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 34.98,
+        "renew": 47.98,
+        "transfer": 34.98
+      }
+    }
+  ],
+  "equipment": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 29.98,
+        "renew": 32.98,
+        "transfer": 29.98
+      }
+    }
+  ],
+  "es": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 18.98,
+        "renew": 28.98,
+        "transfer": null
+      }
+    }
+  ],
+  "esq": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 25.98,
+        "renew": 29.98,
+        "transfer": 25.98
+      }
+    }
+  ],
+  "estate": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 40.98,
+        "renew": 52.98,
+        "transfer": 40.98
+      }
+    }
+  ],
+  "eu.com": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 17.98,
+        "renew": 24.98,
+        "transfer": 17.98
+      }
+    }
+  ],
+  "events": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 47.98,
+        "renew": 57.98,
+        "transfer": 47.98
+      }
+    }
+  ],
+  "exchange": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 40.98,
+        "renew": 49.98,
+        "transfer": 40.98
+      }
+    }
+  ],
+  "expert": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 65.48,
+        "renew": 82.48,
+        "transfer": 65.48
+      }
+    }
+  ],
+  "exposed": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 22.98,
+        "renew": 28.98,
+        "transfer": 22.98
+      }
+    }
+  ],
+  "express": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 40.98,
+        "renew": 49.98,
+        "transfer": 40.98
+      }
+    }
+  ],
+  "fail": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 40.98,
+        "renew": 50.98,
+        "transfer": 40.98
+      }
+    }
+  ],
+  "faith": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 25.98,
+        "renew": 27.98,
+        "transfer": 25.98
+      }
+    }
+  ],
+  "family": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 40.98,
+        "renew": 49.98,
+        "transfer": 40.98
+      }
+    }
+  ],
+  "fan": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 57.98,
+        "renew": 68.98,
+        "transfer": 57.98
+      }
+    }
+  ],
+  "fans": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 10.98,
+        "renew": 13.98,
+        "transfer": 10.98
+      }
+    }
+  ],
+  "farm": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 40.98,
+        "renew": 49.98,
+        "transfer": 40.98
+      }
+    }
+  ],
+  "fashion": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 33.98,
+        "renew": 45.98,
+        "transfer": null
+      }
+    }
+  ],
+  "fast": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 35.98,
+        "renew": 35.98,
+        "transfer": 35.98
+      }
+    }
+  ],
+  "feedback": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 389.98,
+        "renew": 489.98,
+        "transfer": 389.98
+      }
+    }
+  ],
+  "film": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 77.98,
+        "renew": 97.98,
+        "transfer": 77.98
+      }
+    }
+  ],
+  "finance": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 68.98,
+        "renew": 82.98,
+        "transfer": 68.98
+      }
+    }
+  ],
+  "financial": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 61.98,
+        "renew": 66.98,
+        "transfer": 61.98
+      }
+    }
+  ],
+  "fish": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 46.98,
+        "renew": 59.98,
+        "transfer": 46.98
+      }
+    }
+  ],
+  "fishing": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 33.98,
+        "renew": 45.98,
+        "transfer": null
+      }
+    }
+  ],
+  "fit": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 33.98,
+        "renew": 45.98,
+        "transfer": null
+      }
+    }
+  ],
+  "fitness": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 43.98,
+        "renew": 54.98,
+        "transfer": 43.98
+      }
+    }
+  ],
+  "flights": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 61.98,
+        "renew": 75.98,
+        "transfer": 61.98
+      }
+    }
+  ],
+  "florist": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 31.98,
+        "renew": 41.98,
+        "transfer": 31.98
+      }
+    }
+  ],
+  "flowers": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 128.98,
+        "renew": 159.98,
+        "transfer": 138.98
+      }
+    }
+  ],
+  "foo": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 12.98,
+        "renew": 17.98,
+        "transfer": 12.98
+      }
+    }
+  ],
+  "food": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 38.98,
+        "renew": 48.98,
+        "transfer": 38.98
+      }
+    }
+  ],
+  "football": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 26.98,
+        "renew": 36.98,
+        "transfer": 26.98
+      }
+    }
+  ],
+  "forex": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 109.98,
+        "renew": 133.98,
+        "transfer": 109.98
+      }
+    }
+  ],
+  "forsale": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 38.48,
+        "renew": 47.48,
+        "transfer": 38.48
+      }
+    }
+  ],
+  "forum": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 38.98,
+        "renew": 49.98,
+        "transfer": 38.98
+      }
+    }
+  ],
+  "foundation": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 27.98,
+        "renew": 37.98,
+        "transfer": 27.98
+      }
+    }
+  ],
+  "fr": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 17.98,
+        "renew": 20.98,
+        "transfer": null
+      }
+    }
+  ],
+  "free": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 38.98,
+        "renew": 44.98,
+        "transfer": 38.98
+      }
+    }
+  ],
+  "fund": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 74.98,
+        "renew": 92.98,
+        "transfer": 74.98
+      }
+    }
+  ],
+  "furniture": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 100.98,
+        "renew": 127.98,
+        "transfer": 100.98
+      }
+    }
+  ],
+  "futbol": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 16.98,
+        "renew": 21.98,
+        "transfer": 16.98
+      }
+    }
+  ],
+  "fyi": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 6.98,
+        "renew": 9.68,
+        "transfer": 6.98
+      }
+    }
+  ],
+  "gallery": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 29.98,
+        "renew": 36.98,
+        "transfer": 29.98
+      }
+    }
+  ],
+  "game": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 389.98,
+        "renew": 498.0,
+        "transfer": 389.98
+      }
+    }
+  ],
+  "games": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 35.98,
+        "renew": 42.98,
+        "transfer": 35.98
+      }
+    }
+  ],
+  "garden": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 33.98,
+        "renew": 43.98,
+        "transfer": null
+      }
+    }
+  ],
+  "gay": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 40.98,
+        "renew": 50.98,
+        "transfer": 40.98
+      }
+    }
+  ],
+  "gb.net": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 9.98,
+        "renew": 12.58,
+        "transfer": 9.98
+      }
+    }
+  ],
+  "gdn": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 11.98,
+        "renew": 14.98,
+        "transfer": null
+      }
+    }
+  ],
+  "gift": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 20.98,
+        "renew": 23.98,
+        "transfer": null
+      }
+    }
+  ],
+  "gifts": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 38.48,
+        "renew": 47.48,
+        "transfer": 38.48
+      }
+    }
+  ],
+  "gives": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 27.98,
+        "renew": 37.98,
+        "transfer": 27.98
+      }
+    }
+  ],
+  "giving": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 27.98,
+        "renew": 35.98,
+        "transfer": 27.98
+      }
+    }
+  ],
+  "glass": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 76.98,
+        "renew": 99.98,
+        "transfer": 76.98
+      }
+    }
+  ],
+  "global": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 102.98,
+        "renew": 127.98,
+        "transfer": 102.98
+      }
+    }
+  ],
+  "gmbh": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 47.98,
+        "renew": 56.98,
+        "transfer": 47.98
+      }
+    }
+  ],
+  "gold": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 108.98,
+        "renew": 130.98,
+        "transfer": 108.98
+      }
+    }
+  ],
+  "golf": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 67.98,
+        "renew": 83.98,
+        "transfer": 67.98
+      }
+    }
+  ],
+  "gr.com": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 14.98,
+        "renew": 21.98,
+        "transfer": 14.98
+      }
+    }
+  ],
+  "graphics": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 22.98,
+        "renew": 31.98,
+        "transfer": 22.98
+      }
+    }
+  ],
+  "gratis": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 24.98,
+        "renew": 31.98,
+        "transfer": 24.98
+      }
+    }
+  ],
+  "green": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 84.98,
+        "renew": 102.98,
+        "transfer": 84.98
+      }
+    }
+  ],
+  "gripe": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 6.98,
+        "renew": 8.98,
+        "transfer": 6.98
+      }
+    }
+  ],
+  "group": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 26.98,
+        "renew": 35.98,
+        "transfer": 26.98
+      }
+    }
+  ],
+  "guide": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 43.48,
+        "renew": 54.48,
+        "transfer": 43.48
+      }
+    }
+  ],
+  "guitars": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 128.98,
+        "renew": 159.98,
+        "transfer": 128.98
+      }
+    }
+  ],
+  "guru": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 44.98,
+        "renew": 54.98,
+        "transfer": 44.98
+      }
+    }
+  ],
+  "hair": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 19.98,
+        "renew": 19.98,
+        "transfer": 19.98
+      }
+    }
+  ],
+  "hamburg": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 69.98,
+        "renew": 73.98,
+        "transfer": null
+      }
+    }
+  ],
+  "haus": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 35.98,
+        "renew": 37.98,
+        "transfer": 35.98
+      }
+    }
+  ],
+  "health": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 82.98,
+        "renew": 107.98,
+        "transfer": 82.98
+      }
+    }
+  ],
+  "healthcare": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 93.98,
+        "renew": 111.98,
+        "transfer": 93.98
+      }
+    }
+  ],
+  "help": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 32.98,
+        "renew": 43.98,
+        "transfer": 32.98
+      }
+    }
+  ],
+  "hiphop": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 25.98,
+        "renew": 33.98,
+        "transfer": 25.98
+      }
+    }
+  ],
+  "hockey": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 62.98,
+        "renew": 72.98,
+        "transfer": 62.98
+      }
+    }
+  ],
+  "holdings": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 67.98,
+        "renew": 81.98,
+        "transfer": 67.98
+      }
+    }
+  ],
+  "holiday": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 67.98,
+        "renew": 81.98,
+        "transfer": 67.98
+      }
+    }
+  ],
+  "homes": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 19.98,
+        "renew": 19.98,
+        "transfer": 19.98
+      }
+    }
+  ],
+  "horse": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 33.98,
+        "renew": 43.98,
+        "transfer": null
+      }
+    }
+  ],
+  "hospital": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 55.98,
+        "renew": 71.98,
+        "transfer": 55.98
+      }
+    }
+  ],
+  "hosting": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 368.98,
+        "renew": 398.0,
+        "transfer": 398.98
+      }
+    }
+  ],
+  "hot": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 52.98,
+        "renew": 58.98,
+        "transfer": 52.98
+      }
+    }
+  ],
+  "house": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 46.98,
+        "renew": 55.98,
+        "transfer": 46.98
+      }
+    }
+  ],
+  "how": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 30.98,
+        "renew": 41.98,
+        "transfer": null
+      }
+    }
+  ],
+  "hu.net": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 32.98,
+        "renew": 44.98,
+        "transfer": 32.98
+      }
+    }
+  ],
+  "im": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 8.48,
+        "renew": 12.98,
+        "transfer": 0.0
+      }
+    }
+  ],
+  "immo": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 36.98,
+        "renew": 43.98,
+        "transfer": 36.98
+      }
+    }
+  ],
+  "immobilien": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 39.98,
+        "renew": 43.98,
+        "transfer": 39.98
+      }
+    }
+  ],
+  "in.net": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 7.98,
+        "renew": 10.48,
+        "transfer": 7.98
+      }
+    }
+  ],
+  "industries": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 47.98,
+        "renew": 58.98,
+        "transfer": 47.98
+      }
+    }
+  ],
+  "ing": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 12.98,
+        "renew": 16.98,
+        "transfer": 12.98
+      }
+    }
+  ],
+  "ink": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 33.98,
+        "renew": 43.98,
+        "transfer": 33.98
+      }
+    }
+  ],
+  "institute": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 28.98,
+        "renew": 37.98,
+        "transfer": 28.98
+      }
+    }
+  ],
+  "insure": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 76.98,
+        "renew": 91.98,
+        "transfer": 76.98
+      }
+    }
+  ],
+  "international": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 32.48,
+        "renew": 40.48,
+        "transfer": 32.48
+      }
+    }
+  ],
+  "investments": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 136.98,
+        "renew": 166.98,
+        "transfer": 136.98
+      }
+    }
+  ],
+  "irish": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 22.98,
+        "renew": 31.98,
+        "transfer": 22.98
+      }
+    }
+  ],
+  "it.com": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 32.98,
+        "renew": 38.98,
+        "transfer": 32.98
+      }
+    }
+  ],
+  "jetzt": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 24.48,
+        "renew": 30.48,
+        "transfer": 24.48
+      }
+    }
+  ],
+  "jewelry": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 67.98,
+        "renew": 69.98,
+        "transfer": 67.98
+      }
+    }
+  ],
+  "jp.net": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 8.98,
+        "renew": 11.98,
+        "transfer": 8.98
+      }
+    }
+  ],
+  "jpn.com": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 38.98,
+        "renew": 48.98,
+        "transfer": 38.98
+      }
+    }
+  ],
+  "juegos": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 368.98,
+        "renew": 478.98,
+        "transfer": 368.98
+      }
+    }
+  ],
+  "kaufen": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 29.98,
+        "renew": 33.58,
+        "transfer": 29.98
+      }
+    }
+  ],
+  "kids": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 22.98,
+        "renew": 29.98,
+        "transfer": 22.98
+      }
+    }
+  ],
+  "kim": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 24.48,
+        "renew": 32.98,
+        "transfer": 24.48
+      }
+    }
+  ],
+  "kitchen": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 67.98,
+        "renew": 83.98,
+        "transfer": 67.98
+      }
+    }
+  ],
+  "kiwi": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 31.98,
+        "renew": 35.68,
+        "transfer": null
+      }
+    }
+  ],
+  "krd": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 34.98,
+        "renew": 44.98,
+        "transfer": 29.98
+      }
+    }
+  ],
+  "kyoto": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 70.98,
+        "renew": 78.98,
+        "transfer": null
+      }
+    }
+  ],
+  "la": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 32.98,
+        "renew": 41.98,
+        "transfer": 32.98
+      }
+    }
+  ],
+  "land": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 43.98,
+        "renew": 54.98,
+        "transfer": 43.98
+      }
+    }
+  ],
+  "lat": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 40.98,
+        "renew": 40.98,
+        "transfer": 40.98
+      }
+    }
+  ],
+  "latino": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 22.98,
+        "renew": 26.98,
+        "transfer": 22.98
+      }
+    }
+  ],
+  "law": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 105.98,
+        "renew": 130.98,
+        "transfer": 105.98
+      }
+    }
+  ],
+  "lawyer": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 65.98,
+        "renew": 66.98,
+        "transfer": 65.98
+      }
+    }
+  ],
+  "lease": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 58.98,
+        "renew": 73.98,
+        "transfer": 58.98
+      }
+    }
+  ],
+  "legal": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 74.98,
+        "renew": 88.98,
+        "transfer": 74.98
+      }
+    }
+  ],
+  "lgbt": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 84.98,
+        "renew": 93.98,
+        "transfer": 84.98
+      }
+    }
+  ],
+  "li": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 14.98,
+        "renew": 19.98,
+        "transfer": null
+      }
+    }
+  ],
+  "lifestyle": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 38.98,
+        "renew": 48.98,
+        "transfer": 38.98
+      }
+    }
+  ],
+  "lighting": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 22.98,
+        "renew": 31.98,
+        "transfer": 22.98
+      }
+    }
+  ],
+  "limited": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 37.98,
+        "renew": 39.98,
+        "transfer": 37.98
+      }
+    }
+  ],
+  "limo": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 57.98,
+        "renew": 68.98,
+        "transfer": 57.98
+      }
+    }
+  ],
+  "link": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 8.98,
+        "renew": 11.98,
+        "transfer": 8.98
+      }
+    }
+  ],
+  "living": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 38.98,
+        "renew": 48.98,
+        "transfer": 38.98
+      }
+    }
+  ],
+  "llc": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 44.98,
+        "renew": 54.98,
+        "transfer": 44.98
+      }
+    }
+  ],
+  "loan": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 25.98,
+        "renew": 27.98,
+        "transfer": 25.98
+      }
+    }
+  ],
+  "loans": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 122.98,
+        "renew": 144.98,
+        "transfer": 122.98
+      }
+    }
+  ],
+  "locker": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 46.98,
+        "renew": 56.98,
+        "transfer": 46.98
+      }
+    }
+  ],
+  "lol": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 40.98,
+        "renew": 40.98,
+        "transfer": 40.98
+      }
+    }
+  ],
+  "london": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 36.98,
+        "renew": 41.98,
+        "transfer": 36.98
+      }
+    }
+  ],
+  "love": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 28.98,
+        "renew": 38.98,
+        "transfer": 28.98
+      }
+    }
+  ],
+  "ltd": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 32.98,
+        "renew": 42.98,
+        "transfer": 32.98
+      }
+    }
+  ],
+  "ltda": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 42.98,
+        "renew": 46.98,
+        "transfer": null
+      }
+    }
+  ],
+  "luxury": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": null,
+        "renew": 500.98,
+        "transfer": null
+      }
+    }
+  ],
+  "maison": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 60.98,
+        "renew": 69.98,
+        "transfer": 60.98
+      }
+    }
+  ],
+  "makeup": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 19.98,
+        "renew": 19.98,
+        "transfer": 19.98
+      }
+    }
+  ],
+  "management": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 26.98,
+        "renew": 34.98,
+        "transfer": 26.98
+      }
+    }
+  ],
+  "market": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 46.98,
+        "renew": 55.98,
+        "transfer": 46.98
+      }
+    }
+  ],
+  "marketing": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 43.98,
+        "renew": 53.98,
+        "transfer": 43.98
+      }
+    }
+  ],
+  "markets": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 20.98,
+        "renew": 26.98,
+        "transfer": 20.98
+      }
+    }
+  ],
+  "mba": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 40.98,
+        "renew": 49.98,
+        "transfer": 40.98
+      }
+    }
+  ],
+  "me.uk": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 7.48,
+        "renew": 9.98,
+        "transfer": 0.0
+      }
+    }
+  ],
+  "media": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 47.98,
+        "renew": 58.98,
+        "transfer": 47.98
+      }
+    }
+  ],
+  "melbourne": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 44.98,
+        "renew": 53.98,
+        "transfer": 44.98
+      }
+    }
+  ],
+  "meme": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 12.98,
+        "renew": 15.98,
+        "transfer": 12.98
+      }
+    }
+  ],
+  "memorial": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 54.98,
+        "renew": 64.98,
+        "transfer": 54.98
+      }
+    }
+  ],
+  "men": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 25.98,
+        "renew": 27.98,
+        "transfer": 25.98
+      }
+    }
+  ],
+  "menu": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 34.98,
+        "renew": 38.98,
+        "transfer": null
+      }
+    }
+  ],
+  "mex.com": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 12.98,
+        "renew": 14.48,
+        "transfer": 12.98
+      }
+    }
+  ],
+  "miami": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 24.98,
+        "renew": 30.98,
+        "transfer": 24.98
+      }
+    }
+  ],
+  "mobi": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 54.98,
+        "renew": 64.98,
+        "transfer": 54.98
+      }
+    }
+  ],
+  "mobile": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 22.98,
+        "renew": 26.98,
+        "transfer": 22.98
+      }
+    }
+  ],
+  "moda": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 43.98,
+        "renew": 45.98,
+        "transfer": 43.98
+      }
+    }
+  ],
+  "moe": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 14.98,
+        "renew": 17.88,
+        "transfer": null
+      }
+    }
+  ],
+  "mom": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 32.98,
+        "renew": 45.98,
+        "transfer": null
+      }
+    }
+  ],
+  "money": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 34.98,
+        "renew": 38.98,
+        "transfer": 34.98
+      }
+    }
+  ],
+  "monster": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 19.98,
+        "renew": 19.98,
+        "transfer": 19.98
+      }
+    }
+  ],
+  "mortgage": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 65.98,
+        "renew": 76.98,
+        "transfer": 65.98
+      }
+    }
+  ],
+  "motorcycles": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 19.98,
+        "renew": 19.98,
+        "transfer": 19.98
+      }
+    }
+  ],
+  "mov": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 12.98,
+        "renew": 15.98,
+        "transfer": 12.98
+      }
+    }
+  ],
+  "movie": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 369.98,
+        "renew": 446.98,
+        "transfer": 369.98
+      }
+    }
+  ],
+  "music": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 47.98,
+        "renew": 52.48,
+        "transfer": 47.98
+      }
+    }
+  ],
+  "my": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 32.98,
+        "renew": 38.98,
+        "transfer": 32.98
+      }
+    }
+  ],
+  "nagoya": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 16.98,
+        "renew": 24.98,
+        "transfer": null
+      }
+    }
+  ],
+  "name": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 8.98,
+        "renew": 9.98,
+        "transfer": 8.98
+      }
+    }
+  ],
+  "navy": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 43.98,
+        "renew": 45.98,
+        "transfer": 43.98
+      }
+    }
+  ],
+  "net.au": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 18.98,
+        "renew": 20.98,
+        "transfer": null
+      }
+    }
+  ],
+  "net.cn": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": null,
+        "renew": 23.98,
+        "transfer": null
+      }
+    }
+  ],
+  "net.im": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 8.48,
+        "renew": 12.48,
+        "transfer": 0.0
+      }
+    }
+  ],
+  "net.pe": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 88.98,
+        "renew": 97.98,
+        "transfer": 115.98
+      }
+    }
+  ],
+  "net.ph": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 52.98,
+        "renew": 58.98,
+        "transfer": 68.98
+      }
+    }
+  ],
+  "net.vc": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 32.98,
+        "renew": 43.98,
+        "transfer": 32.98
+      }
+    }
+  ],
+  "network": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 36.98,
+        "renew": 46.98,
+        "transfer": 36.98
+      }
+    }
+  ],
+  "new": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 488.98,
+        "renew": 601.98,
+        "transfer": 488.98
+      }
+    }
+  ],
+  "news": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 34.48,
+        "renew": 41.48,
+        "transfer": 34.48
+      }
+    }
+  ],
+  "nexus": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 12.98,
+        "renew": 15.98,
+        "transfer": 12.98
+      }
+    }
+  ],
+  "ngo": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 18.98,
+        "renew": 24.98,
+        "transfer": 18.98
+      }
+    }
+  ],
+  "ninja": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 32.98,
+        "renew": 42.98,
+        "transfer": 32.98
+      }
+    }
+  ],
+  "nom.es": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 18.98,
+        "renew": 20.98,
+        "transfer": null
+      }
+    }
+  ],
+  "now": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 38.98,
+        "renew": 49.98,
+        "transfer": 38.98
+      }
+    }
+  ],
+  "nu": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": null,
+        "renew": 39.88,
+        "transfer": null
+      }
+    }
+  ],
+  "nyc": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 32.98,
+        "renew": 43.98,
+        "transfer": 32.98
+      }
+    }
+  ],
+  "observer": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 11.98,
+        "renew": 16.98,
+        "transfer": null
+      }
+    }
+  ],
+  "okinawa": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 17.98,
+        "renew": 22.98,
+        "transfer": null
+      }
+    }
+  ],
+  "one": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 30.98,
+        "renew": 30.98,
+        "transfer": 30.98
+      }
+    }
+  ],
+  "ong": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 18.98,
+        "renew": 24.98,
+        "transfer": 18.98
+      }
+    }
+  ],
+  "onl": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 23.98,
+        "renew": 28.98,
+        "transfer": null
+      }
+    }
+  ],
+  "org.au": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 18.98,
+        "renew": 20.98,
+        "transfer": null
+      }
+    }
+  ],
+  "org.cn": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": null,
+        "renew": 23.98,
+        "transfer": null
+      }
+    }
+  ],
+  "org.es": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 18.98,
+        "renew": 20.98,
+        "transfer": null
+      }
+    }
+  ],
+  "org.im": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 8.48,
+        "renew": 12.48,
+        "transfer": 0.0
+      }
+    }
+  ],
+  "org.mx": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 21.98,
+        "renew": 32.98,
+        "transfer": 25.98
+      }
+    }
+  ],
+  "org.pe": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 88.98,
+        "renew": 99.98,
+        "transfer": 115.98
+      }
+    }
+  ],
+  "org.ph": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 52.98,
+        "renew": 58.98,
+        "transfer": 68.98
+      }
+    }
+  ],
+  "org.uk": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 7.48,
+        "renew": 9.98,
+        "transfer": 0.0
+      }
+    }
+  ],
+  "org.vc": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 32.98,
+        "renew": 41.98,
+        "transfer": 32.98
+      }
+    }
+  ],
+  "osaka": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 32.98,
+        "renew": 41.98,
+        "transfer": null
+      }
+    }
+  ],
+  "page": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 12.98,
+        "renew": 16.98,
+        "transfer": 12.98
+      }
+    }
+  ],
+  "paris": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 66.98,
+        "renew": 66.98,
+        "transfer": null
+      }
+    }
+  ],
+  "partners": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 74.98,
+        "renew": 88.98,
+        "transfer": 74.98
+      }
+    }
+  ],
+  "parts": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 43.98,
+        "renew": 45.98,
+        "transfer": 43.98
+      }
+    }
+  ],
+  "party": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 25.98,
+        "renew": 27.98,
+        "transfer": 25.98
+      }
+    }
+  ],
+  "pe": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 88.98,
+        "renew": 95.98,
+        "transfer": 115.98
+      }
+    }
+  ],
+  "pet": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 27.98,
+        "renew": 35.98,
+        "transfer": 27.98
+      }
+    }
+  ],
+  "phd": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 25.98,
+        "renew": 29.98,
+        "transfer": 25.98
+      }
+    }
+  ],
+  "photo": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 31.98,
+        "renew": 40.98,
+        "transfer": 31.98
+      }
+    }
+  ],
+  "photography": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 38.48,
+        "renew": 46.48,
+        "transfer": 38.48
+      }
+    }
+  ],
+  "photos": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 31.98,
+        "renew": 40.98,
+        "transfer": 31.98
+      }
+    }
+  ],
+  "pics": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 40.98,
+        "renew": 40.98,
+        "transfer": 40.98
+      }
+    }
+  ],
+  "pictures": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 16.48,
+        "renew": 20.98,
+        "transfer": 16.48
+      }
+    }
+  ],
+  "pink": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 27.48,
+        "renew": 31.48,
+        "transfer": 27.48
+      }
+    }
+  ],
+  "pizza": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 67.98,
+        "renew": 83.98,
+        "transfer": 67.98
+      }
+    }
+  ],
+  "place": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 22.98,
+        "renew": 30.98,
+        "transfer": 22.98
+      }
+    }
+  ],
+  "plumbing": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 76.98,
+        "renew": 89.98,
+        "transfer": 76.98
+      }
+    }
+  ],
+  "plus": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 57.98,
+        "renew": 72.98,
+        "transfer": 57.98
+      }
+    }
+  ],
+  "poker": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 71.98,
+        "renew": 85.98,
+        "transfer": 71.98
+      }
+    }
+  ],
+  "porn": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 128.98,
+        "renew": 154.98,
+        "transfer": 128.98
+      }
+    }
+  ],
+  "press": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 85.98,
+        "renew": 99.98,
+        "transfer": 85.98
+      }
+    }
+  ],
+  "productions": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 42.98,
+        "renew": 50.98,
+        "transfer": 42.98
+      }
+    }
+  ],
+  "prof": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 25.98,
+        "renew": 29.38,
+        "transfer": 25.98
+      }
+    }
+  ],
+  "promo": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 26.48,
+        "renew": 33.48,
+        "transfer": 26.48
+      }
+    }
+  ],
+  "properties": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 40.98,
+        "renew": 43.98,
+        "transfer": 40.98
+      }
+    }
+  ],
+  "property": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 128.98,
+        "renew": 161.98,
+        "transfer": 128.98
+      }
+    }
+  ],
+  "protection": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 2298.0,
+        "renew": 2950.0,
+        "transfer": 2298.0
+      }
+    }
+  ],
+  "pub": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 42.98,
+        "renew": 51.98,
+        "transfer": 42.98
+      }
+    }
+  ],
+  "quest": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 19.98,
+        "renew": 19.98,
+        "transfer": 19.98
+      }
+    }
+  ],
+  "racing": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 25.98,
+        "renew": 27.98,
+        "transfer": 25.98
+      }
+    }
+  ],
+  "realty": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 312.98,
+        "renew": 456.98,
+        "transfer": null
+      }
+    }
+  ],
+  "recipes": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 81.98,
+        "renew": 95.98,
+        "transfer": 81.98
+      }
+    }
+  ],
+  "red": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 24.48,
+        "renew": 28.48,
+        "transfer": 24.48
+      }
+    }
+  ],
+  "rehab": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 38.48,
+        "renew": 47.48,
+        "transfer": 38.48
+      }
+    }
+  ],
+  "reise": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 102.98,
+        "renew": 127.98,
+        "transfer": 102.98
+      }
+    }
+  ],
+  "reisen": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 21.98,
+        "renew": 28.98,
+        "transfer": 21.98
+      }
+    }
+  ],
+  "rent": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 62.98,
+        "renew": 81.98,
+        "transfer": 62.98
+      }
+    }
+  ],
+  "rentals": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 46.98,
+        "renew": 56.98,
+        "transfer": 46.98
+      }
+    }
+  ],
+  "repair": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 38.48,
+        "renew": 47.48,
+        "transfer": 38.48
+      }
+    }
+  ],
+  "report": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 26.48,
+        "renew": 34.48,
+        "transfer": 26.48
+      }
+    }
+  ],
+  "republican": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 31.98,
+        "renew": 43.98,
+        "transfer": 31.98
+      }
+    }
+  ],
+  "rest": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 32.98,
+        "renew": 41.98,
+        "transfer": 32.98
+      }
+    }
+  ],
+  "restaurant": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 67.98,
+        "renew": 81.98,
+        "transfer": 67.98
+      }
+    }
+  ],
+  "review": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 25.98,
+        "renew": 27.98,
+        "transfer": 25.98
+      }
+    }
+  ],
+  "reviews": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 65.98,
+        "renew": 77.98,
+        "transfer": 65.98
+      }
+    }
+  ],
+  "rip": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 24.98,
+        "renew": 32.98,
+        "transfer": 24.98
+      }
+    }
+  ],
+  "rocks": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 22.98,
+        "renew": 29.98,
+        "transfer": 22.98
+      }
+    }
+  ],
+  "rodeo": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 13.98,
+        "renew": 17.98,
+        "transfer": null
+      }
+    }
+  ],
+  "rsvp": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 12.98,
+        "renew": 16.98,
+        "transfer": 12.98
+      }
+    }
+  ],
+  "ru.com": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 176.98,
+        "renew": 220.98,
+        "transfer": 176.98
+      }
+    }
+  ],
+  "run": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 28.98,
+        "renew": 35.98,
+        "transfer": 28.98
+      }
+    }
+  ],
+  "ryukyu": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 17.98,
+        "renew": 22.98,
+        "transfer": null
+      }
+    }
+  ],
+  "sa.com": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 359.98,
+        "renew": 498.0,
+        "transfer": 359.98
+      }
+    }
+  ],
+  "sale": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 40.98,
+        "renew": 48.98,
+        "transfer": 40.98
+      }
+    }
+  ],
+  "salon": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 55.98,
+        "renew": 69.98,
+        "transfer": 55.98
+      }
+    }
+  ],
+  "sarl": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 6.98,
+        "renew": 8.98,
+        "transfer": 6.98
+      }
+    }
+  ],
+  "sats": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": null,
+        "renew": 20.0,
+        "transfer": null
+      }
+    }
+  ],
+  "sbs": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 19.98,
+        "renew": 25.98,
+        "transfer": 19.98
+      }
+    }
+  ],
+  "school": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 38.48,
+        "renew": 49.98,
+        "transfer": 38.48
+      }
+    }
+  ],
+  "schule": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 29.98,
+        "renew": 32.98,
+        "transfer": 29.98
+      }
+    }
+  ],
+  "science": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 25.98,
+        "renew": 27.98,
+        "transfer": 25.98
+      }
+    }
+  ],
+  "se.net": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 32.98,
+        "renew": 44.98,
+        "transfer": 32.98
+      }
+    }
+  ],
+  "security": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 2298.0,
+        "renew": 2950.0,
+        "transfer": 2327.98
+      }
+    }
+  ],
+  "services": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 40.98,
+        "renew": 51.98,
+        "transfer": 40.98
+      }
+    }
+  ],
+  "sex": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 128.98,
+        "renew": 154.98,
+        "transfer": 128.98
+      }
+    }
+  ],
+  "sexy": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 2998.0,
+        "renew": 3298.0,
+        "transfer": 2898.0
+      }
+    }
+  ],
+  "sg": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 56.98,
+        "renew": 63.98,
+        "transfer": null
+      }
+    }
+  ],
+  "sh": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 62.98,
+        "renew": 76.98,
+        "transfer": 62.98
+      }
+    }
+  ],
+  "shiksha": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 54.98,
+        "renew": 69.98,
+        "transfer": 54.98
+      }
+    }
+  ],
+  "shoes": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 67.98,
+        "renew": 81.98,
+        "transfer": 67.98
+      }
+    }
+  ],
+  "shopping": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 29.98,
+        "renew": 37.98,
+        "transfer": 29.98
+      }
+    }
+  ],
+  "show": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 43.98,
+        "renew": 47.98,
+        "transfer": 43.98
+      }
+    }
+  ],
+  "singles": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 33.98,
+        "renew": 36.98,
+        "transfer": 33.98
+      }
+    }
+  ],
+  "site": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 1.78,
+        "renew": 43.98,
+        "transfer": 37.98
+      }
+    }
+  ],
+  "ski": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 76.98,
+        "renew": 82.98,
+        "transfer": null
+      }
+    }
+  ],
+  "skin": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 19.98,
+        "renew": 19.98,
+        "transfer": 19.98
+      }
+    }
+  ],
+  "so": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 64.98,
+        "renew": 68.98,
+        "transfer": 128.98
+      }
+    }
+  ],
+  "soccer": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 27.48,
+        "renew": 29.48,
+        "transfer": 27.48
+      }
+    }
+  ],
+  "social": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 43.98,
+        "renew": 55.98,
+        "transfer": 43.98
+      }
+    }
+  ],
+  "software": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 43.98,
+        "renew": 56.98,
+        "transfer": 43.98
+      }
+    }
+  ],
+  "solar": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 67.98,
+        "renew": 81.98,
+        "transfer": 67.98
+      }
+    }
+  ],
+  "solutions": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 32.98,
+        "renew": 41.98,
+        "transfer": 32.98
+      }
+    }
+  ],
+  "soy": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 28.98,
+        "renew": 39.98,
+        "transfer": null
+      }
+    }
+  ],
+  "spot": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 25.98,
+        "renew": 31.98,
+        "transfer": 25.98
+      }
+    }
+  ],
+  "storage": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 598.98,
+        "renew": 858.0,
+        "transfer": 598.0
+      }
+    }
+  ],
+  "stream": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 25.98,
+        "renew": 27.98,
+        "transfer": 25.98
+      }
+    }
+  ],
+  "studio": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 39.98,
+        "renew": 52.98,
+        "transfer": 39.98
+      }
+    }
+  ],
+  "study": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 40.98,
+        "renew": 50.98,
+        "transfer": 40.98
+      }
+    }
+  ],
+  "style": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 40.98,
+        "renew": 49.98,
+        "transfer": 40.98
+      }
+    }
+  ],
+  "substack": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 30.98,
+        "renew": 30.98,
+        "transfer": null
+      }
+    }
+  ],
+  "sucks": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 278.98,
+        "renew": 298.0,
+        "transfer": null
+      }
+    }
+  ],
+  "supplies": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 25.48,
+        "renew": 32.48,
+        "transfer": 25.48
+      }
+    }
+  ],
+  "supply": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 27.48,
+        "renew": 33.48,
+        "transfer": 27.48
+      }
+    }
+  ],
+  "support": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 28.98,
+        "renew": 37.98,
+        "transfer": 28.98
+      }
+    }
+  ],
+  "surf": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 33.98,
+        "renew": 43.98,
+        "transfer": null
+      }
+    }
+  ],
+  "surgery": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 57.98,
+        "renew": 68.98,
+        "transfer": 57.98
+      }
+    }
+  ],
+  "sydney": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 44.98,
+        "renew": 54.98,
+        "transfer": 44.98
+      }
+    }
+  ],
+  "systems": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 37.48,
+        "renew": 47.48,
+        "transfer": 37.48
+      }
+    }
+  ],
+  "talk": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 46.98,
+        "renew": 46.98,
+        "transfer": 46.98
+      }
+    }
+  ],
+  "tattoo": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 38.98,
+        "renew": 48.98,
+        "transfer": 38.98
+      }
+    }
+  ],
+  "tax": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 71.98,
+        "renew": 85.98,
+        "transfer": 71.98
+      }
+    }
+  ],
+  "taxi": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 65.98,
+        "renew": 69.98,
+        "transfer": 65.98
+      }
+    }
+  ],
+  "team": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 38.48,
+        "renew": 46.48,
+        "transfer": 38.48
+      }
+    }
+  ],
+  "technology": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 29.98,
+        "renew": 37.98,
+        "transfer": 29.98
+      }
+    }
+  ],
+  "tel": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 10.98,
+        "renew": 15.98,
+        "transfer": 10.98
+      }
+    }
+  ],
+  "tennis": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 67.98,
+        "renew": 81.98,
+        "transfer": 67.98
+      }
+    }
+  ],
+  "theater": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 67.98,
+        "renew": 80.98,
+        "transfer": 67.98
+      }
+    }
+  ],
+  "theatre": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 598.98,
+        "renew": 620.0,
+        "transfer": 598.98
+      }
+    }
+  ],
+  "tickets": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 428.98,
+        "renew": 568.0,
+        "transfer": 428.98
+      }
+    }
+  ],
+  "tienda": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 62.98,
+        "renew": 74.98,
+        "transfer": 62.98
+      }
+    }
+  ],
+  "tips": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 33.48,
+        "renew": 42.48,
+        "transfer": 33.48
+      }
+    }
+  ],
+  "tires": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 87.98,
+        "renew": 110.98,
+        "transfer": 87.98
+      }
+    }
+  ],
+  "today": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 29.98,
+        "renew": 38.98,
+        "transfer": 29.98
+      }
+    }
+  ],
+  "tokyo": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 16.98,
+        "renew": 24.98,
+        "transfer": null
+      }
+    }
+  ],
+  "tools": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 38.48,
+        "renew": 47.48,
+        "transfer": 38.48
+      }
+    }
+  ],
+  "top": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 5.98,
+        "renew": 6.98,
+        "transfer": 5.98
+      }
+    }
+  ],
+  "tours": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 65.98,
+        "renew": 81.98,
+        "transfer": 65.98
+      }
+    }
+  ],
+  "town": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 38.48,
+        "renew": 47.48,
+        "transfer": 38.48
+      }
+    }
+  ],
+  "toys": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 68.48,
+        "renew": 82.48,
+        "transfer": 68.48
+      }
+    }
+  ],
+  "trade": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 25.98,
+        "renew": 27.98,
+        "transfer": 25.98
+      }
+    }
+  ],
+  "trading": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 21.98,
+        "renew": 27.98,
+        "transfer": 21.98
+      }
+    }
+  ],
+  "training": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 43.98,
+        "renew": 53.98,
+        "transfer": 43.98
+      }
+    }
+  ],
+  "travel": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 157.98,
+        "renew": 186.98,
+        "transfer": 157.98
+      }
+    }
+  ],
+  "tube": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 25.98,
+        "renew": 33.98,
+        "transfer": 25.98
+      }
+    }
+  ],
+  "uk.com": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 31.98,
+        "renew": 35.68,
+        "transfer": 31.98
+      }
+    }
+  ],
+  "uk.net": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 31.98,
+        "renew": 35.68,
+        "transfer": 31.98
+      }
+    }
+  ],
+  "university": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 65.98,
+        "renew": 77.98,
+        "transfer": 65.98
+      }
+    }
+  ],
+  "uno": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 27.98,
+        "renew": 31.98,
+        "transfer": null
+      }
+    }
+  ],
+  "us.com": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 19.98,
+        "renew": 25.98,
+        "transfer": 19.98
+      }
+    }
+  ],
+  "us.org": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 19.98,
+        "renew": 23.98,
+        "transfer": 19.98
+      }
+    }
+  ],
+  "vacations": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 40.98,
+        "renew": 49.98,
+        "transfer": 40.98
+      }
+    }
+  ],
+  "vana": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 2298.0,
+        "renew": 2498.0,
+        "transfer": 2298.0
+      }
+    }
+  ],
+  "vc": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 32.98,
+        "renew": 41.98,
+        "transfer": 32.98
+      }
+    }
+  ],
+  "vegas": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 51.98,
+        "renew": 64.98,
+        "transfer": 51.98
+      }
+    }
+  ],
+  "ventures": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 62.98,
+        "renew": 75.98,
+        "transfer": 62.98
+      }
+    }
+  ],
+  "vet": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 43.98,
+        "renew": 52.98,
+        "transfer": 43.98
+      }
+    }
+  ],
+  "viajes": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 43.98,
+        "renew": 57.98,
+        "transfer": 43.98
+      }
+    }
+  ],
+  "video": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 38.48,
+        "renew": 49.48,
+        "transfer": 38.48
+      }
+    }
+  ],
+  "villas": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 62.98,
+        "renew": 74.98,
+        "transfer": 62.98
+      }
+    }
+  ],
+  "vin": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 62.98,
+        "renew": 75.98,
+        "transfer": 62.98
+      }
+    }
+  ],
+  "vision": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 47.98,
+        "renew": 59.98,
+        "transfer": 47.98
+      }
+    }
+  ],
+  "vodka": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 33.98,
+        "renew": 43.98,
+        "transfer": null
+      }
+    }
+  ],
+  "vote": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 95.98,
+        "renew": 119.98,
+        "transfer": 95.98
+      }
+    }
+  ],
+  "voting": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 1398.0,
+        "renew": 1448.0,
+        "transfer": null
+      }
+    }
+  ],
+  "voto": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 68.98,
+        "renew": 86.98,
+        "transfer": 68.98
+      }
+    }
+  ],
+  "voyage": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 61.98,
+        "renew": 73.98,
+        "transfer": 61.98
+      }
+    }
+  ],
+  "wales": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 12.98,
+        "renew": 18.98,
+        "transfer": null
+      }
+    }
+  ],
+  "watch": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 43.98,
+        "renew": 56.98,
+        "transfer": 43.98
+      }
+    }
+  ],
+  "webcam": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 25.98,
+        "renew": 27.98,
+        "transfer": 25.98
+      }
+    }
+  ],
+  "wedding": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 33.98,
+        "renew": 43.98,
+        "transfer": null
+      }
+    }
+  ],
+  "wiki": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 33.98,
+        "renew": 43.98,
+        "transfer": 33.98
+      }
+    }
+  ],
+  "win": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 25.98,
+        "renew": 27.98,
+        "transfer": 25.98
+      }
+    }
+  ],
+  "wine": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 62.98,
+        "renew": 75.98,
+        "transfer": 62.98
+      }
+    }
+  ],
+  "work": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 13.98,
+        "renew": 17.98,
+        "transfer": null
+      }
+    }
+  ],
+  "works": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 40.98,
+        "renew": 51.98,
+        "transfer": 40.98
+      }
+    }
+  ],
+  "ws": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 30.98,
+        "renew": 38.98,
+        "transfer": null
+      }
+    }
+  ],
+  "wtf": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 38.48,
+        "renew": 49.48,
+        "transfer": 38.48
+      }
+    }
+  ],
+  "xn--3ds443g": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": null,
+        "renew": 35.98,
+        "transfer": null
+      }
+    }
+  ],
+  "xn--6frz82g": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 14.98,
+        "renew": 19.98,
+        "transfer": null
+      }
+    }
+  ],
+  "xxx": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 128.98,
+        "renew": 154.98,
+        "transfer": 128.98
+      }
+    }
+  ],
+  "yachts": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 19.98,
+        "renew": 19.98,
+        "transfer": 19.98
+      }
+    }
+  ],
+  "yoga": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 33.98,
+        "renew": 45.98,
+        "transfer": null
+      }
+    }
+  ],
+  "yokohama": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 16.98,
+        "renew": 22.98,
+        "transfer": null
+      }
+    }
+  ],
+  "you": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 27.98,
+        "renew": 27.98,
+        "transfer": 27.98
+      }
+    }
+  ],
+  "za.com": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 359.98,
+        "renew": 462.98,
+        "transfer": 359.98
+      }
+    }
+  ],
+  "zip": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 12.98,
+        "renew": 15.88,
+        "transfer": 12.98
+      }
+    }
+  ],
+  "zone": [
+    {
+      "register": "namecheap.com",
+      "prices": {
+        "regular": 40.98,
+        "renew": 51.98,
+        "transfer": 40.98
+      }
+    }
+  ]
+}
