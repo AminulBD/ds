@@ -27,8 +27,14 @@ US dollars — see [Prices](#prices).
 
 ## Install
 
-Every release ships installers and plain archives for Linux, macOS and Windows
-on x86_64, arm64 and 32-bit x86. Grab one from the
+On macOS or Linux with [Homebrew](https://brew.sh):
+
+```sh
+brew install aminulbd/ds/ds
+```
+
+Every release also ships installers and plain archives for Linux, macOS and
+Windows on x86_64, arm64 and 32-bit x86. Grab one from the
 [releases page](../../releases):
 
 | Platform | File | Install |
