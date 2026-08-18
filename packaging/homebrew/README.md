@@ -1,36 +1,26 @@
 # packaging/homebrew
 
-`ds.rb` is the **source-building** Homebrew formula, kept here for an eventual
-[homebrew/core](https://github.com/Homebrew/homebrew-core) submission. It is not
-the formula users install today.
+`ds` is distributed exclusively through the
+[aminulbd/homebrew-tap](https://github.com/aminulbd/homebrew-tap) tap. There is
+no Homebrew core formula.
 
-Day-to-day installs come from the tap at
-[aminulbd/homebrew-tap](https://github.com/aminulbd/homebrew-tap), whose
-`Formula/ds.rb` downloads the prebuilt per-platform tarball from the releases
-page instead of compiling. homebrew/core does not accept prebuilt formulae —
-hence two files.
+The tap's `Formula/ds.rb` installs the matching prebuilt release archive for
+macOS (Apple Silicon or Intel) and Linux (ARM or Intel). `brew install --HEAD`
+builds the latest `main` branch from source using Rust.
 
-It lives in this repo rather than in the tap because
-`brew test-bot --only-tap-syntax` lints every `.rb` in a tap: a formula outside
-`Formula/` is linted as plain Ruby (tripping
-`Style/FrozenStringLiteralComment`), and two files declaring
-`class Ds < Formula` trip `Lint/DuplicateMethods`.
-
-## Before submitting to homebrew/core
-
-`ds` must first clear the new-formula gates in Homebrew's
-`utils/shared_audits.rb`. Self-submissions get a 3x notability multiplier, so an
-author-opened PR needs **90 forks, 90 watchers, or 225 stars**, and the repo
-must be **30+ days old**. Check the current numbers first:
+## Install
 
 ```sh
-gh repo view aminulbd/ds --json stargazerCount,forkCount,watchers,createdAt
+brew install aminulbd/tap/ds
 ```
 
-Then bump `url`/`sha256` to the release being submitted and verify:
+## Updating the formula
+
+For each release, update the versioned release URLs and SHA-256 checksums in
+`Formula/ds.rb` in the tap, then verify:
 
 ```sh
-brew install --build-from-source ./ds.rb
-brew test ./ds.rb
-brew audit --new --strict --online ./ds.rb
+brew install --build-from-source aminulbd/tap/ds
+brew test aminulbd/tap/ds
+brew audit --strict aminulbd/tap/ds
 ```
