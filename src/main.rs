@@ -37,6 +37,7 @@ const USER_AGENT: &str = concat!("ds/", env!("CARGO_PKG_VERSION"), " (domain-sea
 #[command(
     name = "ds",
     version,
+    disable_version_flag = true,
     about = "Check domain availability over RDAP with a WHOIS fallback",
     long_about = "Check domain availability over RDAP with a WHOIS fallback.\n\n\
                   Examples:\n  \
@@ -192,6 +193,10 @@ struct Args {
     /// Disable coloured output.
     #[arg(long = "no-color")]
     no_color: bool,
+
+    /// Print the version and exit.
+    #[arg(short = 'v', short_alias = 'V', long, action = clap::ArgAction::Version)]
+    version: Option<bool>,
 }
 
 /// Which level of the tree a name is registered at.

@@ -438,6 +438,7 @@ bundled table has never heard of, or hold a corporate zone at nothing.
 | `--refresh` | | re-download the IANA RDAP bootstrap (cached 7 days in `~/.cache/ds/`) |
 | `-q, --quiet` | | summary only |
 | `--no-color` | | plain output (also honours `NO_COLOR`) |
+| `-v, --version` | | print the version and exit |
 
 ## Accuracy notes
 
