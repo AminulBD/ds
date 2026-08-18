@@ -5,7 +5,7 @@
 the formula users install today.
 
 Day-to-day installs come from the tap at
-[aminulbd/homebrew-ds](https://github.com/aminulbd/homebrew-ds), whose
+[aminulbd/homebrew-tap](https://github.com/aminulbd/homebrew-tap), whose
 `Formula/ds.rb` downloads the prebuilt per-platform tarball from the releases
 page instead of compiling. homebrew/core does not accept prebuilt formulae —
 hence two files.

@@ -30,7 +30,7 @@ US dollars — see [Prices](#prices).
 On macOS or Linux with [Homebrew](https://brew.sh):
 
 ```sh
-brew install aminulbd/ds/ds
+brew install aminulbd/tap/ds
 ```
 
 Every release also ships installers and plain archives for Linux, macOS and
