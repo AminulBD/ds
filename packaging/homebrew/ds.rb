@@ -1,8 +1,8 @@
 class Ds < Formula
   desc "Check domain availability over RDAP with a WHOIS fallback"
   homepage "https://github.com/aminulbd/ds"
-  url "https://github.com/aminulbd/ds/archive/refs/tags/v0.1.4.tar.gz"
-  sha256 "84839befd95e33975b06fbf9b3e201f14df3461500f98f75a2e6249ef6e4e9b0"
+  url "https://github.com/aminulbd/ds/archive/refs/tags/v0.1.5.tar.gz"
+  sha256 "458549fe0897c6cafe3b96abb923057fdaf65f57cfa008aab6bfe82ce655cf0d"
   license "MIT"
   head "https://github.com/aminulbd/ds.git", branch: "main"
 
