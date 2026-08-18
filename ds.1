@@ -128,6 +128,14 @@ Write
 .I unavailable.txt
 and, when a registry could not be reached,
 .IR unknown.txt .
+With
+.B \-\-json
+they are written as
+.IR available.json ,
+.I unavailable.json
+and
+.I unknown.json
+instead, each holding a JSON array of the full results.
 Nothing is written without this.
 .TP
 .BR \-o ", " \-\-out\-dir " " \fIDIR\fR
@@ -263,6 +271,11 @@ Written in the working directory, or
 when
 .B \-\-save
 is given.
+The
+.I .json
+counterparts are written instead when
+.B \-\-json
+is also given.
 .SH EXAMPLES
 .PP
 Check one name across a few TLDs:

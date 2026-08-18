@@ -171,6 +171,17 @@ ds mybrand --tld popular --append           # so does --append
 * `unknown.txt` — only when a registry could not be reached, so a failed lookup
   is never filed as "available"
 
+With `--json` the same three files are written as `available.json`,
+`unavailable.json` and `unknown.json`, each a JSON array of the full results
+rather than a list of names:
+
+```sh
+ds mybrand --tld all --save --json          # available.json, unavailable.json
+```
+
+`--append` merges into the array already in the file, so the result is still
+one valid JSON document.
+
 `--available-only` trims what is printed, not what is saved.
 
 ## Choosing TLDs

@@ -109,7 +109,9 @@ struct Args {
     timeout: u64,
 
     /// Write the results to available.txt, unavailable.txt and, if any
-    /// lookup failed, unknown.txt. Nothing is written without this.
+    /// lookup failed, unknown.txt. With --json they are written as
+    /// available.json, unavailable.json and unknown.json instead. Nothing is
+    /// written without this.
     #[arg(short, long)]
     save: bool,
 
@@ -1040,40 +1042,76 @@ fn save(args: &Args, results: &[CheckResult]) -> Result<Vec<(PathBuf, usize)>> {
     let dir = args.out_dir.clone().unwrap_or_else(|| PathBuf::from("."));
     std::fs::create_dir_all(&dir).with_context(|| format!("creating {}", dir.display()))?;
 
+    // --json asks for JSON everywhere, saved files included.
+    let ext = if args.json { "json" } else { "txt" };
     let groups = [
-        (Status::Available, "available.txt"),
-        (Status::Taken, "unavailable.txt"),
-        (Status::Unknown, "unknown.txt"),
+        (Status::Available, "available"),
+        (Status::Taken, "unavailable"),
+        (Status::Unknown, "unknown"),
     ];
 
     let mut written = Vec::new();
-    for (status, filename) in groups {
-        let lines: Vec<&str> = results
-            .iter()
-            .filter(|r| r.status == status)
-            .map(|r| r.domain.as_str())
-            .collect();
+    for (status, stem) in groups {
+        let matching: Vec<&CheckResult> = results.iter().filter(|r| r.status == status).collect();
 
-        // Only create unknown.txt when there is something to put in it.
-        if status == Status::Unknown && lines.is_empty() {
+        // Only create the unknown file when there is something to put in it.
+        if status == Status::Unknown && matching.is_empty() {
             continue;
         }
 
-        let path = dir.join(filename);
-        let mut file = std::fs::OpenOptions::new()
-            .create(true)
-            .write(true)
-            .append(args.append)
-            .truncate(!args.append)
-            .open(&path)
-            .with_context(|| format!("writing {}", path.display()))?;
-        for line in &lines {
-            writeln!(file, "{line}")?;
+        let path = dir.join(format!("{stem}.{ext}"));
+
+        if args.json {
+            // Two JSON arrays back to back are not a JSON file, so appending
+            // means merging with whatever the last run left behind.
+            let mut entries = if args.append {
+                saved_entries(&path)?
+            } else {
+                Vec::new()
+            };
+            for r in &matching {
+                entries.push(serde_json::to_value(r)?);
+            }
+            let body = serde_json::to_string_pretty(&entries)?;
+            std::fs::write(&path, format!("{body}\n"))
+                .with_context(|| format!("writing {}", path.display()))?;
+        } else {
+            let mut file = std::fs::OpenOptions::new()
+                .create(true)
+                .write(true)
+                .append(args.append)
+                .truncate(!args.append)
+                .open(&path)
+                .with_context(|| format!("writing {}", path.display()))?;
+            for r in &matching {
+                writeln!(file, "{}", r.domain)?;
+            }
         }
-        written.push((path, lines.len()));
+
+        written.push((path, matching.len()));
     }
 
     Ok(written)
+}
+
+/// The entries already in a saved JSON file, so `--append` extends that array.
+/// A missing file is an empty one; anything else there is left alone rather
+/// than overwritten.
+fn saved_entries(path: &Path) -> Result<Vec<serde_json::Value>> {
+    let text = match std::fs::read_to_string(path) {
+        Ok(text) => text,
+        Err(e) if e.kind() == std::io::ErrorKind::NotFound => return Ok(Vec::new()),
+        Err(e) => return Err(e).with_context(|| format!("reading {}", path.display())),
+    };
+    if text.trim().is_empty() {
+        return Ok(Vec::new());
+    }
+    serde_json::from_str(&text).with_context(|| {
+        format!(
+            "{} is not a JSON array — --append cannot extend it",
+            path.display()
+        )
+    })
 }
 
 fn summarize(results: &[CheckResult], elapsed: Duration, written: &[(PathBuf, usize)]) {
