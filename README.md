@@ -27,7 +27,13 @@ US dollars — see [Prices](#prices).
 
 ## Install
 
-On macOS or Linux with [Homebrew](https://brew.sh):
+### Quick Install (Linux & macOS)
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/aminulbd/ds/main/packaging/install.sh | sh
+```
+
+Or on macOS or Linux with [Homebrew](https://brew.sh):
 
 ```sh
 brew install aminulbd/tap/ds
