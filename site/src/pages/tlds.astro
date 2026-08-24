@@ -1,0 +1,321 @@
+---
+import Base from '../layouts/Base.astro';
+import data from '../data/tlds.json';
+
+const { rows, counts, priceRange, generated } = data;
+const fmt = (n: number) => n.toLocaleString('en-US');
+const money = (n: number | null) => (n === null ? '—' : `$${n.toFixed(2)}`);
+const host = (url: string | null) => {
+  if (!url) return null;
+  try { return new URL(url).host; } catch { return url; }
+};
+
+// Every priced entry in the bundled table comes from one registrar. Saying
+// "average" here would be false, so the column says whose list price it is.
+const registrars = [...new Set(rows.flatMap((r) => r.registrars))];
+const singleSource = registrars.length === 1 ? registrars[0] : null;
+
+const SOURCE_LABEL: Record<string, string> = {
+  both: 'RDAP + WHOIS',
+  rdap: 'RDAP',
+  whois: 'WHOIS',
+  none: 'neither',
+};
+---
+
+<Base
+  title="TLD prices and registries — every TLD ds knows"
+  description={`Registration and renewal prices for ${fmt(counts.priced)} top-level domains, plus the RDAP endpoint or WHOIS server that answers for each of ${fmt(counts.total)} TLDs.`}
+>
+  <div class="wrap page">
+    <h1>TLDs &amp; prices</h1>
+    <p class="lede muted">
+      Every TLD <code>ds</code> knows how to check — {fmt(counts.total)} of them —
+      with what each costs to register and which registry answers for it. This is the
+      same data the binary carries, so the table and the CLI always agree.
+    </p>
+
+    <div class="stats">
+      <div><strong>{fmt(counts.total)}</strong><span>TLDs</span></div>
+      <div><strong>{fmt(counts.priced)}</strong><span>priced</span></div>
+      <div><strong>{fmt(counts.rdap)}</strong><span>RDAP</span></div>
+      <div><strong>{fmt(counts.whois)}</strong><span>WHOIS</span></div>
+      <div><strong>{fmt(counts.cctld)}</strong><span>country-code</span></div>
+    </div>
+
+    <div class="controls">
+      <label class="search">
+        <span class="visually-hidden">Filter TLDs</span>
+        <input
+          type="search" id="q" placeholder="Filter — try io, co.uk, or verisign"
+          autocomplete="off" spellcheck="false"
+        />
+      </label>
+      <label>
+        <span class="visually-hidden">Lookup source</span>
+        <select id="source">
+          <option value="">Any source</option>
+          <option value="rdap">Has RDAP</option>
+          <option value="whois">Has WHOIS</option>
+          <option value="none">Neither</option>
+        </select>
+      </label>
+      <label>
+        <span class="visually-hidden">TLD type</span>
+        <select id="kind">
+          <option value="">All types</option>
+          <option value="cctld">Country-code only</option>
+          <option value="second">Second level (.com)</option>
+          <option value="third">Third level (.co.uk)</option>
+        </select>
+      </label>
+      <label class="check">
+        <input type="checkbox" id="priced" /> Priced only
+      </label>
+      <p class="count faint" id="count" aria-live="polite">
+        {fmt(counts.total)} TLDs
+      </p>
+    </div>
+
+    <div class="table-scroll">
+      <table id="tbl">
+        <thead>
+          <tr>
+            <th aria-sort="ascending"><button type="button" data-sort="tld">TLD</button></th>
+            <th class="num"><button type="button" data-sort="price">Register</button></th>
+            <th class="num"><button type="button" data-sort="renew">Renew</button></th>
+            <th><button type="button" data-sort="source">Source</button></th>
+            <th>Registry</th>
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((r) => (
+            <tr
+              data-tld={r.tld}
+              data-price={r.price ?? ''}
+              data-renew={r.renew ?? ''}
+              data-source={r.source}
+              data-rdap={r.rdapServer ? '1' : ''}
+              data-whois={r.whoisHost ? '1' : ''}
+              data-cctld={r.cctld ? '1' : ''}
+              data-level={r.level}
+              data-search={`${r.tld} ${host(r.rdapServer) ?? ''} ${r.whoisHost ?? ''}`.toLowerCase()}
+            >
+              <th scope="row" class="tld">.{r.tld}</th>
+              <td class="num">{money(r.price)}</td>
+              <td class="num faint">{money(r.renew)}</td>
+              <td>
+                <span class={`tag tag-${r.source}`}>{SOURCE_LABEL[r.source]}</span>
+              </td>
+              <td class="reg faint">{host(r.rdapServer) ?? r.whoisHost ?? '—'}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <p class="empty" id="empty" hidden>Nothing matches that filter.</p>
+    </div>
+
+    <section class="notes prose">
+      <h2>About this data</h2>
+      <ul>
+        <li>
+          <strong>Prices are {singleSource ? <>{singleSource} list prices</> : <>registrar list prices</>}</strong>,
+          bundled with the CLI and last regenerated {generated}. They cover {fmt(counts.priced)} of
+          the {fmt(counts.total)} TLDs here, from {money(priceRange.min)} to {money(priceRange.max)} a
+          year; the rest show <code>—</code> because nothing in the table prices them.{' '}
+          {singleSource && <> The file has room for several registrars per TLD and <code>ds</code> averages
+          across them, but every entry currently quotes {singleSource}, so treat these as one
+          registrar's list prices rather than a market average.</>}
+        </li>
+        <li>
+          Treat them as list prices, not quotes — first-year promotions, ICANN fees, taxes and
+          premium names all move the real number, and a registry may not sell you the TLD at
+          all. Supply your own table with <code>--pricing-file</code>; see{' '}
+          <a href="/docs/choosing-the-source#your-own-prices">Your own prices</a>.
+        </li>
+        <li>
+          <strong>Source</strong> is which protocol answers: RDAP endpoints come from{' '}
+          <a href="https://data.iana.org/rdap/dns.json">IANA's bootstrap</a>, refreshed when this
+          page is built; WHOIS servers come from the bundled <code>whois.json</code>. RDAP is
+          authoritative, WHOIS is text matching — see <a href="/docs/accuracy-notes">Accuracy notes</a>.
+        </li>
+        <li>
+          A few registries answer nobody: <code>.li</code> and <code>.qa</code> refuse public
+          WHOIS and have no RDAP, so <code>ds</code> reports them <code>UNKNOWN</code> rather
+          than guessing.
+        </li>
+      </ul>
+      <p>
+        Check any of these for real:{' '}
+        <code>ds mybrand --tld io,de,co.uk</code>
+      </p>
+    </section>
+  </div>
+
+  <script>
+    const tbody = document.querySelector<HTMLTableSectionElement>('#tbl tbody')!;
+    const allRows = Array.from(tbody.rows);
+    const q = document.querySelector<HTMLInputElement>('#q')!;
+    const source = document.querySelector<HTMLSelectElement>('#source')!;
+    const kind = document.querySelector<HTMLSelectElement>('#kind')!;
+    const priced = document.querySelector<HTMLInputElement>('#priced')!;
+    const count = document.querySelector<HTMLParagraphElement>('#count')!;
+    const empty = document.querySelector<HTMLParagraphElement>('#empty')!;
+
+    let sortKey = 'tld';
+    let sortDir = 1;
+
+    const num = (v: string | undefined) => (v ? parseFloat(v) : NaN);
+
+    function apply() {
+      const term = q.value.trim().toLowerCase();
+      const src = source.value;
+      const k = kind.value;
+      const onlyPriced = priced.checked;
+      let shown = 0;
+
+      for (const row of allRows) {
+        const d = row.dataset;
+        let ok = !term || (d.search ?? '').includes(term);
+        if (ok && src === 'rdap') ok = d.rdap === '1';
+        if (ok && src === 'whois') ok = d.whois === '1';
+        if (ok && src === 'none') ok = d.source === 'none';
+        if (ok && k === 'cctld') ok = d.cctld === '1';
+        if (ok && k === 'second') ok = d.level === '2';
+        if (ok && k === 'third') ok = d.level === '3';
+        if (ok && onlyPriced) ok = d.price !== '';
+        row.hidden = !ok;
+        if (ok) shown++;
+      }
+
+      count.textContent =
+        shown === allRows.length
+          ? `${shown.toLocaleString('en-US')} TLDs`
+          : `${shown.toLocaleString('en-US')} of ${allRows.length.toLocaleString('en-US')} TLDs`;
+      empty.hidden = shown > 0;
+    }
+
+    function sortBy(key: string) {
+      sortDir = key === sortKey ? -sortDir : 1;
+      sortKey = key;
+
+      const sorted = [...allRows].sort((a, b) => {
+        const A = a.dataset, B = b.dataset;
+        if (key === 'price' || key === 'renew') {
+          const x = num(A[key]), y = num(B[key]);
+          // Unpriced TLDs always sort last, whichever way the column is going.
+          if (isNaN(x) && isNaN(y)) return A.tld!.localeCompare(B.tld!);
+          if (isNaN(x)) return 1;
+          if (isNaN(y)) return -1;
+          return (x - y) * sortDir;
+        }
+        return (A[key] ?? '').localeCompare(B[key] ?? '') * sortDir;
+      });
+
+      const frag = document.createDocumentFragment();
+      for (const r of sorted) frag.appendChild(r);
+      tbody.appendChild(frag);
+
+      document.querySelectorAll<HTMLButtonElement>('[data-sort]').forEach((b) => {
+        const active = b.dataset.sort === key;
+        const th = b.closest('th')!;
+        th.setAttribute('aria-sort', active ? (sortDir === 1 ? 'ascending' : 'descending') : 'none');
+        th.dataset.active = active ? String(sortDir) : '';
+      });
+    }
+
+    document.querySelectorAll<HTMLButtonElement>('[data-sort]')
+      .forEach((b) => b.addEventListener('click', () => sortBy(b.dataset.sort!)));
+
+    let t: number;
+    q.addEventListener('input', () => {
+      clearTimeout(t);
+      t = window.setTimeout(apply, 90);
+    });
+    [source, kind, priced].forEach((el) => el.addEventListener('change', apply));
+
+    // Deep-link support: /tlds?q=io
+    const initial = new URLSearchParams(location.search).get('q');
+    if (initial) { q.value = initial; }
+    apply();
+  </script>
+</Base>
+
+<style>
+  .page { padding: 3rem 1.5rem; }
+  .lede { font-size: 1.05rem; max-width: 70ch; margin-top: -.5rem; }
+
+  .stats {
+    display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 1rem;
+    padding: 1.25rem 0; border-block: 1px solid var(--border); margin: 1.75rem 0;
+  }
+  @media (max-width: 640px) { .stats { grid-template-columns: repeat(3, 1fr); gap: 1rem; } }
+  .stats div { display: flex; flex-direction: column; }
+  .stats strong { font-family: var(--mono); font-size: 1.35rem; letter-spacing: -.02em; }
+  .stats span { color: var(--fg-muted); font-size: .8rem; }
+
+  .controls {
+    display: flex; flex-wrap: wrap; gap: .6rem; align-items: center;
+    margin-bottom: 1rem; position: sticky; top: 3.75rem; z-index: 20;
+    background: var(--bg); padding: .75rem 0;
+  }
+  .controls .search { flex: 1 1 18rem; }
+  .controls input[type="search"], .controls select {
+    width: 100%; font: inherit; font-size: .92rem;
+    padding: .5rem .7rem; border-radius: 6px;
+    border: 1px solid var(--border-strong); background: var(--surface); color: var(--fg);
+  }
+  .controls select { width: auto; }
+  .controls input[type="search"]:focus-visible, .controls select:focus-visible {
+    outline: 2px solid var(--accent); outline-offset: 1px;
+  }
+  .check { display: flex; align-items: center; gap: .4rem; font-size: .9rem; color: var(--fg-muted); white-space: nowrap; }
+  .count { margin: 0 0 0 auto; font-size: .85rem; white-space: nowrap; }
+
+  .table-scroll { overflow-x: auto; border: 1px solid var(--border); border-radius: var(--radius); }
+  #tbl { font-size: .9rem; }
+  #tbl thead th { position: sticky; top: 0; background: var(--bg-soft); z-index: 10; padding: 0; }
+  #tbl thead th button {
+    all: unset; box-sizing: border-box; display: block; width: 100%; cursor: pointer;
+    padding: .6rem .7rem; font-size: .75rem; font-weight: 600;
+    text-transform: uppercase; letter-spacing: .05em; color: var(--fg-muted);
+  }
+  #tbl thead th button:hover { color: var(--fg); }
+  #tbl thead th button:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+  #tbl thead th[data-active="1"] button::after { content: " ↑"; color: var(--accent); }
+  #tbl thead th[data-active="-1"] button::after { content: " ↓"; color: var(--accent); }
+  #tbl thead th.num button { text-align: right; }
+  #tbl tbody tr:hover { background: var(--bg-soft); }
+  /* Row headers are <th>, so they inherit the global uppercase column-header
+     styling — reset it, or every TLD reads as .AAA. */
+  #tbl tbody th.tld {
+    font-family: var(--mono); font-weight: 550; text-align: left;
+    text-transform: none; letter-spacing: normal;
+    font-size: .9rem; color: var(--fg);
+  }
+  /* Keep the TLD in view while the rest of the row scrolls sideways — without
+     it you lose track of which TLD a price belongs to on a narrow screen. */
+  #tbl tbody th.tld, #tbl thead th:first-child {
+    position: sticky; left: 0; z-index: 5;
+    background: var(--bg);
+    box-shadow: 1px 0 0 var(--border);
+  }
+  #tbl thead th:first-child { background: var(--bg-soft); z-index: 15; }
+  #tbl tbody tr:hover th.tld { background: var(--bg-soft); }
+  #tbl .num { text-align: right; font-family: var(--mono); font-variant-numeric: tabular-nums; }
+  #tbl .reg { font-family: var(--mono); font-size: .8rem; max-width: 22rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+  .tag {
+    display: inline-block; font-size: .72rem; padding: .1rem .45rem;
+    border-radius: 4px; border: 1px solid var(--border-strong); color: var(--fg-muted);
+    white-space: nowrap;
+  }
+  .tag-both  { color: var(--available); border-color: color-mix(in srgb, var(--available) 45%, transparent); }
+  .tag-rdap  { color: var(--available); border-color: color-mix(in srgb, var(--available) 30%, transparent); }
+  .tag-whois { color: var(--unknown);   border-color: color-mix(in srgb, var(--unknown) 40%, transparent); }
+  .tag-none  { color: var(--fg-faint); }
+
+  .empty { padding: 2rem; text-align: center; color: var(--fg-muted); }
+  .notes { margin-top: 3rem; max-width: var(--measure); }
+  .notes li { margin-bottom: .75rem; }
+</style>

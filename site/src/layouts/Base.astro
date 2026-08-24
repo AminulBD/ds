@@ -1,0 +1,93 @@
+---
+import '../styles/global.css';
+
+interface Props {
+  title: string;
+  description: string;
+  /** Omitted on the landing page, which supplies its own <h1>. */
+  wide?: boolean;
+}
+
+const { title, description, wide = false } = Astro.props;
+const canonical = new URL(Astro.url.pathname, Astro.site).href;
+const path = Astro.url.pathname.replace(/\/+$/, '') || '/';
+const nav = [
+  { href: '/docs/usage', label: 'Docs', short: 'Docs', match: '/docs' },
+  { href: '/tlds', label: 'TLDs & prices', short: 'TLDs', match: '/tlds' },
+  { href: '/install', label: 'Install', short: 'Install', match: '/install' },
+  { href: 'https://github.com/AminulBD/ds', label: 'GitHub', short: 'GitHub', match: null },
+];
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={new URL('/og.png', Astro.site).href} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:image" content={new URL('/og.png', Astro.site).href} />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+    {/* Applied before first paint so a pinned theme never flashes the other one. */}
+    <script is:inline>
+      (() => {
+        const t = localStorage.getItem('ds-theme');
+        if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t;
+      })();
+    </script>
+  </head>
+  <body>
+    <a href="#main" class="visually-hidden">Skip to content</a>
+    <header class="site-header">
+      <div class="wrap">
+        <a class="brand" href="/">ds</a>
+        <nav class="site-nav">
+          {nav.map((n) => (
+            <a
+              href={n.href}
+              aria-current={n.match && path.startsWith(n.match) ? 'page' : undefined}
+            >
+              <span class="nav-long">{n.label}</span>
+              <span class="nav-short">{n.short}</span>
+            </a>
+          ))}
+          <button class="theme-toggle" type="button" aria-label="Toggle colour theme" data-theme-toggle>◐</button>
+        </nav>
+      </div>
+    </header>
+
+    <main id="main">
+      <slot />
+    </main>
+
+    <footer class="site-footer">
+      <div class="wrap">
+        <span>MIT licensed</span>
+        <a href="https://github.com/AminulBD/ds">Source</a>
+        <a href="https://github.com/AminulBD/ds/releases">Releases</a>
+        <a href="https://github.com/AminulBD/ds/issues">Issues</a>
+        <span class="spacer faint">Built by <a href="https://github.com/AminulBD">Aminul Islam</a></span>
+      </div>
+    </footer>
+
+    <script is:inline>
+      document.querySelector('[data-theme-toggle]')?.addEventListener('click', () => {
+        const root = document.documentElement;
+        const dark = root.dataset.theme
+          ? root.dataset.theme === 'dark'
+          : matchMedia('(prefers-color-scheme: dark)').matches;
+        root.dataset.theme = dark ? 'light' : 'dark';
+        localStorage.setItem('ds-theme', root.dataset.theme);
+      });
+    </script>
+  </body>
+</html>

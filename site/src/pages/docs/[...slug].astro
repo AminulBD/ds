@@ -1,0 +1,24 @@
+---
+import { getCollection, render } from 'astro:content';
+import Docs from '../../layouts/Docs.astro';
+
+export async function getStaticPaths() {
+  const entries = await getCollection('docs');
+  return entries.map((entry) => ({ params: { slug: entry.id }, props: { entry } }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+
+// First real line of the section makes a better meta description than the title
+// alone — skip headings, fences and table rows to find it.
+const firstLine =
+  (entry.body ?? '')
+    .split('\n')
+    .find((l) => l.trim() && !l.startsWith('#') && !l.startsWith('```') && !l.startsWith('|')) ?? '';
+const plain = firstLine.replace(/[*`[\]]/g, '').trim();
+const description = `${entry.data.title} — ${plain}`.slice(0, 175);
+---
+<Docs title={entry.data.title} description={description}>
+  <Content />
+</Docs>

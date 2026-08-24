@@ -1,0 +1,22 @@
+{
+  "name": "ds-site",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "prebuild": "node scripts/split-readme.mjs && node scripts/build-tlds.mjs && node scripts/build-cli.mjs && node scripts/build-release.mjs && node scripts/build-og.mjs",
+    "predev": "node scripts/split-readme.mjs && node scripts/build-tlds.mjs && node scripts/build-cli.mjs && node scripts/build-release.mjs && node scripts/build-og.mjs",
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "gen": "node scripts/split-readme.mjs && node scripts/build-tlds.mjs && node scripts/build-cli.mjs && node scripts/build-release.mjs && node scripts/build-og.mjs"
+  },
+  "dependencies": {
+    "@astrojs/sitemap": "^3.7.3",
+    "astro": "^7.2.6"
+  },
+  "allowScripts": {
+    "esbuild@0.28.2": true,
+    "fsevents@2.3.3": true
+  }
+}

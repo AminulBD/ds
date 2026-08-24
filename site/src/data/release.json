@@ -1,0 +1,198 @@
+{
+  "tag": "v0.1.5",
+  "version": "0.1.5",
+  "published": "2026-08-18",
+  "url": "https://github.com/AminulBD/ds/releases/tag/v0.1.5",
+  "checksums": "https://github.com/AminulBD/ds/releases/download/v0.1.5/SHA256SUMS",
+  "assets": [
+    {
+      "name": "ds_0.1.5-1_amd64.deb",
+      "url": "https://github.com/AminulBD/ds/releases/download/v0.1.5/ds_0.1.5-1_amd64.deb",
+      "size": 1920220,
+      "os": "Debian, Ubuntu",
+      "arch": "x86_64",
+      "kind": "deb",
+      "libc": null
+    },
+    {
+      "name": "ds_0.1.5-1_arm64.deb",
+      "url": "https://github.com/AminulBD/ds/releases/download/v0.1.5/ds_0.1.5-1_arm64.deb",
+      "size": 1700528,
+      "os": "Debian, Ubuntu",
+      "arch": "arm64",
+      "kind": "deb",
+      "libc": null
+    },
+    {
+      "name": "ds_0.1.5-1_i386.deb",
+      "url": "https://github.com/AminulBD/ds/releases/download/v0.1.5/ds_0.1.5-1_i386.deb",
+      "size": 1773456,
+      "os": "Debian, Ubuntu",
+      "arch": "x86 (32-bit)",
+      "kind": "deb",
+      "libc": null
+    },
+    {
+      "name": "ds-0.1.5-1.aarch64.rpm",
+      "url": "https://github.com/AminulBD/ds/releases/download/v0.1.5/ds-0.1.5-1.aarch64.rpm",
+      "size": 1940662,
+      "os": "Fedora, RHEL, openSUSE",
+      "arch": "arm64",
+      "kind": "rpm",
+      "libc": null
+    },
+    {
+      "name": "ds-0.1.5-1.i686.rpm",
+      "url": "https://github.com/AminulBD/ds/releases/download/v0.1.5/ds-0.1.5-1.i686.rpm",
+      "size": 1917168,
+      "os": "Fedora, RHEL, openSUSE",
+      "arch": "x86 (32-bit)",
+      "kind": "rpm",
+      "libc": null
+    },
+    {
+      "name": "ds-0.1.5-1.x86_64.rpm",
+      "url": "https://github.com/AminulBD/ds/releases/download/v0.1.5/ds-0.1.5-1.x86_64.rpm",
+      "size": 2058724,
+      "os": "Fedora, RHEL, openSUSE",
+      "arch": "x86_64",
+      "kind": "rpm",
+      "libc": null
+    },
+    {
+      "name": "ds-v0.1.5-aarch64-apple-darwin.dmg",
+      "url": "https://github.com/AminulBD/ds/releases/download/v0.1.5/ds-v0.1.5-aarch64-apple-darwin.dmg",
+      "size": 2656085,
+      "os": "macOS",
+      "arch": "arm64",
+      "kind": "dmg",
+      "libc": null
+    },
+    {
+      "name": "ds-v0.1.5-aarch64-apple-darwin.tar.gz",
+      "url": "https://github.com/AminulBD/ds/releases/download/v0.1.5/ds-v0.1.5-aarch64-apple-darwin.tar.gz",
+      "size": 2170657,
+      "os": "macOS",
+      "arch": "arm64",
+      "kind": "tar.gz",
+      "libc": null
+    },
+    {
+      "name": "ds-v0.1.5-aarch64-pc-windows-msvc.msi",
+      "url": "https://github.com/AminulBD/ds/releases/download/v0.1.5/ds-v0.1.5-aarch64-pc-windows-msvc.msi",
+      "size": 2547712,
+      "os": "Windows",
+      "arch": "arm64",
+      "kind": "msi",
+      "libc": null
+    },
+    {
+      "name": "ds-v0.1.5-aarch64-pc-windows-msvc.zip",
+      "url": "https://github.com/AminulBD/ds/releases/download/v0.1.5/ds-v0.1.5-aarch64-pc-windows-msvc.zip",
+      "size": 2365986,
+      "os": "Windows",
+      "arch": "arm64",
+      "kind": "zip",
+      "libc": null
+    },
+    {
+      "name": "ds-v0.1.5-aarch64-unknown-linux-gnu.tar.gz",
+      "url": "https://github.com/AminulBD/ds/releases/download/v0.1.5/ds-v0.1.5-aarch64-unknown-linux-gnu.tar.gz",
+      "size": 2226805,
+      "os": "Linux",
+      "arch": "arm64",
+      "kind": "tar.gz",
+      "libc": "gnu"
+    },
+    {
+      "name": "ds-v0.1.5-aarch64-unknown-linux-musl.tar.gz",
+      "url": "https://github.com/AminulBD/ds/releases/download/v0.1.5/ds-v0.1.5-aarch64-unknown-linux-musl.tar.gz",
+      "size": 2302024,
+      "os": "Linux",
+      "arch": "arm64",
+      "kind": "tar.gz",
+      "libc": "musl"
+    },
+    {
+      "name": "ds-v0.1.5-i686-pc-windows-msvc.msi",
+      "url": "https://github.com/AminulBD/ds/releases/download/v0.1.5/ds-v0.1.5-i686-pc-windows-msvc.msi",
+      "size": 2301952,
+      "os": "Windows",
+      "arch": "x86 (32-bit)",
+      "kind": "msi",
+      "libc": null
+    },
+    {
+      "name": "ds-v0.1.5-i686-pc-windows-msvc.zip",
+      "url": "https://github.com/AminulBD/ds/releases/download/v0.1.5/ds-v0.1.5-i686-pc-windows-msvc.zip",
+      "size": 2077706,
+      "os": "Windows",
+      "arch": "x86 (32-bit)",
+      "kind": "zip",
+      "libc": null
+    },
+    {
+      "name": "ds-v0.1.5-i686-unknown-linux-musl.tar.gz",
+      "url": "https://github.com/AminulBD/ds/releases/download/v0.1.5/ds-v0.1.5-i686-unknown-linux-musl.tar.gz",
+      "size": 2279642,
+      "os": "Linux",
+      "arch": "x86 (32-bit)",
+      "kind": "tar.gz",
+      "libc": "musl"
+    },
+    {
+      "name": "ds-v0.1.5-x86_64-apple-darwin.dmg",
+      "url": "https://github.com/AminulBD/ds/releases/download/v0.1.5/ds-v0.1.5-x86_64-apple-darwin.dmg",
+      "size": 2794980,
+      "os": "macOS",
+      "arch": "x86_64",
+      "kind": "dmg",
+      "libc": null
+    },
+    {
+      "name": "ds-v0.1.5-x86_64-apple-darwin.tar.gz",
+      "url": "https://github.com/AminulBD/ds/releases/download/v0.1.5/ds-v0.1.5-x86_64-apple-darwin.tar.gz",
+      "size": 2292237,
+      "os": "macOS",
+      "arch": "x86_64",
+      "kind": "tar.gz",
+      "libc": null
+    },
+    {
+      "name": "ds-v0.1.5-x86_64-pc-windows-msvc.msi",
+      "url": "https://github.com/AminulBD/ds/releases/download/v0.1.5/ds-v0.1.5-x86_64-pc-windows-msvc.msi",
+      "size": 2686976,
+      "os": "Windows",
+      "arch": "x86_64",
+      "kind": "msi",
+      "libc": null
+    },
+    {
+      "name": "ds-v0.1.5-x86_64-pc-windows-msvc.zip",
+      "url": "https://github.com/AminulBD/ds/releases/download/v0.1.5/ds-v0.1.5-x86_64-pc-windows-msvc.zip",
+      "size": 2494931,
+      "os": "Windows",
+      "arch": "x86_64",
+      "kind": "zip",
+      "libc": null
+    },
+    {
+      "name": "ds-v0.1.5-x86_64-unknown-linux-gnu.tar.gz",
+      "url": "https://github.com/AminulBD/ds/releases/download/v0.1.5/ds-v0.1.5-x86_64-unknown-linux-gnu.tar.gz",
+      "size": 2379939,
+      "os": "Linux",
+      "arch": "x86_64",
+      "kind": "tar.gz",
+      "libc": "gnu"
+    },
+    {
+      "name": "ds-v0.1.5-x86_64-unknown-linux-musl.tar.gz",
+      "url": "https://github.com/AminulBD/ds/releases/download/v0.1.5/ds-v0.1.5-x86_64-unknown-linux-musl.tar.gz",
+      "size": 2458069,
+      "os": "Linux",
+      "arch": "x86_64",
+      "kind": "tar.gz",
+      "libc": "musl"
+    }
+  ]
+}

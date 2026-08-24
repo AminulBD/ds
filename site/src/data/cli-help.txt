@@ -1,0 +1,152 @@
+Check domain availability over RDAP with a WHOIS fallback.
+
+Examples:
+  ds apple --tld all
+  ds apple --tld com,net --details
+  ds apple,orange,bangla,english --tld com,net
+  ds @names.txt --tld popular --available-only --save
+  ds apple --tld all --level second
+  ds apple --tld com,io --where
+  ds apple google --tld popular --whois --dns-records
+  ds apple.com --details --registry
+
+Usage: ds [OPTIONS] <NAMES>...
+
+Arguments:
+  <NAMES>...
+          Name(s) to check: `apple`, `apple,orange,bangla`, `@names.txt`, or several arguments. A full domain (`apple.com`) is checked as-is when --tld is omitted
+
+Options:
+  -t, --tld <TLD>
+          TLDs to check: comma separated list, `all`, `popular`, `rdap`, or `@file`
+
+      --whois
+          Query WHOIS as well and print the raw response
+
+      --details
+          Show registration details (registrar, dates, status, nameservers)
+
+      --registry
+          Show which registry answered (RDAP endpoint / WHOIS server)
+
+      --dns-records
+          Look up A/AAAA/NS/MX/TXT/CNAME/SOA records
+
+      --where
+          For available domains, show the registry and where to register them
+
+      --all-info
+          Shorthand for --details --registry --whois --dns-records --where
+
+      --raw
+          Include the raw RDAP JSON in the output
+
+      --json
+          Print results as a JSON array instead of text
+
+      --available-only
+          Only print available domains. Saved files still cover every result
+
+  -c, --concurrency <CONCURRENCY>
+          Parallel lookups
+          
+          [default: 20]
+
+      --per-host <PER_HOST>
+          Parallel lookups against any single registry server
+          
+          [default: 4]
+
+      --timeout <TIMEOUT>
+          Per-request timeout in seconds
+          
+          [default: 10]
+
+  -s, --save
+          Write the results to available.txt, unavailable.txt and, if any lookup failed, unknown.txt. With --json they are written as available.json, unavailable.json and unknown.json instead. Nothing is written without this
+
+  -o, --out-dir <DIR>
+          Directory for those files (implies --save). Defaults to the working directory
+
+      --append
+          Append to the output files instead of overwriting them (implies --save)
+
+      --level <LEVEL>
+          Which level the name is registered at: second (`apple.com`), third (`apple.co.uk`), or any. Filters the --tld list
+
+          Possible values:
+          - any:    Both
+          - second: Straight under the TLD: `apple.com`, `apple.de`
+          - third:  Under a multi-label suffix: `apple.co.uk`, `apple.com.au`
+          
+          [default: any]
+
+      --tld-len <N|MIN-MAX>
+          Keep only TLDs of this length: `2` for the two-letter ccTLDs, or a range like `2-3`, `-3`, `4-`. Measured on the last label, so `co.uk` counts as 2
+
+      --cctld
+          Only country-code TLDs — the two-letter ones (`de`, `io`, `co.uk`). Shorthand for --tld-len 2
+
+      --source <SOURCE>
+          Where to look: auto (RDAP, then the bundled WHOIS table, then an IANA referral), rdap (RDAP only), or whois (bundled whois.json only)
+
+          Possible values:
+          - auto:  RDAP, then the bundled WHOIS table, then an IANA referral
+          - rdap:  RDAP only
+          - whois: The bundled whois.json table only
+          
+          [default: auto]
+
+      --rdap-file <PATH>
+          Custom RDAP server list, in the bootstrap format IANA publishes. Without this, ./rdap.json and ~/.config/ds/rdap.json are picked up automatically when they exist
+
+      --rdap-mode <RDAP_MODE>
+          What to do with that list: merge it over the IANA bootstrap (custom entries win) or use only it
+
+          Possible values:
+          - merge: Custom entries win, everything else comes from the built-in list
+          - only:  Use the custom list alone
+          
+          [default: merge]
+
+      --whois-file <PATH>
+          Custom WHOIS server table, in the same format as the bundled whois.json. Without this, ./whois.json and ~/.config/ds/whois.json are picked up automatically when they exist
+
+      --whois-mode <WHOIS_MODE>
+          What to do with that table: merge it over the bundled one (custom entries win) or use only it
+
+          Possible values:
+          - merge: Custom entries win, everything else comes from the built-in list
+          - only:  Use the custom list alone
+          
+          [default: merge]
+
+      --pricing-file <PATH>
+          Custom price table, in the same format as the bundled pricing.json. Without this, ./pricing.json and ~/.config/ds/pricing.json are picked up automatically when they exist
+
+      --pricing-mode <PRICING_MODE>
+          What to do with that table: merge it over the bundled one (custom entries win) or use only it
+
+          Possible values:
+          - merge: Custom entries win, everything else comes from the built-in list
+          - only:  Use the custom list alone
+          
+          [default: merge]
+
+      --no-iana
+          Never query whois.iana.org: no referral when a bundled WHOIS host is stale, and no registry names for --where
+
+      --refresh
+          Re-download the IANA RDAP bootstrap file
+
+  -q, --quiet
+          Suppress progress output; only the summary is printed
+
+      --no-color
+          Disable coloured output
+
+  -v, --version
+          Print the version and exit
+
+  -h, --help
+          Print help (see a summary with '-h')

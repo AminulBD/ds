@@ -1,0 +1,39 @@
+---
+import Base from './Base.astro';
+import DocsSidebar from '../components/DocsSidebar.astro';
+
+interface Props { title: string; description: string }
+const { title, description } = Astro.props;
+---
+<Base title={`${title} — ds`} description={description}>
+  <div class="docs wrap">
+    <aside><DocsSidebar /></aside>
+    <article class="prose">
+      <h1>{title}</h1>
+      <slot />
+      <hr />
+      <p class="faint edit-note">
+        These pages are generated from the{' '}
+        <a href="https://github.com/AminulBD/ds/blob/main/README.md">project README</a>,
+        so they never drift from what ships with the binary.
+      </p>
+    </article>
+  </div>
+</Base>
+
+<style>
+  .docs {
+    display: grid;
+    grid-template-columns: 14rem minmax(0, 1fr);
+    gap: 3rem;
+    padding: 3rem 1.5rem;
+    align-items: start;
+  }
+  @media (max-width: 860px) {
+    .docs { grid-template-columns: 1fr; gap: 1.5rem; padding-top: 2rem; }
+    .docs aside {
+      border-bottom: 1px solid var(--border); padding-bottom: 1.25rem;
+    }
+  }
+  .edit-note { font-size: .85rem; }
+</style>

@@ -1,0 +1,18 @@
+---
+import Docs from '../../layouts/Docs.astro';
+import help from '../../data/cli-help.txt?raw';
+---
+<Docs
+  title="All options"
+  description="The complete ds option reference, generated from the binary's own --help output."
+>
+  <p>
+    Every flag <code>ds</code> accepts, captured from the binary's own{' '}
+    <code>--help</code> at build time — so this page cannot fall behind a release.
+  </p>
+  <pre class="cli-help"><code>{help}</code></pre>
+</Docs>
+
+<style>
+  .cli-help { font-size: .82rem; line-height: 1.55; }
+</style>
