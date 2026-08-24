@@ -1,0 +1,24 @@
+---
+interface Props { command: string; label?: string }
+const { command, label } = Astro.props;
+---
+<div class="copy-row">
+  {label && <span class="visually-hidden">{label}</span>}
+  <code>{command}</code>
+  <button type="button" data-copy={command}>Copy</button>
+</div>
+
+<script>
+  document.querySelectorAll<HTMLButtonElement>('[data-copy]').forEach((btn) => {
+    btn.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(btn.dataset.copy ?? '');
+        const was = btn.textContent;
+        btn.textContent = 'Copied';
+        setTimeout(() => { btn.textContent = was; }, 1400);
+      } catch {
+        btn.textContent = 'Press ⌘C';
+      }
+    });
+  });
+</script>

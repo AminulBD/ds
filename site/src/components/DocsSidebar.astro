@@ -1,0 +1,44 @@
+---
+import { getCollection } from 'astro:content';
+
+const docs = (await getCollection('docs')).sort((a, b) => a.data.order - b.data.order);
+const path = Astro.url.pathname.replace(/\/+$/, '');
+---
+<nav class="docs-nav" aria-label="Documentation">
+  <p class="docs-nav-title">Guide</p>
+  <ul>
+    {docs.map((d) => (
+      <li>
+        <a href={`/docs/${d.id}`} aria-current={path === `/docs/${d.id}` ? 'page' : undefined}>
+          {d.data.title}
+        </a>
+      </li>
+    ))}
+  </ul>
+  <p class="docs-nav-title">Reference</p>
+  <ul>
+    <li><a href="/docs/cli" aria-current={path === '/docs/cli' ? 'page' : undefined}>All options</a></li>
+    <li><a href="/tlds" >TLDs &amp; prices</a></li>
+    <li><a href="/install">Install</a></li>
+  </ul>
+</nav>
+
+<style>
+  .docs-nav { position: sticky; top: 5.25rem; font-size: .92rem; }
+  .docs-nav-title {
+    font-size: .72rem; text-transform: uppercase; letter-spacing: .08em;
+    color: var(--fg-faint); margin: 1.5rem 0 .5rem; font-weight: 600;
+  }
+  .docs-nav-title:first-child { margin-top: 0; }
+  .docs-nav ul { list-style: none; margin: 0; padding: 0; }
+  .docs-nav li { margin: 0; }
+  .docs-nav a {
+    display: block; padding: .3rem .6rem; margin-left: -.6rem;
+    color: var(--fg-muted); text-decoration: none; border-radius: 5px;
+  }
+  .docs-nav a:hover { color: var(--fg); background: var(--bg-soft); }
+  .docs-nav a[aria-current="page"] {
+    color: var(--fg); background: var(--bg-soft); font-weight: 550;
+    box-shadow: inset 2px 0 0 var(--accent);
+  }
+</style>

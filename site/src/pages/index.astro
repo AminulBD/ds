@@ -1,0 +1,176 @@
+---
+import Base from '../layouts/Base.astro';
+import CopyCommand from '../components/CopyCommand.astro';
+import tlds from '../data/tlds.json';
+
+const { counts, priceRange } = tlds;
+const fmt = (n: number) => n.toLocaleString('en-US');
+
+// A real `ds nimbusforge --tld com,net,io,dev,co.uk` run, in arrival order.
+const demo = [
+  { k: 'ok',  name: 'nimbusforge.dev',   status: 'AVAILABLE', price: '$15.98', src: 'rdap',   ms: '630ms' },
+  { k: 'ok',  name: 'nimbusforge.io',    status: 'AVAILABLE', price: '$65.98', src: 'whois',  ms: '634ms' },
+  { k: 'no',  name: 'nimbusforge.net',   status: 'TAKEN',     price: '$14.98', src: 'rdap',   ms: '842ms' },
+  { k: 'ok',  name: 'nimbusforge.co.uk', status: 'AVAILABLE', price:  '$7.48', src: 'rdap',   ms: '985ms' },
+  { k: 'no',  name: 'nimbusforge.com',   status: 'TAKEN',     price: '$14.98', src: 'rdap',   ms: '1045ms' },
+];
+
+const features = [
+  {
+    title: 'RDAP first, WHOIS second',
+    body: 'Every lookup asks RDAP, using IANA’s bootstrap list. TLDs with no RDAP service fall back to WHOIS on port 43 — and if a bundled host has gone stale, IANA is asked who serves that TLD today.',
+  },
+  {
+    title: 'It never guesses',
+    body: 'WHOIS is text matching, so it can be wrong. Anything ds cannot answer conclusively comes back UNKNOWN with the reason attached, rather than being filed as available.',
+  },
+  {
+    title: 'Every TLD at once',
+    body: `One name against ${fmt(counts.total)} known TLDs, or a curated popular set, or a list from a file. Filter by level, by length, or to country-code TLDs only.`,
+  },
+  {
+    title: 'Prices in the same line',
+    body: `Registration and renewal prices for ${fmt(counts.priced)} TLDs ship inside the binary, from ${'$'}${priceRange.min} to ${'$'}${fmt(priceRange.max)} a year. Bring your own table when you have real quotes.`,
+  },
+  {
+    title: 'Paces itself',
+    body: 'Hundreds of TLDs sit behind a handful of servers. ds caps concurrency per host, backs off on 403 and 429, and stops querying a server that keeps refusing rather than burning the run on doomed retries.',
+  },
+  {
+    title: 'One static binary',
+    body: 'The TLD and price tables are embedded at compile time. The .deb and .rpm are built from static musl binaries and depend on nothing at all.',
+  },
+];
+---
+
+<Base
+  title="ds — check domain availability across every TLD"
+  description="A small Rust CLI that checks domain availability across many TLDs at once. RDAP first, WHOIS fallback, registration prices included, and never a guess."
+>
+  <section class="hero wrap">
+    <div class="hero-copy">
+      <h1>Is it taken?<br /><span class="hero-accent">Ask every TLD at once.</span></h1>
+      <p class="lede">
+        <strong>ds</strong> is a small Rust CLI that checks domain availability across{' '}
+        {fmt(counts.total)} TLDs. It asks RDAP first and falls back to WHOIS, prints what
+        each TLD costs, and reports what it could not answer instead of guessing.
+      </p>
+      <CopyCommand command="brew install aminulbd/tap/ds" label="Install with Homebrew" />
+      <div class="hero-actions">
+        <a class="btn btn-primary" href="/docs/usage">Read the docs</a>
+        <a class="btn btn-ghost" href="/tlds">Browse {fmt(counts.total)} TLDs &amp; prices</a>
+      </div>
+      <p class="faint hero-alt">
+        Not on Homebrew? <a href="/install">Packages for Linux, macOS and Windows →</a>
+      </p>
+    </div>
+
+    <div class="term hero-term" data-demo>
+      <div class="term-bar">
+        <span class="term-dot"></span><span class="term-dot"></span><span class="term-dot"></span>
+        <span class="term-title">ds — domain search</span>
+      </div>
+      <pre class="term-body"><code><span class="cmd">ds nimbusforge --tld com,net,io,dev,co.uk</span>
+<span class="dim demo-line">Checking 5 domains (20 concurrent)</span>
+{demo.map((d) => (
+  <span class={`demo-line ${d.k}`}>{d.k === 'ok' ? '+' : '-'} {d.name.padEnd(22)}{d.status.padEnd(11)}{d.price.padStart(7)} <span class="dim">{d.src.padEnd(6)}{d.ms.padStart(7)}</span></span>
+))}
+<span class="demo-line dim">summary: <span class="ok">3 available</span>  <span class="no">2 taken</span>  0 unknown   (5 checked in 1.0s)</span></code></pre>
+    </div>
+  </section>
+
+  <section class="stats wrap">
+    <div><strong>{fmt(counts.total)}</strong><span>TLDs known</span></div>
+    <div><strong>{fmt(counts.rdap)}</strong><span>with RDAP</span></div>
+    <div><strong>{fmt(counts.whois)}</strong><span>with WHOIS</span></div>
+    <div><strong>{fmt(counts.priced)}</strong><span>priced</span></div>
+  </section>
+
+  <section class="wrap features">
+    <h2 class="section-title">What it does</h2>
+    <div class="feature-grid">
+      {features.map((f) => (
+        <article class="card">
+          <h3>{f.title}</h3>
+          <p>{f.body}</p>
+        </article>
+      ))}
+    </div>
+  </section>
+
+  <section class="wrap cta">
+    <div class="cta-inner">
+      <div>
+        <h2>Every TLD, every price, in one table</h2>
+        <p class="muted">
+          The same data the binary carries — {fmt(counts.priced)} priced TLDs, which
+          registry answers for each, and whether it speaks RDAP or WHOIS.
+        </p>
+      </div>
+      <a class="btn btn-primary" href="/tlds">Open the TLD explorer</a>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .hero {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+    gap: 3.5rem;
+    align-items: center;
+    padding: clamp(3rem, 8vw, 5.5rem) 1.5rem clamp(2.5rem, 5vw, 4rem);
+  }
+  @media (max-width: 900px) {
+    .hero { grid-template-columns: 1fr; gap: 2.5rem; }
+  }
+  .hero h1 { margin-bottom: 1rem; }
+  .hero-accent { color: var(--accent); }
+  .lede { font-size: 1.1rem; color: var(--fg-muted); max-width: 46ch; margin: 0 0 1.75rem; }
+  .lede strong { color: var(--fg); font-family: var(--mono); }
+  .hero-actions { display: flex; flex-wrap: wrap; gap: .75rem; margin-top: 1.25rem; }
+  .hero-alt { font-size: .88rem; margin-top: 1.1rem; }
+  .hero-term { min-width: 0; }
+
+  /* Lines are revealed in arrival order; reduced-motion users get them at once. */
+  .demo-line { display: block; opacity: 0; animation: reveal .01s forwards; }
+  [data-demo] .demo-line:nth-child(2)  { animation-delay: .35s; }
+  [data-demo] .demo-line:nth-child(3)  { animation-delay: .95s; }
+  [data-demo] .demo-line:nth-child(4)  { animation-delay: 1.10s; }
+  [data-demo] .demo-line:nth-child(5)  { animation-delay: 1.35s; }
+  [data-demo] .demo-line:nth-child(6)  { animation-delay: 1.55s; }
+  [data-demo] .demo-line:nth-child(7)  { animation-delay: 1.80s; }
+  [data-demo] .demo-line:nth-child(8)  { animation-delay: 2.15s; }
+  @keyframes reveal { to { opacity: 1; } }
+  @media (prefers-reduced-motion: reduce) {
+    .demo-line { opacity: 1; animation: none; }
+  }
+
+  .stats {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem;
+    padding: 1.75rem 1.5rem; border-block: 1px solid var(--border);
+    margin-bottom: 1rem;
+  }
+  @media (max-width: 620px) { .stats { grid-template-columns: repeat(2, 1fr); gap: 1.5rem 1rem; } }
+  .stats div { display: flex; flex-direction: column; }
+  .stats strong { font-family: var(--mono); font-size: 1.6rem; letter-spacing: -.03em; }
+  .stats span { color: var(--fg-muted); font-size: .84rem; }
+
+  .section-title { font-size: 1.05rem; text-transform: uppercase; letter-spacing: .07em; color: var(--fg-muted); }
+  .features { padding-bottom: 1rem; }
+  .feature-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr)); gap: 1rem; }
+  .card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 1.25rem 1.35rem;
+  }
+  .card h3 { margin: 0 0 .5rem; font-size: 1rem; }
+  .card p { margin: 0; color: var(--fg-muted); font-size: .93rem; }
+
+  .cta { padding: 3rem 1.5rem 1rem; }
+  .cta-inner {
+    display: flex; flex-wrap: wrap; gap: 1.5rem; align-items: center; justify-content: space-between;
+    background: var(--bg-soft); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 2rem;
+  }
+  .cta-inner h2 { margin: 0 0 .4rem; font-size: 1.35rem; }
+  .cta-inner p { margin: 0; max-width: 52ch; font-size: .95rem; }
+</style>

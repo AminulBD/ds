@@ -1,0 +1,239 @@
+/* ds — ds.aminul.dev
+   Palette is taken from the CLI's own output: green for AVAILABLE, red for
+   TAKEN, amber for UNKNOWN. Light is the default; dark follows the system
+   unless the toggle has pinned one. */
+
+:root {
+  --bg:        #fbfbf9;
+  --bg-soft:   #f2f2ee;
+  --surface:   #ffffff;
+  --border:    #e2e2dc;
+  --border-strong: #c9c9c0;
+  --fg:        #16181d;
+  --fg-muted:  #5c6068;
+  --fg-faint:  #85898f;
+
+  --available: #1a7f37;
+  --taken:     #b3402f;
+  --unknown:   #9a6700;
+  --accent:    #1a7f37;
+  --accent-fg: #ffffff;
+  --link:      #0d5c2b;
+
+  --term-bg:   #14161a;
+  --term-fg:   #d6dae1;
+  --term-dim:  #7d838e;
+  --term-green:#4ac26b;
+  --term-red:   #f0837a;
+  --term-amber:#d4a72c;
+
+  --radius: 8px;
+  --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, "Helvetica Neue", Arial, sans-serif;
+  --measure: 68ch;
+  --wrap: 1180px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg:        #0f1115;
+    --bg-soft:   #161920;
+    --surface:   #14171d;
+    --border:    #262b34;
+    --border-strong: #39404c;
+    --fg:        #e6e9ee;
+    --fg-muted:  #9aa1ac;
+    --fg-faint:  #6e7681;
+
+    --available: #4ac26b;
+    --taken:     #f0837a;
+    --unknown:   #d4a72c;
+    --accent:    #4ac26b;
+    --accent-fg: #0f1115;
+    --link:      #6cd68a;
+
+    --term-bg:   #0a0c10;
+    --term-fg:   #d6dae1;
+  }
+}
+
+:root[data-theme="dark"] {
+  --bg:        #0f1115;
+  --bg-soft:   #161920;
+  --surface:   #14171d;
+  --border:    #262b34;
+  --border-strong: #39404c;
+  --fg:        #e6e9ee;
+  --fg-muted:  #9aa1ac;
+  --fg-faint:  #6e7681;
+  --available: #4ac26b;
+  --taken:     #f0837a;
+  --unknown:   #d4a72c;
+  --accent:    #4ac26b;
+  --accent-fg: #0f1115;
+  --link:      #6cd68a;
+  --term-bg:   #0a0c10;
+  --term-fg:   #d6dae1;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; scroll-padding-top: 5rem; }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--sans);
+  font-size: 16px;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: var(--link); text-underline-offset: 2px; }
+a:hover { text-decoration-thickness: 2px; }
+
+h1, h2, h3, h4 { line-height: 1.25; font-weight: 650; letter-spacing: -0.015em; margin: 2em 0 .6em; }
+h1 { font-size: clamp(2rem, 5vw, 2.9rem); margin-top: 0; letter-spacing: -0.03em; }
+h2 { font-size: 1.5rem; }
+h3 { font-size: 1.15rem; }
+
+code, kbd, pre, samp { font-family: var(--mono); }
+:not(pre) > code {
+  background: var(--bg-soft);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: .12em .35em;
+  font-size: .875em;
+  white-space: nowrap;
+}
+pre {
+  background: var(--term-bg) !important;
+  color: var(--term-fg);
+  border-radius: var(--radius);
+  padding: 1rem 1.15rem;
+  overflow-x: auto;
+  font-size: .855rem;
+  line-height: 1.6;
+  border: 1px solid var(--border);
+}
+pre code { background: none !important; border: 0; padding: 0; white-space: pre; }
+
+table { border-collapse: collapse; width: 100%; font-size: .93rem; }
+th, td { text-align: left; padding: .55rem .7rem; border-bottom: 1px solid var(--border); }
+th { font-weight: 600; color: var(--fg-muted); font-size: .82rem; text-transform: uppercase; letter-spacing: .04em; }
+
+hr { border: 0; border-top: 1px solid var(--border); margin: 2.5rem 0; }
+blockquote { margin: 1.5rem 0; padding-left: 1rem; border-left: 3px solid var(--border-strong); color: var(--fg-muted); }
+img { max-width: 100%; height: auto; }
+
+.wrap { max-width: var(--wrap); margin: 0 auto; padding: 0 1.5rem; }
+.prose { max-width: var(--measure); }
+.prose > *:first-child { margin-top: 0; }
+.prose table { display: block; overflow-x: auto; white-space: nowrap; }
+.mono { font-family: var(--mono); }
+.muted { color: var(--fg-muted); }
+.faint { color: var(--fg-faint); }
+.visually-hidden {
+  position: absolute; width: 1px; height: 1px; overflow: hidden;
+  clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap;
+}
+
+/* ---------- header ---------- */
+.site-header {
+  position: sticky; top: 0; z-index: 50;
+  background: color-mix(in srgb, var(--bg) 88%, transparent);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--border);
+}
+.site-header .wrap { display: flex; align-items: center; gap: 1.5rem; height: 3.75rem; }
+.brand {
+  font-family: var(--mono); font-weight: 700; font-size: 1.05rem;
+  color: var(--fg); text-decoration: none; letter-spacing: -.02em;
+  white-space: nowrap;
+}
+.brand::before { content: "$ "; color: var(--accent); }
+.site-nav { display: flex; gap: 1.25rem; margin-left: auto; align-items: center; font-size: .92rem; }
+.site-nav a { color: var(--fg-muted); text-decoration: none; white-space: nowrap; }
+.nav-short { display: none; }
+/* Narrow screens get the short labels and tighter spacing, so the bar stays
+   on one line instead of wrapping the brand onto a second row. */
+@media (max-width: 560px) {
+  .site-header .wrap { gap: .75rem; padding-inline: 1rem; }
+  .site-nav { gap: .85rem; font-size: .87rem; }
+  .nav-long { display: none; }
+  .nav-short { display: inline; }
+}
+.site-nav a:hover, .site-nav a[aria-current="page"] { color: var(--fg); }
+.theme-toggle {
+  background: none; border: 1px solid var(--border); color: var(--fg-muted);
+  border-radius: 6px; width: 2rem; height: 2rem; cursor: pointer;
+  display: grid; place-items: center; padding: 0; font-size: .95rem;
+}
+.theme-toggle:hover { color: var(--fg); border-color: var(--border-strong); }
+
+/* ---------- footer ---------- */
+.site-footer {
+  border-top: 1px solid var(--border); margin-top: 5rem;
+  padding: 2.5rem 0; color: var(--fg-muted); font-size: .88rem;
+}
+.site-footer .wrap { display: flex; flex-wrap: wrap; gap: 1rem 2rem; align-items: baseline; }
+.site-footer a { color: var(--fg-muted); }
+.site-footer .spacer { margin-left: auto; }
+
+/* ---------- terminal block ---------- */
+.term {
+  background: var(--term-bg); border: 1px solid var(--border);
+  border-radius: var(--radius); overflow: hidden; font-family: var(--mono);
+  box-shadow: 0 12px 32px -18px rgba(0,0,0,.55);
+}
+.term-bar {
+  display: flex; align-items: center; gap: .45rem;
+  padding: .6rem .85rem; border-bottom: 1px solid rgba(255,255,255,.07);
+  background: rgba(255,255,255,.03);
+}
+.term-dot { width: 11px; height: 11px; border-radius: 50%; background: #3a4048; }
+.term-title { margin-left: .5rem; color: var(--term-dim); font-size: .75rem; }
+.term-body {
+  margin: 0; padding: 1rem 1.15rem; overflow-x: auto;
+  color: var(--term-fg); font-size: .85rem; line-height: 1.75;
+  background: none !important; border: 0; border-radius: 0;
+}
+.term-body .cmd { color: var(--term-fg); }
+.term-body .cmd::before { content: "$ "; color: var(--term-green); }
+.term-body .ok   { color: var(--term-green); }
+.term-body .no   { color: var(--taken); }
+.term-body .unk  { color: var(--term-amber); }
+.term-body .dim  { color: var(--term-dim); }
+
+/* ---------- buttons ---------- */
+.btn {
+  display: inline-flex; align-items: center; gap: .5rem;
+  padding: .6rem 1.1rem; border-radius: 7px; font-weight: 550; font-size: .95rem;
+  text-decoration: none; border: 1px solid transparent; cursor: pointer;
+}
+.btn-primary { background: var(--accent); color: var(--accent-fg); }
+.btn-primary:hover { filter: brightness(1.07); }
+.btn-ghost { border-color: var(--border-strong); color: var(--fg); background: var(--surface); }
+.btn-ghost:hover { border-color: var(--fg-faint); }
+
+/* ---------- copyable command ---------- */
+.copy-row {
+  display: flex; align-items: stretch; gap: 0;
+  border: 1px solid var(--border-strong); border-radius: 7px;
+  background: var(--surface); overflow: hidden; max-width: 32rem;
+}
+.copy-row code {
+  flex: 1; padding: .65rem .85rem; font-size: .9rem; background: none;
+  border: 0; white-space: nowrap; overflow-x: auto; color: var(--fg);
+}
+.copy-row button {
+  border: 0; border-left: 1px solid var(--border); background: var(--bg-soft);
+  color: var(--fg-muted); padding: 0 .9rem; cursor: pointer; font-size: .82rem;
+  font-family: var(--sans);
+}
+.copy-row button:hover { color: var(--fg); background: var(--border); }

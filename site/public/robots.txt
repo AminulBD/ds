@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://ds.aminul.dev/sitemap-index.xml

@@ -1,0 +1,97 @@
+---
+import Base from '../layouts/Base.astro';
+import CopyCommand from '../components/CopyCommand.astro';
+import { getEntry, render } from 'astro:content';
+import release from '../data/release.json';
+
+const entry = await getEntry('pages', 'install');
+const { Content } = entry ? await render(entry) : { Content: null };
+
+const kb = (n: number) =>
+  n >= 1024 * 1024 ? `${(n / 1024 / 1024).toFixed(1)} MB` : `${Math.round(n / 1024)} KB`;
+
+// Grouped for the picker: the installer people most likely want, per platform.
+const GROUPS = [
+  { os: 'macOS', note: 'Apple silicon is arm64; Intel Macs are x86_64.' },
+  { os: 'Windows', note: 'The .msi needs the Visual C++ Redistributable — see below.' },
+  { os: 'Debian, Ubuntu', note: 'Static musl build, so it depends on nothing.' },
+  { os: 'Fedora, RHEL, openSUSE', note: 'Static musl build, so it depends on nothing.' },
+  { os: 'Linux', note: 'Plain archives. Prefer musl unless you need the gnu build.' },
+];
+const grouped = GROUPS
+  .map((g) => ({ ...g, assets: release.assets.filter((a) => a.os === g.os) }))
+  .filter((g) => g.assets.length);
+---
+
+<Base
+  title="Install ds"
+  description="Install ds on macOS, Linux or Windows — Homebrew, .deb, .rpm, .dmg, .msi, or a plain archive. Every release ships builds for x86_64, arm64 and 32-bit x86."
+>
+  <div class="wrap page">
+    <h1>Install</h1>
+    <p class="lede muted">
+      Latest release <a href={release.url}><strong>{release.tag}</strong></a>
+      {release.published && <> — published {release.published}</>}.
+    </p>
+
+    <section class="quick">
+      <h2>Homebrew</h2>
+      <p class="muted">macOS or Linux, and the way to get updates automatically.</p>
+      <CopyCommand command="brew install aminulbd/tap/ds" label="Install with Homebrew" />
+    </section>
+
+    <section>
+      <h2>Direct downloads</h2>
+      <p class="muted">
+        Real filenames from the {release.tag} release, verified against{' '}
+        <a href={release.checksums ?? release.url}>SHA256SUMS</a>.
+      </p>
+      {grouped.map((g) => (
+        <div class="dl-group">
+          <h3>{g.os}</h3>
+          <p class="faint dl-note">{g.note}</p>
+          <ul class="dl-list">
+            {g.assets.map((a) => (
+              <li>
+                <a href={a.url} class="mono">{a.name}</a>
+                <span class="faint">
+                  {a.arch}{a.libc ? ` · ${a.libc}` : ''} · {kb(a.size)}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))}
+      {!release.assets.length && (
+        <p><a href={release.url}>Browse the release assets on GitHub →</a></p>
+      )}
+    </section>
+
+    <section class="prose readme-install">
+      <h2>Notes</h2>
+      {Content && <Content />}
+    </section>
+  </div>
+</Base>
+
+<style>
+  .page { padding: 3rem 1.5rem; max-width: 54rem; }
+  .lede { font-size: 1.05rem; margin-top: -.5rem; }
+  .quick { margin: 2rem 0 3rem; }
+  .quick h2, section > h2 { margin-top: 0; }
+  section { margin-bottom: 3rem; }
+  .dl-group { margin: 1.75rem 0; }
+  .dl-group h3 { margin: 0 0 .2rem; font-size: 1rem; }
+  .dl-note { font-size: .85rem; margin: 0 0 .6rem; }
+  .dl-list { list-style: none; margin: 0; padding: 0; }
+  .dl-list li {
+    display: flex; flex-wrap: wrap; gap: .35rem 1rem; align-items: baseline;
+    justify-content: space-between;
+    padding: .5rem .75rem; border: 1px solid var(--border);
+    border-radius: 6px; margin-bottom: .35rem; background: var(--surface);
+  }
+  .dl-list a { font-size: .875rem; word-break: break-all; }
+  .dl-list span { font-size: .8rem; white-space: nowrap; }
+  /* The README section already carries its own h2/h3s. */
+  .readme-install :global(h3) { font-size: 1.05rem; }
+</style>
