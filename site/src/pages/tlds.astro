@@ -30,9 +30,10 @@ const SOURCE_LABEL: Record<string, string> = {
   <div class="wrap page">
     <h1>TLDs &amp; prices</h1>
     <p class="lede muted">
-      Every TLD <code>ds</code> knows how to check — {fmt(counts.total)} of them —
-      with what each costs to register and which registry answers for it. This is the
-      same data the binary carries, so the table and the CLI always agree.
+      Every TLD <code>ds</code> carries data for — {fmt(counts.total)} of them — with what
+      each costs to register and which registry answers for it. The prices and servers are
+      read straight out of the binary's own tables, so a figure here is the figure the CLI
+      will use.
     </p>
 
     <div class="stats">
@@ -63,10 +64,18 @@ const SOURCE_LABEL: Record<string, string> = {
       <label>
         <span class="visually-hidden">TLD type</span>
         <select id="kind">
-          <option value="">All types</option>
-          <option value="cctld">Country-code only</option>
-          <option value="second">Second level (.com)</option>
-          <option value="third">Third level (.co.uk)</option>
+          <option value="">Any type</option>
+          <option value="gtld">Generic — .com, .xyz ({fmt(counts.gtld)})</option>
+          <option value="cctld">Country-code — .de, .io ({fmt(counts.cctld)})</option>
+          <option value="idn">Internationalised — .рф ({fmt(counts.idn)})</option>
+        </select>
+      </label>
+      <label>
+        <span class="visually-hidden">Registration level</span>
+        <select id="level">
+          <option value="">Any level</option>
+          <option value="2">Second level — .com ({fmt(counts.second)})</option>
+          <option value="3">Third level — .co.uk ({fmt(counts.third)})</option>
         </select>
       </label>
       <label class="check">
@@ -97,11 +106,17 @@ const SOURCE_LABEL: Record<string, string> = {
               data-source={r.source}
               data-rdap={r.rdapServer ? '1' : ''}
               data-whois={r.whoisHost ? '1' : ''}
-              data-cctld={r.cctld ? '1' : ''}
+              data-kind={r.kind}
               data-level={r.level}
-              data-search={`${r.tld} ${host(r.rdapServer) ?? ''} ${r.whoisHost ?? ''}`.toLowerCase()}
+              data-search={`${r.tld} ${r.unicode ?? ''} ${host(r.rdapServer) ?? ''} ${r.whoisHost ?? ''}`.toLowerCase()}
             >
-              <th scope="row" class="tld">.{r.tld}</th>
+              <th scope="row" class="tld">
+                {r.unicode ? (
+                  <><span class="tld-uni">.{r.unicode}</span><span class="tld-puny">.{r.tld}</span></>
+                ) : (
+                  <>.{r.tld}</>
+                )}
+              </th>
               <td class="num">{money(r.price)}</td>
               <td class="num faint">{money(r.renew)}</td>
               <td>
@@ -140,6 +155,32 @@ const SOURCE_LABEL: Record<string, string> = {
           authoritative, WHOIS is text matching — see <a href="/docs/accuracy-notes">Accuracy notes</a>.
         </li>
         <li>
+          <strong>Type and level are separate filters</strong>, as they are in the CLI:
+          type is measured on the last label (the TLD of <code>co.uk</code> is <code>uk</code>),
+          level is where the name actually sits. So country-code plus second level gives the
+          {fmt(counts.rows2ndCctld)} bare ccTLDs — <code>.de</code>, <code>.io</code>,
+          <code>.jp</code> — while country-code alone also sweeps in <code>.co.uk</code> and
+          <code>.com.au</code>. The CLI spells the same pair
+          <code>--cctld --level second</code>.
+        </li>
+        <li>
+          <strong>Country-code</strong> means a two-letter TLD, which is exactly what ICANN
+          reserves for ISO 3166-1 codes and exactly what <code>--cctld</code> selects.
+          Internationalised TLDs are listed separately because they are punycode rather than
+          two ASCII letters — which means a few country TLDs whose readable form is a country
+          code, <code>.рф</code> and <code>.срб</code> among them, count as internationalised
+          here and are likewise missed by <code>--cctld</code>.
+        </li>
+        <li>
+          <strong>This table is slightly wider than <code>--tld all</code></strong>. That sweep
+          covers the {fmt(counts.total - counts.none)} TLDs with a registry to ask;
+          {counts.none} more are priced in the bundled table but have neither an RDAP endpoint
+          nor a WHOIS server on file — mostly resold third-level suffixes like
+          <code>.co.com</code> and <code>.de.com</code>. They are listed here, tagged
+          <span class="tag tag-none">neither</span>, and asking for one by name still works if
+          IANA can name a server for it.
+        </li>
+        <li>
           A few registries answer nobody: <code>.li</code> and <code>.qa</code> refuse public
           WHOIS and have no RDAP, so <code>ds</code> reports them <code>UNKNOWN</code> rather
           than guessing.
@@ -158,6 +199,7 @@ const SOURCE_LABEL: Record<string, string> = {
     const q = document.querySelector<HTMLInputElement>('#q')!;
     const source = document.querySelector<HTMLSelectElement>('#source')!;
     const kind = document.querySelector<HTMLSelectElement>('#kind')!;
+    const level = document.querySelector<HTMLSelectElement>('#level')!;
     const priced = document.querySelector<HTMLInputElement>('#priced')!;
     const count = document.querySelector<HTMLParagraphElement>('#count')!;
     const empty = document.querySelector<HTMLParagraphElement>('#empty')!;
@@ -171,6 +213,7 @@ const SOURCE_LABEL: Record<string, string> = {
       const term = q.value.trim().toLowerCase();
       const src = source.value;
       const k = kind.value;
+      const lvl = level.value;
       const onlyPriced = priced.checked;
       let shown = 0;
 
@@ -180,9 +223,8 @@ const SOURCE_LABEL: Record<string, string> = {
         if (ok && src === 'rdap') ok = d.rdap === '1';
         if (ok && src === 'whois') ok = d.whois === '1';
         if (ok && src === 'none') ok = d.source === 'none';
-        if (ok && k === 'cctld') ok = d.cctld === '1';
-        if (ok && k === 'second') ok = d.level === '2';
-        if (ok && k === 'third') ok = d.level === '3';
+        if (ok && k) ok = d.kind === k;
+        if (ok && lvl) ok = d.level === lvl;
         if (ok && onlyPriced) ok = d.price !== '';
         row.hidden = !ok;
         if (ok) shown++;
@@ -232,7 +274,7 @@ const SOURCE_LABEL: Record<string, string> = {
       clearTimeout(t);
       t = window.setTimeout(apply, 90);
     });
-    [source, kind, priced].forEach((el) => el.addEventListener('change', apply));
+    [source, kind, level, priced].forEach((el) => el.addEventListener('change', apply));
 
     // Deep-link support: /tlds?q=io
     const initial = new URLSearchParams(location.search).get('q');
@@ -260,11 +302,23 @@ const SOURCE_LABEL: Record<string, string> = {
     background: var(--bg); padding: .75rem 0;
   }
   .controls .search { flex: 1 1 18rem; }
+  /* Four controls will not sit on one line on a phone. Pack them two to a row
+     and stop pinning them, or the filter bar alone eats half the screen. */
+  @media (max-width: 720px) {
+    .controls { position: static; padding: .5rem 0 .75rem; gap: .5rem; }
+    .controls .search { flex: 1 1 100%; }
+    .controls > label:not(.search):not(.check) { flex: 1 1 calc(50% - .25rem); min-width: 0; }
+    .controls > label:not(.search):not(.check) select { width: 100%; }
+    .check { flex: 0 0 auto; }
+    .count { margin-left: auto; }
+  }
   .controls input[type="search"], .controls select {
     width: 100%; font: inherit; font-size: .92rem;
     padding: .5rem .7rem; border-radius: 6px;
     border: 1px solid var(--border-strong); background: var(--surface); color: var(--fg);
   }
+  /* Leave room for the native chevron, or long option labels run under it. */
+  .controls select { padding-right: 1.9rem; text-overflow: ellipsis; }
   .controls select { width: auto; }
   .controls input[type="search"]:focus-visible, .controls select:focus-visible {
     outline: 2px solid var(--accent); outline-offset: 1px;
@@ -274,6 +328,10 @@ const SOURCE_LABEL: Record<string, string> = {
 
   .table-scroll { overflow-x: auto; border: 1px solid var(--border); border-radius: var(--radius); }
   #tbl { font-size: .9rem; }
+  /* `overflow-x: auto` on .table-scroll makes it a scroll container on both
+     axes, so `top` here is measured from that box, not the viewport — 0 is the
+     only offset that lines up. The pinned TLD column below is what actually
+     keeps a long row readable. */
   #tbl thead th { position: sticky; top: 0; background: var(--bg-soft); z-index: 10; padding: 0; }
   #tbl thead th button {
     all: unset; box-sizing: border-box; display: block; width: 100%; cursor: pointer;
@@ -293,6 +351,11 @@ const SOURCE_LABEL: Record<string, string> = {
     text-transform: none; letter-spacing: normal;
     font-size: .9rem; color: var(--fg);
   }
+  /* Punycode TLDs show the readable form first, the A-label under it — the
+     registry answers for the A-label, so both are worth having. */
+  .tld-uni { display: block; }
+  .tld-puny { display: block; font-size: .74rem; color: var(--fg-faint); }
+
   /* Keep the TLD in view while the rest of the row scrolls sideways — without
      it you lose track of which TLD a price belongs to on a narrow screen. */
   #tbl tbody th.tld, #tbl thead th:first-child {
