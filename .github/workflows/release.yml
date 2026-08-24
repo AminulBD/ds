@@ -6,8 +6,10 @@ on:
   # Lets you exercise the whole build matrix without cutting a release.
   workflow_dispatch:
 
+# Least privilege by default; only the release job writes anything, and it
+# says so itself.
 permissions:
-  contents: write
+  contents: read
 
 # Re-pushing a tag supersedes the run already going for it, rather than
 # racing it to publish the same release.
@@ -174,6 +176,13 @@ jobs:
     needs: build
     if: startsWith(github.ref, 'refs/tags/')
     runs-on: ubuntu-latest
+    # Creating the release and uploading its assets is the only write this
+    # workflow performs, and it lands on this repository. The tap dispatch
+    # below cannot borrow it: GITHUB_TOKEN is scoped to the repo the run
+    # belongs to and reaches no other, whatever `permissions` says -- hence
+    # its own token.
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v4
 
@@ -207,3 +216,19 @@ jobs:
             gh release create "$GITHUB_REF_NAME" --generate-notes --verify-tag
           fi
           gh release upload "$GITHUB_REF_NAME" dist/* --clobber
+
+      # The tap also polls every six hours, so this only makes the bump
+      # immediate -- a failure here delays it, it does not lose it, and the
+      # release itself is already published by this point. Hence
+      # continue-on-error: an expired token must not redden a good release.
+      #
+      # GH_TOKEN wants a token with Contents: write on aminulbd/homebrew-tap.
+      # github.token cannot serve: it is scoped to this repository alone.
+      - name: Bump the Homebrew tap
+        continue-on-error: true
+        run: |
+          gh api repos/aminulbd/homebrew-tap/dispatches \
+            -f event_type=upstream-release \
+            -f 'client_payload[formula]=ds'
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
