@@ -4,7 +4,7 @@
 
 import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, domainToUnicode } from 'node:url';
 import { dirname, resolve } from 'node:path';
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -15,6 +15,26 @@ const FALLBACK = resolve(dataDir, 'rdap-dns.json');
 
 /** `.CO.UK` / `co.uk` / `.com` -> `co.uk` / `com`. Mirrors normalize_tld in src/tlds.rs. */
 const normalize = (s) => s.trim().replace(/^\.+|\.+$/g, '').toLowerCase();
+
+/**
+ * Sort a TLD into one of three mutually exclusive kinds, measured on the last
+ * label exactly as the CLI's --tld-len does (the TLD of `co.uk` is `uk`):
+ *
+ *   cctld  two letters — what ICANN reserves for ISO 3166-1 country codes,
+ *          and precisely what `--cctld` (= `--tld-len 2`) selects
+ *   idn    an A-label, i.e. punycode: `xn--p1ai` is `.рф`
+ *   gtld   everything else
+ *
+ * Note the IDN bucket also holds a handful of *country* TLDs whose Unicode
+ * form is a country code (`.рф`, `.срб`); they are not two ASCII letters, so
+ * neither this nor the CLI's --cctld counts them as ccTLDs.
+ */
+function classify(tld) {
+  const apex = tld.split('.').pop();
+  if (apex.startsWith('xn--')) return 'idn';
+  if ([...apex].length === 2) return 'cctld';
+  return 'gtld';
+}
 
 const readJson = async (p) => JSON.parse(await readFile(p, 'utf8'));
 
@@ -94,7 +114,10 @@ const rows = [...new Set([...whois.keys(), ...pricing.keys(), ...rdap.keys()])]
       // How many labels the registration sits under: `com` = 2nd level,
       // `co.uk` = 3rd. Matches the --level filter in the CLI.
       level: tld.includes('.') ? 3 : 2,
-      cctld: tld.split('.').pop().length === 2,
+      kind: classify(tld),
+      // The readable form of a punycode TLD: xn--p1ai -> рф. null otherwise.
+      unicode: classify(tld) === 'idn' ? domainToUnicode(tld) : null,
+      cctld: classify(tld) === 'cctld',
       price: p.price ?? null,
       renew: p.renew ?? null,
       transfer: p.transfer ?? null,
@@ -115,7 +138,15 @@ const out = {
     priced: priced.length,
     whois: rows.filter((r) => r.whoisHost).length,
     rdap: rows.filter((r) => r.rdapServer).length,
-    cctld: rows.filter((r) => r.cctld).length,
+    cctld: rows.filter((r) => r.kind === 'cctld').length,
+    gtld: rows.filter((r) => r.kind === 'gtld').length,
+    idn: rows.filter((r) => r.kind === 'idn').length,
+    second: rows.filter((r) => r.level === 2).length,
+    third: rows.filter((r) => r.level === 3).length,
+    // The bare ccTLDs — what `--cctld --level second` leaves you with.
+    rows2ndCctld: rows.filter((r) => r.kind === 'cctld' && r.level === 2).length,
+    // Priced, but with no registry to ask — so outside what `--tld all` sweeps.
+    none: rows.filter((r) => r.source === 'none').length,
   },
   priceRange: {
     min: Math.min(...priced.map((r) => r.price)),
@@ -125,5 +156,5 @@ const out = {
 };
 
 await writeFile(resolve(dataDir, 'tlds.json'), JSON.stringify(out));
-const { total, priced: np, whois: nw, rdap: nr } = out.counts;
-console.log(`  tlds     ${total} rows — ${np} priced, ${nw} whois, ${nr} rdap`);
+const { total, priced: np, cctld: nc, gtld: ng, idn: ni } = out.counts;
+console.log(`  tlds     ${total} rows — ${np} priced; ${ng} gTLD, ${nc} ccTLD, ${ni} IDN`);
