@@ -5,6 +5,9 @@ ds \- domain search: check domain availability across many TLDs
 .B ds
 .RI [ OPTIONS ]
 .IR NAME .\|.\|.
+.br
+.B ds serve
+.RI [ OPTIONS ]
 .SH DESCRIPTION
 .B ds
 checks whether domain names are registered. Each name is checked against every
@@ -303,6 +306,133 @@ Per-request timeout. Default 10.
 .B \-\-no\-color
 Plain output. Also honoured:
 .BR NO_COLOR .
+.SH HTTP API
+.B "ds serve"
+answers the same checks over HTTP, for a web front end or anything else that
+would rather call an API than run a command. It is not in the released binaries
+or packages: the server sits behind the
+.B serve
+cargo feature, so a default build carries none of it and none of its
+dependencies.
+.PP
+.nf
+cargo build \-\-release \-\-features serve
+ds serve
+.fi
+.PP
+.B "GET /v1/check?name=apple&tld=com,net"
+returns the JSON array
+.B \-\-json
+prints.
+.B "GET /healthz"
+returns a status object without touching a registry. Both
+.I name
+and
+.I tld
+may be repeated or comma separated, and
+.I tld
+takes the same
+.B popular
+and
+.B rdap
+keywords
+.B \-\-tld
+does; with no
+.I tld
+a dotted name is a whole domain and a bare label means
+.BR .com .
+A rejected request is a 4xx carrying a JSON
+.I error
+field.
+.PP
+The two statuses that are not a plain yes or no mean in the response exactly
+what they mean on the command line. An inconclusive lookup is
+.BR unknown ,
+and a response carrying one is sent
+.B "Cache\-Control: no\-store"
+because it is a lookup that failed rather than an answer to keep. A name in a
+brand or reserved zone is
+.BR private ,
+with the reason in
+.IR note ,
+and is as cacheable as a
+.BR taken .
+Nothing in the server turns either of them into
+.BR available .
+.PP
+There is no
+.I private
+parameter, and the default rule is the one described above:
+.BR tld=all ", " tld=rdap " and " tld=popular
+leave the closed zones out, while a TLD the caller names is checked whatever it
+is, so
+.B tld=aws
+is answered
+.B private
+with the operator attached. That covers what
+.B "\-\-private include"
+is for, without letting one request spend hundreds of registry lookups on zones
+the bundled table already answers.
+.PP
+A reachable
+.B ds
+server is an open proxy onto other people's registries \(em every request it
+accepts becomes a query made under this host's address. It therefore listens on
+the loopback address only unless told otherwise, caps how much one request may
+ask for, throttles each client, and paces registries with the one limiter the
+whole process shares.
+.TP
+.BR \-\-host " " \fIADDR\fR
+Bind address. Default 127.0.0.1; any other address prints a warning.
+.TP
+.BR \-p ", " \-\-port " " \fIN\fR
+Port. Default 8080.
+.TP
+.BR \-\-max\-lookups " " \fIN\fR
+Most domains one request may ask about, names times TLDs. Default 50, which
+leaves room for
+.B tld=popular
+and rules out
+.BR tld=all .
+.TP
+.BR \-\-rate\-limit " " \fIN\fR
+Requests per minute per client address. Default 60; 0 turns the limit off.
+Behind a reverse proxy every client looks like the proxy, and
+.B X\-Forwarded\-For
+is not trusted, so put per-user limits in the proxy.
+.TP
+.BR \-\-cache\-ttl " " \fISECS\fR
+How long an answer is reused before the registry is asked again. Default 300;
+0 turns the cache off. An
+.B unknown
+is held for at most thirty seconds, since it is a failed lookup rather than a
+fact about the domain.
+.TP
+.BR \-c ", " \-\-concurrency " " \fIN\fR
+Lookups in flight across the whole server. Default 20.
+.TP
+.BR \-\-cors " " \fIORIGIN\fR
+Send
+.B Access\-Control\-Allow\-Origin
+with this value, so a browser page may call the API. Not sent at all by default.
+.TP
+.BR \-\-details ", " \-\-registry ", " \-\-where
+As the options of the same name, and off by default as they are there. Raw
+WHOIS and raw RDAP are never served.
+.PP
+.BR \-\-per\-host ", " \-\-timeout ", " \-\-source " and " \-\-no\-iana
+mean what they mean above.
+.PP
+One consequence of the subcommand: in a build with the feature on,
+.B "ds serve"
+starts the server, so checking the
+.I name
+.B serve
+wants
+.B "ds serve.com"
+or
+.BR "ds \-\- serve" .
+Default builds have no subcommand and are unaffected.
 .SH EXIT STATUS
 .TP
 .B 0
@@ -316,7 +446,9 @@ results do not count as available.
 .B 2
 A startup error, such as an unusable
 .B \-\-tld
-list.
+list, or a port
+.B serve
+could not bind.
 .SH FILES
 .TP
 .I ~/.cache/ds/rdap\-dns.json
