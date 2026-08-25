@@ -140,8 +140,19 @@ impl Default for Registry {
 }
 
 /// `.CO.UK` / `co.uk` / `.com` -> `co.uk` / `com`
+///
+/// Unicode TLDs are punycoded, so `.বাংলা` and `.xn--54b7fta0cc` land on the same
+/// key: every domain `ds` checks is already an A-label by the time it reaches a
+/// table, but the tables themselves are written by hand and by upstream
+/// registries, which spell IDNs either way.
 pub fn normalize_tld(s: &str) -> String {
-    s.trim().trim_matches('.').to_ascii_lowercase()
+    let trimmed = s.trim().trim_matches('.');
+    if trimmed.is_ascii() {
+        return trimmed.to_ascii_lowercase();
+    }
+    // Anything IDNA rejects has no A-label to fall back on; keep the raw form
+    // so a hand-written table still matches itself.
+    idna::domain_to_ascii(trimmed).unwrap_or_else(|_| trimmed.to_lowercase())
 }
 
 /// Look `tld` up in a table, longest suffix first: `a.co.uk` is tried as
@@ -201,6 +212,21 @@ mod tests {
     fn normalizes_tlds() {
         assert_eq!(normalize_tld(".CO.UK"), "co.uk");
         assert_eq!(normalize_tld(" com "), "com");
+        // Unicode TLDs normalize to their A-label, from either spelling.
+        assert_eq!(normalize_tld(".বাংলা"), "xn--54b7fta0cc");
+        assert_eq!(normalize_tld("xn--54b7fta0cc"), "xn--54b7fta0cc");
+    }
+
+    #[test]
+    fn finds_a_unicode_tld_by_either_spelling() {
+        // whois.json spells this one `.বাংলা`; every lookup arrives punycoded.
+        let r = Registry::load().unwrap();
+        let unicode = r.lookup("বাংলা").expect("no server for .বাংলা");
+        let ascii = r
+            .lookup("xn--54b7fta0cc")
+            .expect("no server for .xn--54b7fta0cc");
+        assert_eq!(unicode.endpoint.label(), ascii.endpoint.label());
+        assert_eq!(ascii.endpoint.label(), "whois.get.bd");
     }
 
     #[test]
