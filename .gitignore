@@ -34,3 +34,9 @@
 
 # python bytecode from the scripts/ helpers
 __pycache__/
+
+# scripts/harvest-tld-facts.mjs --deep: cached IANA delegation records, re-fetchable
+/scripts/.iana-cache/
+
+# working log from the --deep crawl
+/iana-deep.log
