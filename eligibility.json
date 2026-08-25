@@ -1,0 +1,83 @@
+{
+  "_about": [
+    "TLDs that are not open to everyone. `ds --where` prints the note and the",
+    "source, so a name reported AVAILABLE under a restricted TLD does not read",
+    "as one you can simply go and buy.",
+    "",
+    "Unlike whois.json and pricing.json this file is hand-maintained: no",
+    "registry publishes eligibility rules in a machine-readable form, so there",
+    "is nothing to generate it from. Every entry therefore carries the page it",
+    "was taken from, and that page — not this file — is the authority. The list",
+    "covers the restricted TLDs a registrar is likely to offer you; it is not",
+    "exhaustive, and a TLD missing from it is not thereby open.",
+    "",
+    "Notes say what kind of gate exists, not the exact legal test: the wording",
+    "of an eligibility rule changes more often than the fact of one.",
+    "",
+    "Sub-zones inherit, longest suffix first: com.au is looked up as com.au,",
+    "then au. Sources last checked 2026-08-25."
+  ],
+
+  "tlds": {
+    "eu": {
+      "note": "EU/EEA only: the registrant must be a citizen of, resident in, or an organisation established in the EU/EEA",
+      "source": "https://eurid.eu/en/get-your-eu/find-a-registrar/who-can-register-eu/"
+    },
+    "fr": {
+      "note": "EU presence: the registrant must reside in, or have its registered office in, the EU/EEA or Switzerland",
+      "source": "https://www.afnic.fr/en/observatory-and-resources/documents-to-consult-or-download/naming-policies/"
+    },
+    "it": {
+      "note": "EU presence: the registrant must be a citizen or resident of, or established in, the EEA, Switzerland, the UK, San Marino or the Vatican",
+      "source": "https://www.nic.it/en/find-your-it/how-register"
+    },
+    "ca": {
+      "note": "Canadian presence: the registrant must meet one of CIRA's Canadian Presence Requirements",
+      "source": "https://www.cira.ca/en/legal-policy-and-compliance/canadian-presence-requirements/"
+    },
+    "au": {
+      "note": "Australian presence: an Australian business or company number, trade mark, or residency is required",
+      "source": "https://www.auda.org.au/au-domain-names/au-rules-and-policies/"
+    },
+    "us": {
+      "note": "US nexus: the registrant must live in, be organised in, or have a genuine connection to the United States",
+      "source": "https://www.about.us/policies"
+    },
+    "br": {
+      "note": "Brazilian presence: a CPF or CNPJ tax registration is required, and a foreign company needs a local representative",
+      "source": "https://registro.br/dominio/regras/"
+    },
+    "gov": {
+      "note": "US government only: federal, state, local and tribal government organisations",
+      "source": "https://get.gov/domains/eligibility/"
+    },
+    "mil": {
+      "note": "US Department of Defense only; not sold to the public",
+      "source": "https://www.iana.org/domains/root/db/mil.html"
+    },
+    "edu": {
+      "note": "US institutions accredited by an agency the Department of Education recognises",
+      "source": "https://www.educause.edu/edu-domain"
+    },
+    "int": {
+      "note": "intergovernmental organisations established by treaty only",
+      "source": "https://www.iana.org/domains/int/policy"
+    },
+    "coop": {
+      "note": "cooperatives, and the organisations that serve them, only",
+      "source": "https://identity.coop/faq/eligibility/"
+    },
+    "museum": {
+      "note": "museums and museum professionals only",
+      "source": "https://welcome.museum/"
+    },
+    "bank": {
+      "note": "verified regulated banks only; the registry checks the applicant's charter before delegating",
+      "source": "https://ftld.com/"
+    },
+    "insurance": {
+      "note": "verified regulated insurance companies only",
+      "source": "https://ftld.com/"
+    }
+  }
+}

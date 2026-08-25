@@ -3,6 +3,7 @@
 use serde::Serialize;
 
 use crate::pricing::Price;
+use crate::registration::{Eligibility, Listing};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
 #[serde(rename_all = "lowercase")]
@@ -91,12 +92,18 @@ pub struct Register {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub registry: Option<String>,
     /// The registry's own "registration information" page, per IANA. For
-    /// ccTLDs this is usually the list of accredited registrars.
+    /// ccTLDs this is usually the list of accredited registrars, which is the
+    /// answer worth having when the TLD is restricted.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub info_url: Option<String>,
-    /// Registrar searches with the domain filled in. Whether a given registrar
-    /// sells this TLD is for the registrar to say.
-    pub search: Vec<String>,
+    /// Why the TLD is not open to everyone, where that is known. Absent does
+    /// not prove open: the bundled list is not exhaustive.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub eligibility: Option<Eligibility>,
+    /// Registrars whose published price for this TLD shows they sell it,
+    /// cheapest first. Empty means the bundled price table names none — not
+    /// that none exists.
+    pub registrars: Vec<Listing>,
 }
 
 #[derive(Debug, Clone, Serialize)]

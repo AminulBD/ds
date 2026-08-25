@@ -125,7 +125,8 @@ install -m755 target/release/ds ~/.local/bin/ds
 install -m644 ds.1 ~/.local/share/man/man1/ds.1     # then: man ds
 ```
 
-`whois.json`, `pricing.json` and `private-tlds.json` are embedded at compile
+`whois.json`, `pricing.json`, `private-tlds.json` and `eligibility.json` are
+embedded at compile
 time, so the binary runs from anywhere.
 
 ## Usage
@@ -303,7 +304,7 @@ and every ccTLD is left exactly as it was.
 | `--registry` | which RDAP endpoint and/or WHOIS server answered |
 | `--whois` | queries WHOIS as well and prints the raw record |
 | `--dns-records` | A, AAAA, NS, MX, TXT, CNAME and SOA records |
-| `--where` | for available domains: the registry, its official registration page, and registrar searches with the name filled in |
+| `--where` | for available domains: the registry, its official registration page, any eligibility rule, and the registrars whose published prices show they sell the TLD |
 | `--raw` | raw RDAP JSON |
 | `--json` | a JSON array instead of the text report |
 | `--all-info` | `--details --registry --whois --dns-records --where` |
@@ -330,27 +331,54 @@ ds apple --tld com --details --registry --dns-records
 ### Where to register
 
 ```sh
-ds mynewbrand --tld com,de --where
+ds mynewbrand --tld de,fr --where
 ```
 
 ```
 + mynewbrand.de                    AVAILABLE     $6.29 whois     858ms
     registry     DENIC eG
     registry url http://www.denic.de/
-    register at  https://porkbun.com/checkout/search?q=mynewbrand.de
-                 https://www.namecheap.com/domains/registration/results/?domain=mynewbrand.de
-                 https://www.dynadot.com/domain/search?domain=mynewbrand.de
-                 https://www.namesilo.com/domain/search-domains?query=mynewbrand.de
+    register at  porkbun.com       $2.90  https://porkbun.com/checkout/search?q=mynewbrand.de
+                 namecheap.com     $6.98  https://www.namecheap.com/domains/registration/results/?domain=mynewbrand.de
++ mynewbrand.fr                    AVAILABLE    $17.98 rdap     1179ms
+    registry     Association Française pour le Nommage Internet en Coopération (A.F.N.I.C.)
+    registry url https://www.nic.fr
+    eligibility  EU presence: the registrant must reside in, or have its registered office in, the EU/EEA or Switzerland
+                 https://www.afnic.fr/en/observatory-and-resources/documents-to-consult-or-download/naming-policies/
+    register at  namecheap.com    $17.98  https://www.namecheap.com/domains/registration/results/?domain=mynewbrand.fr
 ```
 
 The registry name and URL come from IANA's record for the TLD, looked up once
 per TLD and shown only for domains that are actually available. For ccTLDs that
-page is usually the registry's list of accredited registrars, which matters
-because most ccTLDs are not sold by every registrar — `.de` and `.fr` have
-residency or trustee requirements, for instance.
+page is usually the registry's own list of accredited registrars, which is the
+answer worth having when a TLD is not sold on the open market.
 
-The four registrar links are prefilled searches, not a claim that those
-registrars carry the TLD; their pages will say.
+**`register at` is evidence, not a guess.** Each line is a registrar that
+publishes a price for that TLD in [`pricing.json`](#your-own-prices), cheapest
+first — nobody quotes a price for something they cannot sell you. That is why
+`.fr` above lists one registrar and `.de` two: Porkbun's price list carries
+`.de` and not `.fr`. A TLD no registrar in the table prices says so plainly:
+
+```
++ mynewbrand.edu                   AVAILABLE         - whois     365ms
+    eligibility  US institutions accredited by an agency the Department of Education recognises
+                 https://www.educause.edu/edu-domain
+    register at  no registrar in the price table sells .edu
+```
+
+**`eligibility` is who may buy it.** A name being free says nothing about
+whether the registry would let you have it, so a TLD with a residency, nexus or
+membership rule prints that rule and the registry page it came from *before* the
+places to buy it. This comes from the bundled `eligibility.json`, which — unlike
+`whois.json` and `pricing.json` — is hand-maintained, because no registry
+publishes eligibility rules in a machine-readable form. Every entry names the
+page it was taken from, and that page, not `ds`, is the authority. The list
+covers the restricted TLDs a registrar is likely to offer you; **a TLD missing
+from it is not thereby open**.
+
+Both halves are bundled, so `--where` still answers the useful part of the
+question with `--no-iana` or no route to `whois.iana.org` — only the registry
+name and URL drop out.
 
 ## Prices
 
@@ -368,6 +396,10 @@ quote a price the column is the mean of them:
   ]
 }
 ```
+
+`register` names the registrar that published the quote, which is also what
+`--where` reads to say who actually sells a TLD — so keep it accurate if you
+edit the file.
 
 Multi-label suffixes are looked up longest-first, as for WHOIS servers, so
 `.co.uk` gets its own price rather than `.uk`'s. A TLD none of them price shows
@@ -527,9 +559,14 @@ And the same again for the price column, in the format of the bundled
 ```
 
 Where several registrars quote a TLD the column shows the mean, so `.com` above
-reads `$9.54`. `register` is a label for your own benefit; only the prices are
-read, and each of them may be left out or set to `null` for "not sold". A TLD
-that ends up with no registration price at all shows `-`.
+reads `$9.54`. Each price may be left out or set to `null` for "not sold", and a
+TLD that ends up with no registration price at all shows `-`.
+
+`register` names the registrar, and `--where` reads it: a quote here is what
+tells `ds` that this registrar sells that TLD, so the two registrars above are
+what `ds apple --tld com --where` would then offer you. Leave it out and the
+price still counts toward the column, but the entry claims nothing about where
+to buy the name.
 
 ```sh
 ds apple --tld com,io --pricing-file myprices.json                 # merged
@@ -588,6 +625,11 @@ bundled table has never heard of, or hold a corporate zone at nothing.
   registry before being written — see
   [The bundled WHOIS table](#the-bundled-whois-table). The older hand-written
   entries have not been through that mill.
+* `--where` reports registrars from published prices, so it under-claims rather
+  than over-claims: a registrar missing from the bundled `pricing.json` may well
+  sell the TLD anyway. `eligibility.json` is the same shape of promise in the
+  other direction — the restrictions it lists are sourced, but a TLD it does not
+  list is not thereby unrestricted.
 * Large sweeps get rate-limited. `ds` paces itself per host, backs off on
   403/429, and stops querying a server that has refused it six times in a row
   (retrying it after 30s). Identity Digital runs ~250 gTLDs behind one RDAP

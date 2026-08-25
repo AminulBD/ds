@@ -19,12 +19,17 @@ use std::path::Path;
 use anyhow::{bail, Context, Result};
 use serde::{Deserialize, Serialize};
 
-use crate::tlds::normalize_tld;
+use crate::tlds::{lookup_suffix, normalize_tld};
 
 const PRICING_JSON: &str = include_str!("../pricing.json");
 
 #[derive(Debug, Deserialize)]
 struct RawOffer {
+    /// Which registrar published this quote. Optional, because a hand-written
+    /// table may not care to say — but naming it is what lets `--where` treat
+    /// the quote as proof that this registrar sells the TLD.
+    #[serde(default)]
+    register: Option<String>,
     /// Every price key is optional so a hand-written table can quote only the
     /// figure it cares about.
     #[serde(default)]
@@ -61,8 +66,26 @@ impl Price {
     }
 }
 
+/// One named registrar's first-year price for a TLD.
+///
+/// This is the only hard evidence `ds` has about who sells what: a registrar
+/// publishes a price for a TLD it can actually sell you, and simply leaves out
+/// the ones it cannot. `--where` lists these rather than guessing.
+#[derive(Debug, Clone, Serialize)]
+pub struct Offer {
+    pub registrar: String,
+    pub register: f64,
+}
+
+/// What the table knows about one TLD: the averaged price shown in the column,
+/// and the individual quotes it was averaged from.
+struct TldPrices {
+    price: Price,
+    offers: Vec<Offer>,
+}
+
 pub struct Prices {
-    by_tld: HashMap<String, Price>,
+    by_tld: HashMap<String, TldPrices>,
 }
 
 impl Prices {
@@ -99,8 +122,8 @@ impl Prices {
             if tld.is_empty() {
                 continue;
             }
-            if let Some(price) = average(&offers) {
-                by_tld.insert(tld, price);
+            if let Some(entry) = summarise(&offers) {
+                by_tld.insert(tld, entry);
             }
         }
 
@@ -109,14 +132,18 @@ impl Prices {
 
     /// Longest-suffix lookup, as for WHOIS servers: `co.uk` wins over `uk`.
     pub fn lookup(&self, tld: &str) -> Option<Price> {
-        let tld = normalize_tld(tld);
-        let mut rest = tld.as_str();
-        loop {
-            if let Some(price) = self.by_tld.get(rest) {
-                return Some(*price);
-            }
-            rest = &rest[rest.find('.')? + 1..];
-        }
+        self.find(tld).map(|entry| entry.price)
+    }
+
+    /// The registrars that quote a price for this TLD, cheapest first — the
+    /// evidence behind `--where`. Empty when the table prices the TLD without
+    /// saying who quoted it, and when nobody prices it at all.
+    pub fn offers(&self, tld: &str) -> &[Offer] {
+        self.find(tld).map_or(&[], |entry| &entry.offers)
+    }
+
+    fn find(&self, tld: &str) -> Option<&TldPrices> {
+        lookup_suffix(tld, |s| self.by_tld.get(s))
     }
 
     /// Overlay another table on this one; the other side wins per TLD.
@@ -138,8 +165,9 @@ impl Default for Prices {
     }
 }
 
-/// Mean over the registrars that quote a price; a TLD nobody sells has none.
-fn average(offers: &[RawOffer]) -> Option<Price> {
+/// Mean over the registrars that quote a price, plus the quotes themselves; a
+/// TLD nobody sells has neither.
+fn summarise(offers: &[RawOffer]) -> Option<TldPrices> {
     // A price that is missing, negative or not a number is no quote at all.
     let quoted = |v: Option<f64>| v.filter(|p| p.is_finite() && *p >= 0.0);
 
@@ -155,11 +183,33 @@ fn average(offers: &[RawOffer]) -> Option<Price> {
         .filter_map(|o| quoted(o.prices.renew))
         .collect();
 
-    Some(Price {
-        register: mean(&register)?,
-        renew: mean(&renew),
-        currency: "USD",
-        registrars: register.len(),
+    // An anonymous quote still moves the average — it is a real price — but it
+    // names no registrar, so it is no evidence about where to buy the name.
+    let mut named: Vec<Offer> = offers
+        .iter()
+        .filter_map(|o| {
+            let registrar = o.register.as_deref()?.trim();
+            let register = quoted(o.prices.regular)?;
+            (!registrar.is_empty()).then(|| Offer {
+                registrar: registrar.to_ascii_lowercase(),
+                register,
+            })
+        })
+        .collect();
+    named.sort_by(|a, b| {
+        a.register
+            .total_cmp(&b.register)
+            .then_with(|| a.registrar.cmp(&b.registrar))
+    });
+
+    Some(TldPrices {
+        price: Price {
+            register: mean(&register)?,
+            renew: mean(&renew),
+            currency: "USD",
+            registrars: register.len(),
+        },
+        offers: named,
     })
 }
 
@@ -190,7 +240,7 @@ mod tests {
     #[test]
     fn bundled_table_quotes_several_registrars() {
         let p = Prices::load().unwrap();
-        let multi = p.by_tld.values().filter(|v| v.registrars > 1).count();
+        let multi = p.by_tld.values().filter(|v| v.price.registrars > 1).count();
         assert!(
             multi > 400,
             "only {multi} TLDs have more than one registrar quoting them"

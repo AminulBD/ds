@@ -10,6 +10,7 @@ mod model;
 mod pricing;
 mod private;
 mod rdap;
+mod registration;
 mod tlds;
 mod whois;
 
@@ -30,6 +31,7 @@ use limit::HostLimiter;
 use model::{CheckResult, Details, Method, Register, Status};
 use pricing::Prices;
 use private::PrivateTlds;
+use registration::Rules;
 use tlds::Registry;
 use whois::TldInfo;
 
@@ -80,7 +82,8 @@ struct Args {
     #[arg(long = "dns-records")]
     dns_records: bool,
 
-    /// For available domains, show the registry and where to register them.
+    /// For available domains, show the registry, any registration restriction,
+    /// and the registrars that sell the TLD.
     #[arg(long = "where")]
     show_where: bool,
 
@@ -321,6 +324,8 @@ struct Ctx {
     prices: Prices,
     /// TLDs with no public registrations, so an empty answer is not an offer.
     private: PrivateTlds,
+    /// Registration restrictions, for --where.
+    rules: Rules,
     /// Used for every RDAP/WHOIS connection.
     resolver: TokioAsyncResolver,
     /// Only for `--dns-records`.
@@ -510,6 +515,7 @@ async fn run() -> Result<()> {
         registry,
         prices,
         private: private_tlds,
+        rules: Rules::load().context("loading the bundled eligibility.json")?,
         resolver,
         records,
         timeout,
@@ -956,7 +962,8 @@ async fn check(ctx: &Ctx, domain: String, tld: String) -> CheckResult {
         Some(Register {
             registry: info.as_ref().and_then(|i| i.organisation.clone()),
             info_url: info.as_ref().and_then(|i| i.registration_url.clone()),
-            search: registrar_searches(&domain),
+            eligibility: ctx.rules.lookup(&tld).cloned(),
+            registrars: registration::listings(&ctx.prices, &tld, &domain),
         })
     } else {
         None
@@ -978,20 +985,6 @@ async fn check(ctx: &Ctx, domain: String, tld: String) -> CheckResult {
         register,
         elapsed_ms: started.elapsed().as_millis() as u64,
     }
-}
-
-/// Registrar searches with the domain filled in. Deliberately not a claim that
-/// a given registrar sells the TLD — that is for the registrar's page to say.
-fn registrar_searches(domain: &str) -> Vec<String> {
-    [
-        "https://porkbun.com/checkout/search?q=",
-        "https://www.namecheap.com/domains/registration/results/?domain=",
-        "https://www.dynadot.com/domain/search?domain=",
-        "https://www.namesilo.com/domain/search-domains?query=",
-    ]
-    .iter()
-    .map(|prefix| format!("{prefix}{domain}"))
-    .collect()
 }
 
 fn print_result(args: &Args, r: &CheckResult) {
@@ -1102,11 +1095,48 @@ fn print_result(args: &Args, r: &CheckResult) {
         if let Some(url) = &reg.info_url {
             println!("    {:<12} {url}", paint("registry url", Color::Dim));
         }
-        for (i, url) in reg.search.iter().enumerate() {
-            if i == 0 {
-                println!("    {:<12} {url}", paint("register at", Color::Dim));
-            } else {
-                println!("    {:<12} {url}", "");
+
+        // Before the shopping links: a name being free says nothing about
+        // whether this registry would let you have it.
+        if let Some(rule) = &reg.eligibility {
+            println!(
+                "    {:<12} {}",
+                paint("eligibility", Color::Dim),
+                paint(&rule.note, Color::Yellow)
+            );
+            println!("    {:<12} {}", "", rule.source);
+        }
+
+        if reg.registrars.is_empty() {
+            println!(
+                "    {:<12} {}",
+                paint("register at", Color::Dim),
+                paint(
+                    &format!("no registrar in the price table sells .{}", r.tld),
+                    Color::Dim
+                )
+            );
+        } else {
+            // The registrar names line up so the prices beside them compare.
+            let width = reg
+                .registrars
+                .iter()
+                .map(|l| l.registrar.len())
+                .max()
+                .unwrap_or(0);
+            for (i, l) in reg.registrars.iter().enumerate() {
+                let row = format!(
+                    "{:<width$} {:>9}  {}",
+                    l.registrar,
+                    l.price_label(),
+                    l.search.as_deref().unwrap_or("")
+                );
+                let row = row.trim_end();
+                if i == 0 {
+                    println!("    {:<12} {row}", paint("register at", Color::Dim));
+                } else {
+                    println!("    {:<12} {row}", "");
+                }
             }
         }
     }
@@ -1426,11 +1456,24 @@ mod tests {
     }
 
     #[test]
-    fn builds_registrar_searches_for_the_full_domain() {
-        let links = registrar_searches("apple.io");
-        assert_eq!(links.len(), 4);
-        assert!(links.iter().all(|l| l.ends_with("apple.io")));
-        assert!(links[0].starts_with("https://porkbun.com/"));
+    fn registrar_searches_carry_the_full_domain() {
+        let prices = Prices::load().unwrap();
+        let links = registration::listings(&prices, "io", "apple.io");
+
+        assert!(!links.is_empty(), ".io is priced in the bundled table");
+        assert!(links
+            .iter()
+            .filter_map(|l| l.search.as_deref())
+            .all(|s| s.ends_with("apple.io")));
+    }
+
+    #[test]
+    fn a_restricted_tld_says_so_before_it_says_where() {
+        let rules = Rules::load().unwrap();
+        assert!(rules.lookup("eu").is_some());
+        // The two halves are independent: a TLD can be restricted and still
+        // widely sold, which is exactly the case worth warning about.
+        assert!(!registration::listings(&Prices::load().unwrap(), "eu", "apple.eu").is_empty());
     }
 
     #[test]

@@ -122,14 +122,7 @@ impl Registry {
 
     /// Longest-suffix lookup: `co.uk` wins over `uk` for `example.co.uk`.
     pub fn lookup(&self, tld: &str) -> Option<&WhoisServer> {
-        let tld = normalize_tld(tld);
-        let mut rest = tld.as_str();
-        loop {
-            if let Some(server) = self.by_tld.get(rest) {
-                return Some(server);
-            }
-            rest = &rest[rest.find('.')? + 1..];
-        }
+        lookup_suffix(tld, |s| self.by_tld.get(s))
     }
 
     pub fn all_tlds(&self) -> BTreeSet<String> {
@@ -149,6 +142,28 @@ impl Default for Registry {
 /// `.CO.UK` / `co.uk` / `.com` -> `co.uk` / `com`
 pub fn normalize_tld(s: &str) -> String {
     s.trim().trim_matches('.').to_ascii_lowercase()
+}
+
+/// Look `tld` up in a table, longest suffix first: `a.co.uk` is tried as
+/// `a.co.uk`, then `co.uk`, then `uk`.
+///
+/// Every per-TLD table `ds` carries is read this way, so a sub-zone with no
+/// entry of its own inherits the zone it sits under — `nosuchzone.uk` gets
+/// `.uk`'s WHOIS server, price and eligibility rule. It takes a closure rather
+/// than handing back an iterator so the normalized name it walks lives exactly
+/// as long as the walk.
+pub fn lookup_suffix<'t, T>(
+    tld: &str,
+    mut get: impl FnMut(&str) -> Option<&'t T>,
+) -> Option<&'t T> {
+    let tld = normalize_tld(tld);
+    let mut rest = tld.as_str();
+    loop {
+        if let Some(hit) = get(rest) {
+            return Some(hit);
+        }
+        rest = &rest[rest.find('.')? + 1..];
+    }
 }
 
 fn parse_uri(uri: &str) -> Option<Endpoint> {
