@@ -1,0 +1,262 @@
+{
+  "_about": [
+    "What each TLD is *for* — a topical A-Z, grouped by subject.",
+    "",
+    "Unlike the `categories` in tld-facts.json, nothing here is derived. There",
+    "is no source that says .pizza is about food: the root zone records who runs",
+    "a TLD, not what it means. So this file is hand-maintained, like",
+    "eligibility.json, and it is our reading rather than anyone else's.",
+    "",
+    "Rules it is kept to:",
+    "",
+    "  * A TLD is listed only where the name plainly says what it is for. Where",
+    "    it does not — .best, .now, .xyz, .zip, .one — it is left out. An",
+    "    unclassified TLD is an honest gap; a guessed one is noise that reads",
+    "    like a fact.",
+    "  * Brand TLDs are left out wholesale. .apple is not a fruit TLD, and its",
+    "    subject is its owner, which tld-facts.json already records.",
+    "  * A TLD may sit in several categories. .kitchen is both food and home;",
+    "    listing it twice is truer than picking one.",
+    "  * Internationalised TLDs are keyed in punycode, like everywhere else in",
+    "    this repo, with the label and its meaning in the comment beside them.",
+    "",
+    "scripts/harvest-tld-facts.mjs folds these in as `topics`, kept apart from",
+    "the derived `categories` so a reader can always tell which is which.",
+    "scripts/test-tld-facts-parse.mjs checks every TLD named here is real."
+  ],
+  "categories": {
+    "geography": {
+      "name": "Places",
+      "desc": "Cities, regions, and parts of the world.",
+      "tlds": [
+        "abudhabi", "africa", "alsace", "amsterdam", "arab", "asia", "barcelona", "bayern",
+        "bcn", "berlin", "bom", "boston", "brussels", "bzh", "capetown", "cat", "city",
+        "cologne", "corsica", "country", "cymru", "desi", "dubai", "durban", "eus", "frl",
+        "gal", "gent", "hamburg", "helsinki", "irish", "ist", "istanbul", "joburg", "kiwi",
+        "koeln", "krd", "kyoto", "lat", "latino", "london", "madrid", "melbourne", "miami",
+        "moscow", "nagoya", "nrw", "nyc", "okinawa", "osaka", "paris", "quebec", "rio", "ruhr",
+        "ryukyu", "saarland", "scot", "stockholm", "swiss", "sydney", "taipei", "tatar",
+        "tirol", "tokyo", "town", "vegas", "vlaanderen", "wales", "wien", "yokohama", "zuerich",
+        "xn--1qqw23a", "xn--80adxhks", "xn--mgbca7dzdo", "xn--ngbrx", "xn--p1acf", "xn--xhq521b"
+      ]
+    },
+    "business": {
+      "name": "Business & Work",
+      "desc": "Companies, corporate forms, trade, and finding work.",
+      "tlds": [
+        "agency", "associates", "biz", "business", "career", "careers", "center", "ceo",
+        "coach", "company", "consulting", "coop", "delivery", "enterprises", "expert", "gmbh",
+        "group", "guru", "holdings", "inc", "industries", "international", "jobs", "kaufen",
+        "limited", "llc", "llp", "ltd", "ltda", "management", "marketing", "office", "partners",
+        "post", "pro", "sarl", "services", "solutions", "srl", "trade", "ventures", "work",
+        "works", "xn--3bst00m", "xn--55qx5d", "xn--czr694b", "xn--otu796d", "xn--pssy2u",
+        "xn--vhquv"
+      ]
+    },
+    "finance": {
+      "name": "Money & Finance",
+      "desc": "Banking, insurance, investment, lending, and tax.",
+      "tlds": [
+        "accountant", "accountants", "allfinanz", "bank", "bond", "broker", "capital", "cash",
+        "cfd", "cpa", "credit", "creditcard", "creditunion", "exchange", "finance", "financial",
+        "forex", "fund", "insurance", "insure", "investments", "lifeinsurance", "loan", "loans",
+        "markets", "money", "mortgage", "pay", "reit", "tax", "trading", "trust",
+        "versicherung", "xn--ngbe9e0a", "xn--vermgensberater-ctb", "xn--vermgensberatung-pwb"
+      ]
+    },
+    "tech": {
+      "name": "Internet & Technology",
+      "desc": "Software, hosting, data, devices, and the web itself.",
+      "tlds": [
+        "analytics", "anquan", "app", "bot", "box", "call", "chat", "click", "cloud", "codes",
+        "computer", "comsec", "data", "dev", "digital", "directory", "docs", "domains", "dot",
+        "download", "drive", "dvr", "email", "host", "hosting", "link", "map", "mobi", "mobile",
+        "network", "online", "page", "phone", "prod", "protection", "safe", "safety", "search",
+        "secure", "security", "shouji", "site", "software", "storage", "stream", "support",
+        "systems", "tech", "technology", "tel", "web", "webcam", "website", "wiki", "yun",
+        "xn--3ds443g", "xn--4gbrim", "xn--5tzm5g", "xn--6frz82g", "xn--80asehdb", "xn--80aswg",
+        "xn--c2br7g", "xn--fiq228c5hs", "xn--gckr3f0f", "xn--io0a7i", "xn--kput3i",
+        "xn--mgbt3dhd", "xn--ngbc5azd", "xn--ses554g", "xn--t60b56a", "xn--vuq861b"
+      ]
+    },
+    "shopping": {
+      "name": "Shopping & Deals",
+      "desc": "Retail, marketplaces, discounts, and gifts.",
+      "tlds": [
+        "auction", "bargains", "bid", "blackfriday", "boutique", "buy", "cards", "cheap",
+        "christmas", "compare", "coupon", "coupons", "deal", "deals", "direct", "discount",
+        "forsale", "gift", "gifts", "gratis", "market", "promo", "qpon", "sale", "save", "shop",
+        "shopping", "store", "tienda", "toys", "wanggou", "xn--1ck2e1b", "xn--cck2b3b",
+        "xn--czrs0t", "xn--czru2d", "xn--eckvdtc9d", "xn--g2xx48c", "xn--gk3at1e",
+        "xn--hxt814e", "xn--mgbab2bd"
+      ]
+    },
+    "food": {
+      "name": "Food & Drink",
+      "desc": "Eating, drinking, cooking, and growing.",
+      "tlds": [
+        "bar", "beer", "cafe", "catering", "coffee", "cooking", "eat", "farm", "fish",
+        "grocery", "kitchen", "kosher", "menu", "organic", "pizza", "pub", "recipes", "rest",
+        "restaurant", "vin", "vodka", "wine", "xn--imr513n", "xn--jvr189m"
+      ]
+    },
+    "health": {
+      "name": "Health & Wellbeing",
+      "desc": "Medicine, care, fitness, and personal wellbeing.",
+      "tlds": [
+        "beauty", "bio", "care", "clinic", "dds", "dental", "dentist", "diet", "doctor", "fit",
+        "fitness", "hair", "health", "healthcare", "hiv", "hospital", "makeup", "med",
+        "pharmacy", "physio", "rehab", "salon", "skin", "spa", "surgery", "yoga", "xn--nyqy26a"
+      ]
+    },
+    "sports": {
+      "name": "Sport",
+      "desc": "Sports, and the things people do outdoors.",
+      "tlds": [
+        "baseball", "basketball", "bike", "boats", "cricket", "fishing", "football", "futbol",
+        "golf", "hockey", "horse", "mma", "racing", "rodeo", "rugby", "run", "ski", "soccer",
+        "sport", "surf", "team", "tennis", "yachts"
+      ]
+    },
+    "games": {
+      "name": "Games & Betting",
+      "desc": "Playing, and wagering.",
+      "tlds": [
+        "bet", "bingo", "casino", "game", "games", "juegos", "lotto", "play", "poker",
+        "xn--unup4y"
+      ]
+    },
+    "arts": {
+      "name": "Arts & Entertainment",
+      "desc": "Music, film, images, performance, and making things.",
+      "tlds": [
+        "actor", "art", "audio", "author", "band", "broadway", "camera", "dance", "film",
+        "gallery", "guitars", "hiphop", "mov", "movie", "museum", "music", "photo",
+        "photography", "photos", "pics", "pictures", "productions", "show", "song", "studio",
+        "theater", "theatre", "tickets", "tube", "tunes", "video", "xn--fjq720a"
+      ]
+    },
+    "media": {
+      "name": "News & Publishing",
+      "desc": "Reporting, broadcasting, writing, and books.",
+      "tlds": [
+        "blog", "book", "buzz", "channel", "dtv", "media", "news", "observer", "press", "radio",
+        "read", "report", "review", "reviews", "tushu", "watch", "xn--efvy88h", "xn--rovu88b"
+      ]
+    },
+    "legal": {
+      "name": "Law",
+      "desc": "Lawyers, courts, and claims.",
+      "tlds": [
+        "abogado", "attorney", "claims", "esq", "law", "lawyer", "legal"
+      ]
+    },
+    "education": {
+      "name": "Education & Science",
+      "desc": "Schools, universities, learning, and research.",
+      "tlds": [
+        "academy", "college", "courses", "degree", "edu", "education", "engineer",
+        "engineering", "institute", "mba", "phd", "prof", "scholarships", "school", "schule",
+        "science", "shiksha", "study", "training", "university"
+      ]
+    },
+    "realestate": {
+      "name": "Property",
+      "desc": "Buying, selling, and renting places to live and work.",
+      "tlds": [
+        "apartments", "casa", "condos", "estate", "haus", "homes", "house", "immo",
+        "immobilien", "land", "lease", "maison", "mls", "properties", "property", "realestate",
+        "realtor", "realty", "rent", "rentals", "room", "villas"
+      ]
+    },
+    "travel": {
+      "name": "Travel & Hospitality",
+      "desc": "Getting there, and staying there.",
+      "tlds": [
+        "aero", "booking", "cab", "camp", "cruise", "cruises", "flights", "fly", "holiday",
+        "hotels", "limo", "reise", "reisen", "taxi", "tours", "travel", "vacations", "viajes",
+        "voyage", "xn--w4r85el8fhu5dnra"
+      ]
+    },
+    "automotive": {
+      "name": "Cars & Vehicles",
+      "desc": "Vehicles, and keeping them running.",
+      "tlds": [
+        "auto", "autos", "car", "cars", "dealer", "motorcycles", "parts", "tires"
+      ]
+    },
+    "home": {
+      "name": "Home & Trades",
+      "desc": "Building, fixing, furnishing, and the garden.",
+      "tlds": [
+        "build", "builders", "cleaning", "construction", "contractors", "equipment", "florist",
+        "flowers", "furniture", "garden", "glass", "kitchen", "lighting", "plumbing", "repair",
+        "supplies", "supply", "tools", "xn--fct429k"
+      ]
+    },
+    "fashion": {
+      "name": "Fashion & Style",
+      "desc": "Clothes, jewellery, and how things look on a person.",
+      "tlds": [
+        "clothing", "diamonds", "fashion", "jewelry", "luxe", "luxury", "moda", "shoes",
+        "style", "tattoo", "watch", "watches", "xn--9et52u", "xn--bck1b9a5dre4c"
+      ]
+    },
+    "design": {
+      "name": "Design & Creative",
+      "desc": "Architecture, graphics, and design work.",
+      "tlds": [
+        "archi", "design", "graphics", "ink"
+      ]
+    },
+    "religion": {
+      "name": "Faith",
+      "desc": "Religion and religious communities.",
+      "tlds": [
+        "agakhan", "bible", "catholic", "church", "faith", "imamat", "ismaili", "kosher",
+        "shia", "xn--80aqecdr1a", "xn--mgbi4ecexp", "xn--tiq49xqyj"
+      ]
+    },
+    "community": {
+      "name": "People & Community",
+      "desc": "Family, friends, charity, and the groups people belong to.",
+      "tlds": [
+        "baby", "charity", "circle", "club", "community", "dad", "date", "dating", "events",
+        "family", "forum", "foundation", "gay", "gives", "giving", "kids", "lgbt", "love",
+        "meet", "memorial", "mom", "name", "ngo", "nowruz", "ong", "org", "party", "rip",
+        "rsvp", "singles", "social", "wed", "wedding", "xn--30rr7y", "xn--55qw42g",
+        "xn--6qq986b3xl", "xn--c1avg", "xn--d1acj3b", "xn--i1b6b1a6a2e", "xn--nqv7f",
+        "xn--nqv7fs00ema", "xn--q9jyb4c"
+      ]
+    },
+    "government": {
+      "name": "Government & Politics",
+      "desc": "The public sector, the armed forces, and elections.",
+      "tlds": [
+        "airforce", "army", "democrat", "gop", "gov", "int", "mil", "navy", "politie",
+        "republican", "vote", "voting", "voto", "xn--mxtq1m", "xn--zfr164b"
+      ]
+    },
+    "environment": {
+      "name": "Environment & Energy",
+      "desc": "Green concerns, energy, and the natural world.",
+      "tlds": [
+        "earth", "eco", "energy", "green", "solar"
+      ]
+    },
+    "pets": {
+      "name": "Animals",
+      "desc": "Pets and the people who look after them.",
+      "tlds": [
+        "dog", "pet", "vet"
+      ]
+    },
+    "adult": {
+      "name": "Adult",
+      "desc": "Adult content. Listed so it can be filtered out, not promoted.",
+      "tlds": [
+        "adult", "porn", "sex", "sexy", "xxx"
+      ]
+    }
+  }
+}
