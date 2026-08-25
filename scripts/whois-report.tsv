@@ -1,0 +1,930 @@
+tld	verdict	host	needle	reason
+aaa	accept	whois.nic.aaa	no data found	needle verified against both probes
+aarp	accept	whois.nic.aarp	no data found	needle verified against both probes
+abb	accept	whois.nic.abb	domain not found	needle verified against both probes
+abbott	accept	whois.nic.abbott	domain not found	needle verified against both probes
+abbvie	no-server			IANA lists no WHOIS server for this TLD
+abc	accept	whois.nic.abc	domain not found	needle verified against both probes
+able	no-server			IANA lists no WHOIS server for this TLD
+abogado	accept	whois.nic.abogado	no data found	needle verified against both probes
+abudhabi	accept	whois.nic.abudhabi	no data found	needle verified against both probes
+accenture	accept	whois.nic.accenture	domain not found	needle verified against both probes
+aco	reject	whois.nic.aco		free probe: resolving whois.nic.aco: [Errno 8] nodename nor servname provided, or not known
+ads	no-server			IANA lists no WHOIS server for this TLD
+aeg	accept	whois.nic.aeg	domain not found	needle verified against both probes
+aetna	no-server			IANA lists no WHOIS server for this TLD
+afl	accept	whois.nic.afl	no data found	needle verified against both probes
+africa	accept	whois.nic.africa	no information was found matching that query	needle verified against both probes
+agakhan	accept	whois.nic.agakhan	domain not found	needle verified against both probes
+ai	accept	whois.nic.ai	domain not found	needle verified against both probes
+aig	no-server			IANA lists no WHOIS server for this TLD
+airbus	accept	whois.nic.airbus	domain not found	needle verified against both probes
+airtel	accept	whois.nic.airtel	no data found	needle verified against both probes
+akdn	accept	whois.nic.akdn	domain not found	needle verified against both probes
+al	no-server			IANA lists no WHOIS server for this TLD
+alibaba	accept	whois.nic.alibaba	domain not found	needle verified against both probes
+alipay	accept	whois.nic.alipay	domain not found	needle verified against both probes
+allfinanz	accept	whois.nic.allfinanz	the queried object does not exist	needle verified against both probes
+allstate	accept	whois.nic.allstate	domain not found	needle verified against both probes
+ally	accept	whois.nic.ally	no data found	needle verified against both probes
+alsace	accept	whois.nic.alsace	not found	needle verified against both probes
+alstom	accept	whois.nic.alstom	the queried object does not exist	needle verified against both probes
+amazon	no-server			IANA lists no WHOIS server for this TLD
+americanexpress	no-server			IANA lists no WHOIS server for this TLD
+americanfamily	accept	whois.nic.americanfamily	no data found	needle verified against both probes
+amex	no-server			IANA lists no WHOIS server for this TLD
+amfam	accept	whois.nic.amfam	no data found	needle verified against both probes
+amica	no-server			IANA lists no WHOIS server for this TLD
+amsterdam	accept	whois.nic.amsterdam	domain status: free	needle verified against both probes
+analytics	no-server			IANA lists no WHOIS server for this TLD
+android	no-server			IANA lists no WHOIS server for this TLD
+anquan	reject	whois.teleinfo.cn		registered nic.anquan reads as UNKNOWN (empty whois response)
+anz	accept	whois.nic.anz	no data found	needle verified against both probes
+ao	no-server			IANA lists no WHOIS server for this TLD
+aol	accept	whois.nic.aol	domain not found	needle verified against both probes
+app	no-server			IANA lists no WHOIS server for this TLD
+apple	no-server			IANA lists no WHOIS server for this TLD
+aq	no-server			IANA lists no WHOIS server for this TLD
+aquarelle	accept	whois.nic.aquarelle	the queried object does not exist	needle verified against both probes
+arab	accept	whois.nic.arab	no data found	needle verified against both probes
+aramco	no-server			IANA lists no WHOIS server for this TLD
+arte	accept	whois.nic.arte	domain not found	needle verified against both probes
+asda	accept	whois.nic.asda	domain not found	needle verified against both probes
+athleta	no-server			IANA lists no WHOIS server for this TLD
+audi	accept	whois.nic.audi	domain not found	needle verified against both probes
+audible	no-server			IANA lists no WHOIS server for this TLD
+auspost	accept	whois.nic.auspost	no data found	needle verified against both probes
+author	no-server			IANA lists no WHOIS server for this TLD
+auto	accept	whois.nic.auto	the queried object does not exist	needle verified against both probes
+autos	accept	whois.nic.autos	the queried object does not exist	needle verified against both probes
+aw	accept	whois.nic.aw	is free	needle verified against both probes
+aws	no-server			IANA lists no WHOIS server for this TLD
+axa	no-server			IANA lists no WHOIS server for this TLD
+az	no-server			IANA lists no WHOIS server for this TLD
+azure	no-server			IANA lists no WHOIS server for this TLD
+ba	no-server			IANA lists no WHOIS server for this TLD
+baby	accept	whois.nic.baby	the queried object does not exist	needle verified against both probes
+baidu	accept	whois.gtld.knet.cn	the queried object does not exist	needle verified against both probes
+banamex	no-server			IANA lists no WHOIS server for this TLD
+bank	accept	whois.nic.bank	no data found	needle verified against both probes
+barcelona	accept	whois.nic.barcelona	the queried object does not exist	needle verified against both probes
+barclaycard	accept	whois.nic.barclaycard	domain not found	needle verified against both probes
+barclays	accept	whois.nic.barclays	domain not found	needle verified against both probes
+barefoot	accept	whois.nic.barefoot	domain not found	needle verified against both probes
+baseball	accept	whois.nic.baseball	no data found	needle verified against both probes
+basketball	accept	whois.nic.basketball	no data found	needle verified against both probes
+bauhaus	accept	whois.nic.bauhaus	the queried object does not exist	needle verified against both probes
+bayern	accept	whois.nic.bayern	the queried object does not exist	needle verified against both probes
+bb	no-server			IANA lists no WHOIS server for this TLD
+bbc	reject	whois.nic.bbc		free probe: whois.nic.bbc: timed out
+bbt	accept	whois.nic.bbt	domain not found	needle verified against both probes
+bbva	no-server			IANA lists no WHOIS server for this TLD
+bcg	accept	whois.nic.bcg	domain not found	needle verified against both probes
+bcn	accept	whois.nic.bcn	the queried object does not exist	needle verified against both probes
+beats	accept	whois.nic.beats	domain not found	needle verified against both probes
+beauty	accept	whois.nic.beauty	the queried object does not exist	needle verified against both probes
+beer	accept	whois.nic.beer	no data found	needle verified against both probes
+bestbuy	accept	whois.nic.bestbuy	domain not found	needle verified against both probes
+bf	accept	whois.registre.bf	no object found	needle verified against both probes
+bg	reject	whois.register.bg		registered nic.bg reads as UNKNOWN (whois answered for nic.bg (nic.bg))
+bh	accept	whois.nic.bh	is available for registration	needle verified against both probes
+bharti	accept	whois.nic.bharti	no data found	needle verified against both probes
+bi	accept	whois1.nic.bi	no object found	needle verified against both probes
+bible	accept	whois.nic.bible	no data found	needle verified against both probes
+bing	no-server			IANA lists no WHOIS server for this TLD
+bj	accept	whois.nic.bj	no object found	needle verified against both probes
+blockbuster	accept	whois.nic.blockbuster	is available for registration	needle verified against both probes
+bloomberg	accept	whois.nic.bloomberg	domain not found	needle verified against both probes
+bm	accept	whois.nic.bm	domain not found	needle verified against both probes
+bms	accept	whois.nic.bms	domain not found	needle verified against both probes
+bmw	accept	whois.nic.bmw	the queried object does not exist	needle verified against both probes
+bn	accept	whois.bnnic.bn	domain not found	needle verified against both probes
+bnpparibas	accept	whois.nic.bnpparibas	domain not found	needle verified against both probes
+bo	reject	whois.nic.bo		free probe: whois.nic.bo: [Errno 61] Connection refused
+boats	accept	whois.nic.boats	the queried object does not exist	needle verified against both probes
+boehringer	accept	whois.nic.boehringer	domain not found	needle verified against both probes
+bofa	accept	whois.nic.bofa	domain not found	needle verified against both probes
+bom	no-server			IANA lists no WHOIS server for this TLD
+bond	accept	whois.nic.bond	the queried object does not exist	needle verified against both probes
+boo	no-server			IANA lists no WHOIS server for this TLD
+book	no-server			IANA lists no WHOIS server for this TLD
+booking	no-server			IANA lists no WHOIS server for this TLD
+bosch	accept	whois.nic.bosch	domain not found	needle verified against both probes
+bostik	accept	whois.nic.bostik	not found	needle verified against both probes
+boston	accept	whois.nic.boston	no data found	needle verified against both probes
+bot	no-server			IANA lists no WHOIS server for this TLD
+box	accept	whois.nic.box	the queried object does not exist	needle verified against both probes
+bradesco	accept	whois.nic.bradesco	domain not found	needle verified against both probes
+bridgestone	reject	whois.nic.bridgestone		identical answer for a free and a registered name
+broadway	no-server			IANA lists no WHOIS server for this TLD
+broker	no-server			IANA lists no WHOIS server for this TLD
+brother	reject	whois.nic.brother		identical answer for a free and a registered name
+brussels	no-server			IANA lists no WHOIS server for this TLD
+bs	no-server			IANA lists no WHOIS server for this TLD
+bt	no-server			IANA lists no WHOIS server for this TLD
+buy	no-server			IANA lists no WHOIS server for this TLD
+bv	no-server			IANA lists no WHOIS server for this TLD
+bw	reject	whois.nic.net.bw		unregistered afb8qnkygjvc1v74.bw reads as TAKEN (-)
+bzh	accept	whois.nic.bzh	not found	needle verified against both probes
+cal	no-server			IANA lists no WHOIS server for this TLD
+call	no-server			IANA lists no WHOIS server for this TLD
+calvinklein	no-server			IANA lists no WHOIS server for this TLD
+canon	reject	whois.nic.canon		identical answer for a free and a registered name
+capitalone	accept	whois.nic.capitalone	no data found	needle verified against both probes
+car	accept	whois.nic.car	the queried object does not exist	needle verified against both probes
+caravan	no-server			IANA lists no WHOIS server for this TLD
+career	no-server			IANA lists no WHOIS server for this TLD
+cars	accept	whois.nic.cars	the queried object does not exist	needle verified against both probes
+casa	accept	whois.nic.casa	no data found	needle verified against both probes
+case	accept	whois.nic.case	the queried object does not exist	needle verified against both probes
+catholic	accept	whois.nic.catholic	no data found	needle verified against both probes
+cba	accept	whois.nic.cba	no data found	needle verified against both probes
+cbn	no-server			IANA lists no WHOIS server for this TLD
+cbre	no-server			IANA lists no WHOIS server for this TLD
+cern	accept	whois.nic.cern	domain not found	needle verified against both probes
+cf	reject	whois.dot.cf		free probe: whois.dot.cf: [Errno 61] Connection refused
+cfa	accept	whois.nic.cfa	domain not found	needle verified against both probes
+cfd	accept	whois.nic.cfd	the queried object does not exist	needle verified against both probes
+cg	no-server			IANA lists no WHOIS server for this TLD
+chanel	accept	whois.nic.chanel	domain not found	needle verified against both probes
+channel	no-server			IANA lists no WHOIS server for this TLD
+charity	accept	whois.nic.charity	domain not found	needle verified against both probes
+chase	no-server			IANA lists no WHOIS server for this TLD
+chintai	accept	whois.nic.chintai	no data found	needle verified against both probes
+chrome	no-server			IANA lists no WHOIS server for this TLD
+ci	accept	whois.nic.ci	the queried object does not exist	needle verified against both probes
+cipriani	accept	whois.nic.cipriani	domain not found	needle verified against both probes
+circle	no-server			IANA lists no WHOIS server for this TLD
+cisco	no-server			IANA lists no WHOIS server for this TLD
+citadel	accept	whois.nic.citadel	domain not found	needle verified against both probes
+citi	no-server			IANA lists no WHOIS server for this TLD
+citic	no-server			IANA lists no WHOIS server for this TLD
+ck	no-server			IANA lists no WHOIS server for this TLD
+clinique	accept	whois.nic.clinique	domain not found	needle verified against both probes
+clubmed	accept	whois.nic.clubmed	domain not found	needle verified against both probes
+cologne	accept	whois.ryce-rsp.com	no information was found matching that query	needle verified against both probes
+commbank	accept	whois.nic.commbank	no data found	needle verified against both probes
+compare	accept	whois.nic.compare	no data found	needle verified against both probes
+comsec	accept	whois.nic.comsec	no match for	needle verified against both probes
+contact	no-server			IANA lists no WHOIS server for this TLD
+cooking	accept	whois.nic.cooking	no data found	needle verified against both probes
+corsica	accept	whois.nic.corsica	not found	needle verified against both probes
+country	accept	whois.registry.click	is available for registration	needle verified against both probes
+coupon	accept	whois.nic.coupon	domain not found	needle verified against both probes
+cpa	accept	whois.nic.cpa	no data found	needle verified against both probes
+cr	accept	whois.nic.cr	no entries found	needle verified against both probes
+creditunion	accept	whois.nic.creditunion	is available for registration	needle verified against both probes
+crown	accept	whois.nic.crown	not found	needle verified against both probes
+crs	accept	whois.nic.crs	domain not found	needle verified against both probes
+cruise	accept	whois.nic.cruise	domain not found	needle verified against both probes
+cu	no-server			IANA lists no WHOIS server for this TLD
+cuisinella	accept	whois.nic.cuisinella	no data found	needle verified against both probes
+cv	accept	whois.nic.cv	the queried object does not exist	needle verified against both probes
+cw	no-server			IANA lists no WHOIS server for this TLD
+cy	no-server			IANA lists no WHOIS server for this TLD
+cyou	accept	whois.nic.cyou	the queried object does not exist	needle verified against both probes
+dad	no-server			IANA lists no WHOIS server for this TLD
+data	accept	whois.nic.data	is available for registration	needle verified against both probes
+datsun	reject	whois.nic.gmo		identical answer for a free and a registered name
+day	no-server			IANA lists no WHOIS server for this TLD
+dclk	no-server			IANA lists no WHOIS server for this TLD
+dds	accept	whois.nic.dds	no data found	needle verified against both probes
+deal	no-server			IANA lists no WHOIS server for this TLD
+dealer	accept	whois.nic.dealer	the queried object does not exist	needle verified against both probes
+dell	no-server			IANA lists no WHOIS server for this TLD
+deloitte	accept	whois.nic.deloitte	the queried object does not exist	needle verified against both probes
+delta	accept	whois.nic.delta	domain not found	needle verified against both probes
+dhl	no-server			IANA lists no WHOIS server for this TLD
+discover	accept	whois.nic.discover	domain not found	needle verified against both probes
+dish	accept	whois.nic.dish	is available for registration	needle verified against both probes
+diy	accept	whois.registry.click	is available for registration	needle verified against both probes
+dj	no-server			IANA lists no WHOIS server for this TLD
+dm	reject	whois.dmdomains.dm		unregistered sybf47407nlsgnhz.dm reads as TAKEN (-)
+dnp	reject	whois.nic.dnp		identical answer for a free and a registered name
+do	accept	whois.nic.do	no object found	needle verified against both probes
+docs	no-server			IANA lists no WHOIS server for this TLD
+dot	accept	whois.nic.dot	is available for registration	needle verified against both probes
+drive	no-server			IANA lists no WHOIS server for this TLD
+dtv	accept	whois.nic.dtv	is available for registration	needle verified against both probes
+dubai	accept	whois.nic.dubai	no data found	needle verified against both probes
+dupont	no-server			IANA lists no WHOIS server for this TLD
+dvag	accept	whois.nic.dvag	the queried object does not exist	needle verified against both probes
+dvr	accept	whois.nic.dvr	is available for registration	needle verified against both probes
+dz	accept	whois.nic.dz	no match for	needle verified against both probes
+eat	no-server			IANA lists no WHOIS server for this TLD
+edeka	accept	whois.nic.edeka	domain not found	needle verified against both probes
+eg	no-server			IANA lists no WHOIS server for this TLD
+emerck	accept	whois.nic.emerck	domain not found	needle verified against both probes
+epson	reject	whois.nic.epson		identical answer for a free and a registered name
+er	no-server			IANA lists no WHOIS server for this TLD
+ericsson	accept	whois.nic.ericsson	domain not found	needle verified against both probes
+erni	accept	whois.nic.erni	the queried object does not exist	needle verified against both probes
+esq	no-server			IANA lists no WHOIS server for this TLD
+et	no-server			IANA lists no WHOIS server for this TLD
+eurovision	accept	whois.nic.eurovision	the queried object does not exist	needle verified against both probes
+extraspace	accept	whois.nic.extraspace	domain not found	needle verified against both probes
+fage	accept	whois.nic.fage	domain not found	needle verified against both probes
+fairwinds	no-server			IANA lists no WHOIS server for this TLD
+fan	no-server			IANA lists no WHOIS server for this TLD
+farmers	no-server			IANA lists no WHOIS server for this TLD
+fashion	accept	whois.nic.fashion	no data found	needle verified against both probes
+fast	no-server			IANA lists no WHOIS server for this TLD
+fedex	accept	whois.nic.fedex	domain not found	needle verified against both probes
+ferrari	accept	whois.nic.ferrari	domain not found	needle verified against both probes
+ferrero	no-server			IANA lists no WHOIS server for this TLD
+fidelity	accept	whois.nic.fidelity	domain not found	needle verified against both probes
+fido	accept	whois.nic.fido	domain not found	needle verified against both probes
+final	no-server			IANA lists no WHOIS server for this TLD
+fire	no-server			IANA lists no WHOIS server for this TLD
+firestone	reject	whois.nic.firestone		identical answer for a free and a registered name
+firmdale	accept	whois.nic.firmdale	domain not found	needle verified against both probes
+fishing	accept	whois.nic.fishing	no data found	needle verified against both probes
+fit	accept	whois.nic.fit	no data found	needle verified against both probes
+fj	reject	www.whois.fj		free probe: www.whois.fj: [Errno 61] Connection refused
+fk	no-server			IANA lists no WHOIS server for this TLD
+flickr	no-server			IANA lists no WHOIS server for this TLD
+flir	no-server			IANA lists no WHOIS server for this TLD
+fly	no-server			IANA lists no WHOIS server for this TLD
+foo	no-server			IANA lists no WHOIS server for this TLD
+food	accept	whois.registry.click	is available for registration	needle verified against both probes
+ford	no-server			IANA lists no WHOIS server for this TLD
+forex	no-server			IANA lists no WHOIS server for this TLD
+forum	accept	whois.registry.click	is available for registration	needle verified against both probes
+fox	accept	whois.nic.fox	no data found	needle verified against both probes
+free	no-server			IANA lists no WHOIS server for this TLD
+fresenius	accept	whois.nic.fresenius	the queried object does not exist	needle verified against both probes
+frl	accept	whois.nic.frl	the queried object does not exist	needle verified against both probes
+frogans	accept	whois.nic.frogans	domain not found	needle verified against both probes
+frontier	no-server			IANA lists no WHOIS server for this TLD
+ftr	no-server			IANA lists no WHOIS server for this TLD
+fujitsu	reject	whois.nic.gmo		identical answer for a free and a registered name
+ga	no-server			IANA lists no WHOIS server for this TLD
+gallo	accept	whois.nic.gallo	domain not found	needle verified against both probes
+gallup	accept	whois.nic.gallup	domain not found	needle verified against both probes
+gap	no-server			IANA lists no WHOIS server for this TLD
+garden	accept	whois.nic.garden	no data found	needle verified against both probes
+gay	accept	whois.nic.gay	no data found	needle verified against both probes
+gb	no-server			IANA lists no WHOIS server for this TLD
+gbiz	no-server			IANA lists no WHOIS server for this TLD
+ge	accept	whois.nic.ge	no match for	needle verified against both probes
+gea	reject	whois.nic.gea		free probe: resolving whois.nic.gea: [Errno 8] nodename nor servname provided, or not known
+gent	accept	whois.nic.gent	the queried object does not exist	needle verified against both probes
+genting	accept	whois.nic.genting	domain not found	needle verified against both probes
+george	accept	whois.nic.george	no data found	needle verified against both probes
+gg	accept	whois.gg	not found	needle verified against both probes
+ggee	reject	whois.nic.ggee		identical answer for a free and a registered name
+gh	accept	whois.nic.gh	no object found	needle verified against both probes
+gi	accept	whois.identitydigital.services	domain not found	needle verified against both probes
+giving	accept	whois.nic.giving	domain not found	needle verified against both probes
+gl	accept	whois.nic.gl	the queried object does not exist	needle verified against both probes
+gle	no-server			IANA lists no WHOIS server for this TLD
+globo	no-server			IANA lists no WHOIS server for this TLD
+gm	no-server			IANA lists no WHOIS server for this TLD
+gmail	no-server			IANA lists no WHOIS server for this TLD
+gmbh	no-server			IANA lists no WHOIS server for this TLD
+gmo	reject	whois.nic.gmo		identical answer for a free and a registered name
+gmx	accept	whois.nic.gmx	the queried object does not exist	needle verified against both probes
+gn	accept	whois.ande.gov.gn	the queried object does not exist	needle verified against both probes
+godaddy	accept	whois.nic.godaddy	no data found	needle verified against both probes
+goldpoint	reject	whois.nic.goldpoint		identical answer for a free and a registered name
+goodyear	accept	whois.nic.goodyear	domain not found	needle verified against both probes
+goog	no-server			IANA lists no WHOIS server for this TLD
+google	no-server			IANA lists no WHOIS server for this TLD
+gop	reject	whois.nic.gop		free probe: resolving whois.nic.gop: [Errno 8] nodename nor servname provided, or not known
+got	no-server			IANA lists no WHOIS server for this TLD
+gp	reject	whois.nic.gp		free probe: whois.nic.gp: timed out
+gq	reject	whois.dominio.gq		identical answer for a free and a registered name
+gr	no-server			IANA lists no WHOIS server for this TLD
+grainger	no-server			IANA lists no WHOIS server for this TLD
+grocery	accept	whois.nic.grocery	no data found	needle verified against both probes
+group	no-server			IANA lists no WHOIS server for this TLD
+gu	no-server			IANA lists no WHOIS server for this TLD
+gucci	no-server			IANA lists no WHOIS server for this TLD
+guge	no-server			IANA lists no WHOIS server for this TLD
+gw	no-server			IANA lists no WHOIS server for this TLD
+gy	accept	whois.registry.gy	the queried object does not exist	needle verified against both probes
+hair	accept	whois.nic.hair	the queried object does not exist	needle verified against both probes
+hamburg	accept	whois.nic.hamburg	the queried object does not exist	needle verified against both probes
+hangout	no-server			IANA lists no WHOIS server for this TLD
+hbo	no-server			IANA lists no WHOIS server for this TLD
+hdfc	accept	whois.nic.hdfc	domain not found	needle verified against both probes
+hdfcbank	accept	whois.nic.hdfcbank	domain not found	needle verified against both probes
+helsinki	accept	whois.nic.helsinki	domain not found	needle verified against both probes
+here	no-server			IANA lists no WHOIS server for this TLD
+hermes	accept	whois.nic.hermes	domain not found	needle verified against both probes
+hisamitsu	reject	whois.nic.gmo		identical answer for a free and a registered name
+hitachi	reject	whois.nic.gmo		identical answer for a free and a registered name
+hiv	accept	whois.registry.click	is available for registration	needle verified against both probes
+hkt	accept	whois.nic.hkt	domain not found	needle verified against both probes
+hm	reject	whois.registry.hm		free probe: whois.registry.hm: [Errno 61] Connection refused
+hn	accept	whois.nic.hn	the queried object does not exist	needle verified against both probes
+homedepot	accept	whois.nic.homedepot	domain not found	needle verified against both probes
+homegoods	no-server			IANA lists no WHOIS server for this TLD
+homes	accept	whois.nic.homes	the queried object does not exist	needle verified against both probes
+homesense	no-server			IANA lists no WHOIS server for this TLD
+honda	reject	whois.nic.honda		identical answer for a free and a registered name
+horse	accept	whois.nic.horse	no data found	needle verified against both probes
+hot	no-server			IANA lists no WHOIS server for this TLD
+hotels	accept	whois.nic.hotels	no data found	needle verified against both probes
+hotmail	no-server			IANA lists no WHOIS server for this TLD
+hr	accept	whois.dns.hr	no entries found	needle verified against both probes
+hsbc	no-server			IANA lists no WHOIS server for this TLD
+ht	accept	whois.nic.ht	the queried object does not exist	needle verified against both probes
+hughes	accept	whois.nic.hughes	domain not found	needle verified against both probes
+hyatt	no-server			IANA lists no WHOIS server for this TLD
+hyundai	reject	whois.nic.hyundai		identical answer for a free and a registered name
+ibm	accept	whois.nic.ibm	no data found	needle verified against both probes
+icbc	accept	whois.nic.icbc	the queried object does not exist	needle verified against both probes
+ice	accept	whois.nic.ice	domain not found	needle verified against both probes
+ieee	no-server			IANA lists no WHOIS server for this TLD
+ifm	accept	whois.nic.ifm	the queried object does not exist	needle verified against both probes
+ikano	accept	whois.nic.ikano	the queried object does not exist	needle verified against both probes
+imamat	accept	whois.nic.imamat	domain not found	needle verified against both probes
+imdb	no-server			IANA lists no WHOIS server for this TLD
+inc	accept	whois.nic.inc	the queried object does not exist	needle verified against both probes
+infiniti	reject	whois.nic.gmo		identical answer for a free and a registered name
+ing	no-server			IANA lists no WHOIS server for this TLD
+insurance	accept	whois.nic.insurance	no data found	needle verified against both probes
+int	reject	whois.iana.org		no DNS-proven registered name found under .int
+intuit	no-server			IANA lists no WHOIS server for this TLD
+ipiranga	no-server			IANA lists no WHOIS server for this TLD
+iq	reject	whois.cmc.iq		free probe: resolving whois.cmc.iq: [Errno 8] nodename nor servname provided, or not known
+ismaili	accept	whois.nic.ismaili	domain not found	needle verified against both probes
+ist	accept	whois.nic.ist	domain not found	needle verified against both probes
+itau	no-server			IANA lists no WHOIS server for this TLD
+itv	accept	whois.nic.itv	domain not found	needle verified against both probes
+jaguar	accept	whois.nic.jaguar	domain not found	needle verified against both probes
+java	accept	whois.nic.java	domain not found	needle verified against both probes
+jcb	reject	whois.nic.gmo		identical answer for a free and a registered name
+je	accept	whois.je	not found	needle verified against both probes
+jeep	accept	whois.nic.jeep	domain not found	needle verified against both probes
+jio	accept	whois.nic.jio	domain not found	needle verified against both probes
+jll	accept	whois.nic.jll	domain not found	needle verified against both probes
+jm	no-server			IANA lists no WHOIS server for this TLD
+jmp	no-server			IANA lists no WHOIS server for this TLD
+jnj	no-server			IANA lists no WHOIS server for this TLD
+jo	reject	whois.nic.net.jo		free probe: whois.nic.net.jo: timed out
+jobs	no-server			IANA lists no WHOIS server for this TLD
+jot	no-server			IANA lists no WHOIS server for this TLD
+joy	no-server			IANA lists no WHOIS server for this TLD
+jpmorgan	no-server			IANA lists no WHOIS server for this TLD
+jprs	accept	whois.nic.jprs	the queried object does not exist	needle verified against both probes
+juniper	accept	whois.nic.juniper	domain not found	needle verified against both probes
+kddi	reject	whois.nic.kddi		identical answer for a free and a registered name
+kerryhotels	accept	whois.nic.kerryhotels	domain not found	needle verified against both probes
+kerryproperties	accept	whois.nic.kerryproperties	domain not found	needle verified against both probes
+kfh	accept	whois.nic.kfh	is available for registration	needle verified against both probes
+kg	accept	whois.kg	is available for registration	needle verified against both probes
+kh	no-server			IANA lists no WHOIS server for this TLD
+ki	accept	whois.nic.ki	the queried object does not exist	needle verified against both probes
+kia	reject	whois.nic.kia		identical answer for a free and a registered name
+kids	accept	whois.nic.kids	domain not found	needle verified against both probes
+kindle	no-server			IANA lists no WHOIS server for this TLD
+kiwi	accept	whois.nic.kiwi	not found	needle verified against both probes
+km	no-server			IANA lists no WHOIS server for this TLD
+kn	accept	whois.nic.kn	the queried object does not exist	needle verified against both probes
+koeln	accept	whois.ryce-rsp.com	no information was found matching that query	needle verified against both probes
+komatsu	reject	whois.nic.komatsu		identical answer for a free and a registered name
+kosher	accept	whois.nic.kosher	domain not found	needle verified against both probes
+kp	no-server			IANA lists no WHOIS server for this TLD
+kpmg	no-server			IANA lists no WHOIS server for this TLD
+kpn	no-server			IANA lists no WHOIS server for this TLD
+krd	accept	whois.nic.krd	no data found	needle verified against both probes
+kred	no-server			IANA lists no WHOIS server for this TLD
+kuokgroup	accept	whois.nic.kuokgroup	domain not found	needle verified against both probes
+kw	no-server			IANA lists no WHOIS server for this TLD
+ky	accept	whois.kyregistry.ky	is available for registration	needle verified against both probes
+kyoto	reject	whois.nic.kyoto		identical answer for a free and a registered name
+lacaixa	accept	whois.nic.lacaixa	the queried object does not exist	needle verified against both probes
+lamborghini	accept	whois.nic.lamborghini	domain not found	needle verified against both probes
+lamer	accept	whois.nic.lamer	domain not found	needle verified against both probes
+landrover	accept	whois.nic.landrover	domain not found	needle verified against both probes
+lanxess	no-server			IANA lists no WHOIS server for this TLD
+lasalle	accept	whois.nic.lasalle	domain not found	needle verified against both probes
+latino	accept	whois.nic.latino	is available for registration	needle verified against both probes
+latrobe	accept	whois.nic.latrobe	no data found	needle verified against both probes
+law	accept	whois.nic.law	no data found	needle verified against both probes
+lb	reject	whois.lbdr.org.lb		no DNS-proven registered name found under .lb
+lc	no-server			IANA lists no WHOIS server for this TLD
+lds	accept	whois.nic.lds	domain not found	needle verified against both probes
+leclerc	accept	whois.nic.leclerc	not found	needle verified against both probes
+lefrak	accept	whois.nic.lefrak	domain not found	needle verified against both probes
+lego	accept	whois.nic.lego	domain not found	needle verified against both probes
+lexus	reject	whois.nic.lexus		identical answer for a free and a registered name
+lidl	accept	whois.nic.lidl	the queried object does not exist	needle verified against both probes
+lifeinsurance	accept	whois.nic.lifeinsurance	no data found	needle verified against both probes
+lifestyle	accept	whois.registry.click	is available for registration	needle verified against both probes
+like	no-server			IANA lists no WHOIS server for this TLD
+lilly	no-server			IANA lists no WHOIS server for this TLD
+lincoln	no-server			IANA lists no WHOIS server for this TLD
+living	accept	whois.registry.click	is available for registration	needle verified against both probes
+lk	no-server			IANA lists no WHOIS server for this TLD
+llc	no-server			IANA lists no WHOIS server for this TLD
+llp	accept	whois.nic.llp	the queried object does not exist	needle verified against both probes
+locker	accept	whois.nic.locker	is available for registration	needle verified against both probes
+locus	no-server			IANA lists no WHOIS server for this TLD
+lotte	reject	whois.nic.lotte		identical answer for a free and a registered name
+lpl	accept	whois.nic.lpl	the queried object does not exist	needle verified against both probes
+lplfinancial	accept	whois.nic.lplfinancial	the queried object does not exist	needle verified against both probes
+lr	no-server			IANA lists no WHOIS server for this TLD
+ls	accept	whois.nic.ls	no record found	needle verified against both probes
+lundbeck	accept	whois.nic.lundbeck	domain not found	needle verified against both probes
+luxe	accept	whois.nic.luxe	no data found	needle verified against both probes
+ly	accept	whois.nic.ly	the queried object does not exist	needle verified against both probes
+madrid	accept	whois.nic.madrid	the queried object does not exist	needle verified against both probes
+maif	accept	whois.nic.maif	domain not found	needle verified against both probes
+makeup	accept	whois.nic.makeup	the queried object does not exist	needle verified against both probes
+man	accept	whois.nic.man	the queried object does not exist	needle verified against both probes
+mango	accept	whois.nic.mango	the queried object does not exist	needle verified against both probes
+map	no-server			IANA lists no WHOIS server for this TLD
+markets	no-server			IANA lists no WHOIS server for this TLD
+marriott	accept	whois.nic.marriott	domain not found	needle verified against both probes
+marshalls	no-server			IANA lists no WHOIS server for this TLD
+mattel	no-server			IANA lists no WHOIS server for this TLD
+mckinsey	accept	whois.nic.mckinsey	domain not found	needle verified against both probes
+med	no-server			IANA lists no WHOIS server for this TLD
+meet	no-server			IANA lists no WHOIS server for this TLD
+meme	no-server			IANA lists no WHOIS server for this TLD
+merck	accept	whois.nic.merck	no information was found matching that query	needle verified against both probes
+merckmsd	accept	whois.nic.merckmsd	no data found	needle verified against both probes
+mh	no-server			IANA lists no WHOIS server for this TLD
+microsoft	no-server			IANA lists no WHOIS server for this TLD
+mini	accept	whois.nic.mini	the queried object does not exist	needle verified against both probes
+mint	no-server			IANA lists no WHOIS server for this TLD
+mit	accept	whois.nic.mit	domain not found	needle verified against both probes
+mitsubishi	reject	whois.nic.gmo		identical answer for a free and a registered name
+ml	accept	whois.nic.ml	the queried object does not exist	needle verified against both probes
+mlb	no-server			IANA lists no WHOIS server for this TLD
+mls	accept	whois.nic.mls	not found	needle verified against both probes
+mma	accept	whois.nic.mma	not found	needle verified against both probes
+mo	accept	whois.monic.mo	no match for	needle verified against both probes
+mobile	accept	whois.nic.mobile	is available for registration	needle verified against both probes
+moi	no-server			IANA lists no WHOIS server for this TLD
+monash	accept	whois.nic.monash	no data found	needle verified against both probes
+monster	accept	whois.nic.monster	the queried object does not exist	needle verified against both probes
+mormon	accept	whois.nic.mormon	domain not found	needle verified against both probes
+moscow	accept	whois.nic.moscow	domain not found	needle verified against both probes
+moto	accept	whois.nic.moto	no data found	needle verified against both probes
+motorcycles	accept	whois.nic.motorcycles	the queried object does not exist	needle verified against both probes
+mov	no-server			IANA lists no WHOIS server for this TLD
+mp	no-server			IANA lists no WHOIS server for this TLD
+mq	reject	whois.mediaserv.net		registered nic.mq reads as AVAILABLE (-)
+mr	accept	whois.nic.mr	the queried object does not exist	needle verified against both probes
+msd	accept	whois.nic.msd	no data found	needle verified against both probes
+mt	no-server			IANA lists no WHOIS server for this TLD
+mtn	no-server			IANA lists no WHOIS server for this TLD
+mtr	accept	whois.nic.mtr	has not been registered	needle verified against both probes
+mu	accept	whois.tld.mu	domain not found	needle verified against both probes
+museum	accept	whois.nic.museum	not found	needle verified against both probes
+music	accept	whois.registryservices.music	is available for registration	needle verified against both probes
+mv	no-server			IANA lists no WHOIS server for this TLD
+mw	accept	whois.nic.mw	no entries found	needle verified against both probes
+mz	accept	whois.nic.mz	the queried object does not exist	needle verified against both probes
+na	no-server			IANA lists no WHOIS server for this TLD
+nab	accept	whois.nic.nab	domain not found	needle verified against both probes
+nagoya	reject	whois.nic.nagoya		identical answer for a free and a registered name
+nba	no-server			IANA lists no WHOIS server for this TLD
+nc	reject	whois.nc		registered whois.nc reads as UNKNOWN (unrecognised whois response)
+ne	no-server			IANA lists no WHOIS server for this TLD
+nec	reject	whois.nic.nec		identical answer for a free and a registered name
+netbank	accept	whois.nic.netbank	no data found	needle verified against both probes
+netflix	no-server			IANA lists no WHOIS server for this TLD
+neustar	no-server			IANA lists no WHOIS server for this TLD
+new	no-server			IANA lists no WHOIS server for this TLD
+next	accept	whois.nic.next	domain not found	needle verified against both probes
+nextdirect	accept	whois.nic.nextdirect	domain not found	needle verified against both probes
+nexus	no-server			IANA lists no WHOIS server for this TLD
+nf	accept	whois.nic.nf	the queried object does not exist	needle verified against both probes
+nfl	no-server			IANA lists no WHOIS server for this TLD
+ng	reject	whois.nic.net.ng		free probe: whois.nic.net.ng: timed out
+nhk	reject	whois.nic.nhk		identical answer for a free and a registered name
+ni	no-server			IANA lists no WHOIS server for this TLD
+nico	reject	whois.nic.nico		identical answer for a free and a registered name
+nike	no-server			IANA lists no WHOIS server for this TLD
+nikon	accept	whois.nic.nikon	domain not found	needle verified against both probes
+nissan	reject	whois.nic.gmo		identical answer for a free and a registered name
+nissay	accept	whois.nic.nissay	domain not found	needle verified against both probes
+nokia	accept	whois.nic.nokia	the queried object does not exist	needle verified against both probes
+norton	reject	whois.nic.norton		free probe: whois.nic.norton: [Errno 54] Connection reset by peer
+now	no-server			IANA lists no WHOIS server for this TLD
+nowruz	no-server			IANA lists no WHOIS server for this TLD
+nowtv	accept	whois.nic.nowtv	domain not found	needle verified against both probes
+np	no-server			IANA lists no WHOIS server for this TLD
+nr	no-server			IANA lists no WHOIS server for this TLD
+nra	accept	whois.nic.nra	domain not found	needle verified against both probes
+nrw	accept	whois.nic.nrw	the queried object does not exist	needle verified against both probes
+ntt	accept	whois.nic.ntt	the queried object does not exist	needle verified against both probes
+obi	accept	whois.nic.obi	domain not found	needle verified against both probes
+observer	accept	whois.nic.observer	is available for registration	needle verified against both probes
+office	no-server			IANA lists no WHOIS server for this TLD
+okinawa	reject	whois.nic.okinawa		identical answer for a free and a registered name
+olayan	reject	whois.nic.olayan		free probe: whois.nic.olayan: [Errno 54] Connection reset by peer
+olayangroup	reject	whois.nic.olayangroup		free probe: whois.nic.olayangroup: [Errno 54] Connection reset by peer
+ollo	accept	whois.nic.ollo	is available for registration	needle verified against both probes
+om	accept	whois.registry.om	no data found	needle verified against both probes
+omega	no-server			IANA lists no WHOIS server for this TLD
+ooo	accept	whois.nic.ooo	the queried object does not exist	needle verified against both probes
+open	reject	whois.nic.open		free probe: whois.nic.open: [Errno 54] Connection reset by peer
+oracle	accept	whois.nic.oracle	domain not found	needle verified against both probes
+orange	accept	whois.nic.orange	domain not found	needle verified against both probes
+organic	no-server			IANA lists no WHOIS server for this TLD
+origins	accept	whois.nic.origins	domain not found	needle verified against both probes
+otsuka	reject	whois.nic.otsuka		identical answer for a free and a registered name
+ott	accept	whois.nic.ott	is available for registration	needle verified against both probes
+ovh	accept	whois.nic.ovh	not found	needle verified against both probes
+page	no-server			IANA lists no WHOIS server for this TLD
+panasonic	reject	whois.nic.gmo		identical answer for a free and a registered name
+pars	no-server			IANA lists no WHOIS server for this TLD
+pay	no-server			IANA lists no WHOIS server for this TLD
+pccw	accept	whois.nic.pccw	domain not found	needle verified against both probes
+pf	reject	whois.registry.pf		free probe: whois.registry.pf: [Errno 61] Connection refused
+pfizer	no-server			IANA lists no WHOIS server for this TLD
+pg	accept	whois.nic.pg	the queried object does not exist	needle verified against both probes
+pharmacy	no-server			IANA lists no WHOIS server for this TLD
+phd	no-server			IANA lists no WHOIS server for this TLD
+philips	reject	whois.nic.philips		free probe: whois.nic.philips: [Errno 54] Connection reset by peer
+phone	accept	whois.nic.phone	is available for registration	needle verified against both probes
+physio	reject	whois.nic.physio		free probe: whois.nic.physio: [Errno 54] Connection reset by peer
+pictet	accept	whois.nic.pictet	domain not found	needle verified against both probes
+pid	accept	whois.registry.click	is available for registration	needle verified against both probes
+pin	no-server			IANA lists no WHOIS server for this TLD
+ping	reject	whois.nic.ping		free probe: whois.nic.ping: [Errno 54] Connection reset by peer
+pioneer	no-server			IANA lists no WHOIS server for this TLD
+pk	accept	whois.pknic.net.pk	status: not registered	needle verified against both probes
+play	no-server			IANA lists no WHOIS server for this TLD
+playstation	reject	whois.nic.playstation		identical answer for a free and a registered name
+pn	no-server			IANA lists no WHOIS server for this TLD
+pnc	accept	whois.nic.pnc	domain not found	needle verified against both probes
+pohl	accept	whois.nic.pohl	the queried object does not exist	needle verified against both probes
+politie	accept	whois.nic.politie	domain status: free	needle verified against both probes
+post	accept	whois.nic.post	domain not found	needle verified against both probes
+pr	accept	whois.afilias-srs.net	domain not found	needle verified against both probes
+praxi	no-server			IANA lists no WHOIS server for this TLD
+prime	no-server			IANA lists no WHOIS server for this TLD
+prod	no-server			IANA lists no WHOIS server for this TLD
+prof	no-server			IANA lists no WHOIS server for this TLD
+progressive	accept	whois.nic.progressive	domain not found	needle verified against both probes
+pru	no-server			IANA lists no WHOIS server for this TLD
+prudential	no-server			IANA lists no WHOIS server for this TLD
+ps	no-server			IANA lists no WHOIS server for this TLD
+pwc	accept	whois.nic.pwc	domain not found	needle verified against both probes
+py	no-server			IANA lists no WHOIS server for this TLD
+qpon	accept	whois.nic.qpon	the queried object does not exist	needle verified against both probes
+quest	accept	whois.nic.quest	the queried object does not exist	needle verified against both probes
+radio	accept	whois.nic.radio	the queried object does not exist	needle verified against both probes
+read	no-server			IANA lists no WHOIS server for this TLD
+realestate	no-server			IANA lists no WHOIS server for this TLD
+realtor	no-server			IANA lists no WHOIS server for this TLD
+realty	accept	whois.nic.realty	is available for registration	needle verified against both probes
+redumbrella	accept	whois.nic.redumbrella	domain not found	needle verified against both probes
+reit	accept	whois.nic.reit	the queried object does not exist	needle verified against both probes
+reliance	accept	whois.nic.reliance	domain not found	needle verified against both probes
+ren	accept	whois.nic.ren	the queried object does not exist	needle verified against both probes
+rexroth	accept	whois.nic.rexroth	domain not found	needle verified against both probes
+richardli	accept	whois.nic.richardli	domain not found	needle verified against both probes
+ricoh	reject	whois.nic.ricoh		identical answer for a free and a registered name
+ril	accept	whois.nic.ril	domain not found	needle verified against both probes
+rio	no-server			IANA lists no WHOIS server for this TLD
+rodeo	reject	whois.nic.rodeo		free probe: whois.nic.rodeo: [Errno 54] Connection reset by peer
+rogers	accept	whois.nic.rogers	domain not found	needle verified against both probes
+room	no-server			IANA lists no WHOIS server for this TLD
+rsvp	no-server			IANA lists no WHOIS server for this TLD
+rugby	reject	whois.nic.rugby		free probe: back end resting after repeated failures
+ruhr	accept	whois.nic.ruhr	the queried object does not exist	needle verified against both probes
+rw	accept	whois.ricta.org.rw	the queried object does not exist	needle verified against both probes
+rwe	accept	whois.nic.rwe	domain not found	needle verified against both probes
+ryukyu	reject	whois.nic.ryukyu		identical answer for a free and a registered name
+saarland	accept	whois.nic.saarland	the queried object does not exist	needle verified against both probes
+safe	no-server			IANA lists no WHOIS server for this TLD
+safety	no-server			IANA lists no WHOIS server for this TLD
+sakura	accept	whois.nic.sakura	the queried object does not exist	needle verified against both probes
+salon	no-server			IANA lists no WHOIS server for this TLD
+samsclub	reject	whois.nic.samsclub		free probe: back end resting after repeated failures
+samsung	accept	whois.nic.samsung	domain not found	needle verified against both probes
+sandvik	reject	whois.nic.sandvik		free probe: back end resting after repeated failures
+sandvikcoromant	reject	whois.nic.sandvikcoromant		free probe: back end resting after repeated failures
+sanofi	accept	whois.nic.sanofi	domain not found	needle verified against both probes
+sap	accept	whois.nic.sap	the queried object does not exist	needle verified against both probes
+sas	no-server			IANA lists no WHOIS server for this TLD
+save	no-server			IANA lists no WHOIS server for this TLD
+saxo	accept	whois.nic.saxo	domain not found	needle verified against both probes
+sb	reject	whois.nic.net.sb		free probe: whois.nic.net.sb: timed out
+sbi	accept	whois.nic.sbi	domain not found	needle verified against both probes
+sbs	accept	whois.nic.sbs	the queried object does not exist	needle verified against both probes
+scb	accept	whois.nic.scb	not found	needle verified against both probes
+schaeffler	reject	whois.afilias-srs.net		registered nic.schaeffler reads as UNKNOWN (whois said: tld is not supported)
+schmidt	reject	whois.nic.schmidt		free probe: back end resting after repeated failures
+scholarships	accept	whois.nic.scholarships	domain not found	needle verified against both probes
+schwarz	accept	whois.nic.schwarz	the queried object does not exist	needle verified against both probes
+sd	accept	whois.nic.sd	the queried object does not exist	needle verified against both probes
+search	no-server			IANA lists no WHOIS server for this TLD
+seat	accept	whois.nic.seat	the queried object does not exist	needle verified against both probes
+secure	no-server			IANA lists no WHOIS server for this TLD
+seek	reject	whois.nic.seek		free probe: back end resting after repeated failures
+select	reject	whois.nic.select		free probe: back end resting after repeated failures
+sener	accept	whois.nic.rwe	domain not found	needle verified against both probes
+seven	reject	whois.nic.seven		free probe: back end resting after repeated failures
+sew	accept	whois.nic.sew	domain not found	needle verified against both probes
+sfr	accept	whois.nic.sfr	the queried object does not exist	needle verified against both probes
+shangrila	accept	whois.nic.shangrila	domain not found	needle verified against both probes
+sharp	reject	whois.nic.gmo		identical answer for a free and a registered name
+shell	no-server			IANA lists no WHOIS server for this TLD
+shia	no-server			IANA lists no WHOIS server for this TLD
+shouji	accept	whois.teleinfo.cn	no matching record	needle verified against both probes
+silk	no-server			IANA lists no WHOIS server for this TLD
+sina	accept	whois.nic.sina	the queried object does not exist	needle verified against both probes
+sj	no-server			IANA lists no WHOIS server for this TLD
+skin	accept	whois.nic.skin	the queried object does not exist	needle verified against both probes
+sky	no-server			IANA lists no WHOIS server for this TLD
+skype	no-server			IANA lists no WHOIS server for this TLD
+sl	no-server			IANA lists no WHOIS server for this TLD
+sling	accept	whois.nic.sling	is available for registration	needle verified against both probes
+sm	accept	whois.nic.sm	no entries found	needle verified against both probes
+smart	accept	whois.nic.smart	the queried object does not exist	needle verified against both probes
+smile	no-server			IANA lists no WHOIS server for this TLD
+sn	accept	whois.nic.sn	not found	needle verified against both probes
+sncf	accept	whois.nic.sncf	not found	needle verified against both probes
+so	accept	whois.nic.so	the queried object does not exist	needle verified against both probes
+softbank	reject	whois.nic.softbank		identical answer for a free and a registered name
+sohu	no-server			IANA lists no WHOIS server for this TLD
+song	accept	whois.nic.song	domain not found	needle verified against both probes
+sony	reject	whois.nic.sony		identical answer for a free and a registered name
+spa	accept	whois.nic.spa	domain not found	needle verified against both probes
+sport	accept	whois.nic.sport	the queried object does not exist	needle verified against both probes
+spot	no-server			IANA lists no WHOIS server for this TLD
+sr	accept	whois.sr	no object found	needle verified against both probes
+ss	accept	whois.nic.ss	the queried object does not exist	needle verified against both probes
+stada	accept	whois.nic.stada	domain not found	needle verified against both probes
+staples	no-server			IANA lists no WHOIS server for this TLD
+star	accept	whois.nic.star	domain not found	needle verified against both probes
+statebank	accept	whois.nic.statebank	domain not found	needle verified against both probes
+statefarm	no-server			IANA lists no WHOIS server for this TLD
+stc	accept	whois.nic.stc	the queried object does not exist	needle verified against both probes
+stcgroup	accept	whois.nic.stcgroup	the queried object does not exist	needle verified against both probes
+stockholm	accept	whois.nic.stockholm	domain not found	needle verified against both probes
+storage	accept	whois.nic.storage	the queried object does not exist	needle verified against both probes
+surf	reject	whois.nic.surf		free probe: back end resting after repeated failures
+suzuki	reject	whois.nic.suzuki		identical answer for a free and a registered name
+sv	no-server			IANA lists no WHOIS server for this TLD
+swatch	no-server			IANA lists no WHOIS server for this TLD
+sy	accept	whois.tld.sy	no object found	needle verified against both probes
+sz	no-server			IANA lists no WHOIS server for this TLD
+tab	reject	whois.nic.tab		free probe: back end resting after repeated failures
+taipei	reject	whois.nic.taipei		free probe: back end resting after repeated failures
+talk	no-server			IANA lists no WHOIS server for this TLD
+taobao	accept	whois.nic.taobao	domain not found	needle verified against both probes
+target	no-server			IANA lists no WHOIS server for this TLD
+tatamotors	accept	whois.nic.tatamotors	domain not found	needle verified against both probes
+tatar	accept	whois.nic.tatar	the queried object does not exist	needle verified against both probes
+tci	no-server			IANA lists no WHOIS server for this TLD
+td	accept	whois.nic.td	the queried object does not exist	needle verified against both probes
+tdk	reject	whois.nic.tdk		free probe: back end resting after repeated failures
+temasek	accept	whois.nic.temasek	domain not found	needle verified against both probes
+teva	reject	whois.nic.teva		free probe: back end resting after repeated failures
+tg	accept	whois.nic.tg	no object found	needle verified against both probes
+thd	accept	whois.nic.thd	domain not found	needle verified against both probes
+tiaa	accept	whois.nic.tiaa	domain not found	needle verified against both probes
+tickets	accept	whois.nic.tickets	the queried object does not exist	needle verified against both probes
+tirol	accept	whois.nic.tirol	no information was found matching that query	needle verified against both probes
+tjmaxx	no-server			IANA lists no WHOIS server for this TLD
+tjx	no-server			IANA lists no WHOIS server for this TLD
+tkmaxx	no-server			IANA lists no WHOIS server for this TLD
+tl	accept	whois.nic.tl	the queried object does not exist	needle verified against both probes
+tmall	accept	whois.nic.tmall	domain not found	needle verified against both probes
+tn	accept	whois.ati.tn	no object found	needle verified against both probes
+tokyo	reject	whois.nic.tokyo		identical answer for a free and a registered name
+toray	reject	whois.nic.toray		identical answer for a free and a registered name
+toshiba	reject	whois.nic.toshiba		identical answer for a free and a registered name
+total	accept	whois.nic.total	not found	needle verified against both probes
+toyota	reject	whois.nic.toyota		identical answer for a free and a registered name
+trading	no-server			IANA lists no WHOIS server for this TLD
+travelers	accept	whois.nic.travelers	domain not found	needle verified against both probes
+travelersinsurance	accept	whois.nic.travelersinsurance	domain not found	needle verified against both probes
+trust	accept	whois.registry.click	is available for registration	needle verified against both probes
+trv	accept	whois.nic.trv	domain not found	needle verified against both probes
+tt	no-server			IANA lists no WHOIS server for this TLD
+tui	accept	whois.nic.tui	the queried object does not exist	needle verified against both probes
+tunes	no-server			IANA lists no WHOIS server for this TLD
+tushu	no-server			IANA lists no WHOIS server for this TLD
+tvs	accept	whois.nic.tvs	domain not found	needle verified against both probes
+ubank	accept	whois.nic.ubank	domain not found	needle verified against both probes
+ubs	accept	whois.nic.ubs	domain not found	needle verified against both probes
+ug	reject	whois.co.ug		registered registry.ug reads as AVAILABLE (-)
+unicom	accept	whois.nic.unicom	the queried object does not exist	needle verified against both probes
+uol	no-server			IANA lists no WHOIS server for this TLD
+ups	accept	whois.nic.ups	domain not found	needle verified against both probes
+uy	reject	whois.nic.org.uy		free probe: whois.nic.org.uy: timed out
+uz	accept	whois.cctld.uz	not found in database	needle verified against both probes
+va	no-server			IANA lists no WHOIS server for this TLD
+vana	accept	whois.registry.click	is available for registration	needle verified against both probes
+vanguard	accept	whois.nic.vanguard	domain not found	needle verified against both probes
+verisign	accept	whois.nic.verisign	no match for	needle verified against both probes
+versicherung	accept	whois.nic.versicherung	the queried object does not exist	needle verified against both probes
+vi	reject	virgil.nic.vi		free probe: virgil.nic.vi: [Errno 61] Connection refused
+vig	accept	whois.nic.vig	domain not found	needle verified against both probes
+viking	accept	whois.nic.viking	domain not found	needle verified against both probes
+vin	no-server			IANA lists no WHOIS server for this TLD
+virgin	no-server			IANA lists no WHOIS server for this TLD
+visa	accept	whois.nic.visa	domain not found	needle verified against both probes
+viva	accept	whois.nic.viva	the queried object does not exist	needle verified against both probes
+vivo	no-server			IANA lists no WHOIS server for this TLD
+vlaanderen	no-server			IANA lists no WHOIS server for this TLD
+vn	no-server			IANA lists no WHOIS server for this TLD
+vodka	reject	whois.nic.vodka		free probe: back end resting after repeated failures
+volvo	accept	whois.nic.volvo	domain not found	needle verified against both probes
+vu	reject	whois.dnrs.vu		free probe: back end resting after repeated failures
+walmart	reject	whois.nic.walmart		free probe: back end resting after repeated failures
+walter	reject	whois.nic.walter		free probe: back end resting after repeated failures
+wang	accept	whois.gtld.zdns.cn	the queried object does not exist	needle verified against both probes
+wanggou	no-server			IANA lists no WHOIS server for this TLD
+watches	no-server			IANA lists no WHOIS server for this TLD
+weather	no-server			IANA lists no WHOIS server for this TLD
+weatherchannel	no-server			IANA lists no WHOIS server for this TLD
+web	no-server			IANA lists no WHOIS server for this TLD
+weber	accept	whois.nic.weber	domain not found	needle verified against both probes
+wed	no-server			IANA lists no WHOIS server for this TLD
+wedding	reject	whois.nic.wedding		free probe: back end resting after repeated failures
+weibo	accept	whois.nic.weibo	the queried object does not exist	needle verified against both probes
+weir	accept	whois.nic.weir	domain not found	needle verified against both probes
+whoswho	accept	whois.nic.whoswho	the queried object does not exist	needle verified against both probes
+wien	accept	whois.nic.wien	no information was found matching that query	needle verified against both probes
+williamhill	no-server			IANA lists no WHOIS server for this TLD
+windows	no-server			IANA lists no WHOIS server for this TLD
+wine	no-server			IANA lists no WHOIS server for this TLD
+winners	no-server			IANA lists no WHOIS server for this TLD
+wme	accept	whois.nic.wme	the queried object does not exist	needle verified against both probes
+woodside	reject	whois.nic.woodside		free probe: back end resting after repeated failures
+wow	no-server			IANA lists no WHOIS server for this TLD
+wtc	reject	whois.nic.wtc		free probe: back end resting after repeated failures
+xbox	no-server			IANA lists no WHOIS server for this TLD
+xerox	reject	whois.nic.xerox		free probe: back end resting after repeated failures
+xihuan	reject	whois.teleinfo.cn		registered nic.xihuan reads as AVAILABLE (-)
+xin	accept	whois.nic.xin	domain not found	needle verified against both probes
+xn--11b4c3d	accept	whois.nic.xn--11b4c3d	no match for	needle verified against both probes
+xn--1ck2e1b	accept	whois.nic.xn--1ck2e1b	domain not found	needle verified against both probes
+xn--1qqw23a	accept	whois.ngtld.cn	the queried object does not exist	needle verified against both probes
+xn--2scrj9c	reject	whois.nixiregistry.in		no DNS-proven registered name found under .xn--2scrj9c
+xn--30rr7y	accept	whois.gtld.zdns.cn	the queried object does not exist	needle verified against both probes
+xn--3bst00m	accept	whois.gtld.zdns.cn	the queried object does not exist	needle verified against both probes
+xn--3ds443g	accept	whois.teleinfo.cn	no matching record	needle verified against both probes
+xn--3e0b707e	accept	whois.kr	not found	needle verified against both probes
+xn--3hcrj9c	reject	whois.nixiregistry.in		no DNS-proven registered name found under .xn--3hcrj9c
+xn--3pxu8k	accept	whois.nic.xn--3pxu8k	no match for	needle verified against both probes
+xn--42c2d9a	accept	whois.nic.xn--42c2d9a	no match for	needle verified against both probes
+xn--45br5cyl	reject	whois.nixiregistry.in		no DNS-proven registered name found under .xn--45br5cyl
+xn--45brj9c	reject	whois.nixiregistry.in		no DNS-proven registered name found under .xn--45brj9c
+xn--45q11c	accept	whois.gtld.zdns.cn	the queried object does not exist	needle verified against both probes
+xn--4dbrk0ce	reject	whois.isoc.org.il		no DNS-proven registered name found under .xn--4dbrk0ce
+xn--4gbrim	accept	whois.nic.xn--4gbrim	the queried object does not exist	needle verified against both probes
+xn--54b7fta0cc	no-server			IANA lists no WHOIS server for this TLD
+xn--55qw42g	accept	whois.nic.xn--55qw42g	the queried object does not exist	needle verified against both probes
+xn--55qx5d	accept	whois.ngtld.cn	the queried object does not exist	needle verified against both probes
+xn--5su34j936bgsg	accept	whois.nic.xn--5su34j936bgsg	domain not found	needle verified against both probes
+xn--5tzm5g	reject	whois.nic.xn--5tzm5g		registered xn--5tzm5g.xn--5tzm5g reads as UNKNOWN (whois said: tld is not supported)
+xn--6frz82g	no-server			IANA lists no WHOIS server for this TLD
+xn--6qq986b3xl	accept	whois.gtld.zdns.cn	the queried object does not exist	needle verified against both probes
+xn--80adxhks	accept	whois.nic.xn--80adxhks	domain not found	needle verified against both probes
+xn--80ao21a	accept	whois.nic.kz	nothing found	needle verified against both probes
+xn--80aqecdr1a	reject	whois.nic.xn--80aqecdr1a		free probe: back end resting after repeated failures
+xn--80asehdb	accept	whois.nic.xn--80asehdb	the queried object does not exist	needle verified against both probes
+xn--80aswg	accept	whois.nic.xn--80aswg	the queried object does not exist	needle verified against both probes
+xn--8y0a063a	accept	whois.nic.xn--8y0a063a	the queried object does not exist	needle verified against both probes
+xn--90a3ac	reject	whois.rnids.rs		no DNS-proven registered name found under .xn--90a3ac
+xn--90ae	reject	whois.imena.bg		no DNS-proven registered name found under .xn--90ae
+xn--90ais	reject	whois.cctld.by		no DNS-proven registered name found under .xn--90ais
+xn--9dbq2a	accept	whois.nic.xn--9dbq2a	no match for	needle verified against both probes
+xn--9et52u	accept	whois.gtld.zdns.cn	the queried object does not exist	needle verified against both probes
+xn--9krt00a	accept	whois.nic.xn--9krt00a	the queried object does not exist	needle verified against both probes
+xn--b4w605ferd	accept	whois.nic.xn--b4w605ferd	domain not found	needle verified against both probes
+xn--bck1b9a5dre4c	accept	whois.nic.xn--bck1b9a5dre4c	domain not found	needle verified against both probes
+xn--c1avg	accept	whois.nic.xn--c1avg	domain not found	needle verified against both probes
+xn--c2br7g	accept	whois.nic.xn--c2br7g	no match for	needle verified against both probes
+xn--cck2b3b	accept	whois.nic.xn--cck2b3b	domain not found	needle verified against both probes
+xn--cckwcxetd	no-server			IANA lists no WHOIS server for this TLD
+xn--cg4bki	reject	whois.kr		no DNS-proven registered name found under .xn--cg4bki
+xn--clchc0ea0b2g2a9gcd	reject	whois.ta.sgnic.sg		no DNS-proven registered name found under .xn--clchc0ea0b2g2a9gcd
+xn--czr694b	no-server			IANA lists no WHOIS server for this TLD
+xn--czrs0t	no-server			IANA lists no WHOIS server for this TLD
+xn--czru2d	accept	whois.gtld.zdns.cn	the queried object does not exist	needle verified against both probes
+xn--d1acj3b	accept	whois.nic.xn--d1acj3b	the queried object does not exist	needle verified against both probes
+xn--d1alf	accept	whois.marnet.mk	no entries found	needle verified against both probes
+xn--e1a4c	reject	whois.eu		no DNS-proven registered name found under .xn--e1a4c
+xn--eckvdtc9d	accept	whois.nic.xn--eckvdtc9d	domain not found	needle verified against both probes
+xn--efvy88h	accept	whois.gtld.zdns.cn	the queried object does not exist	needle verified against both probes
+xn--fct429k	accept	whois.nic.xn--fct429k	domain not found	needle verified against both probes
+xn--fhbei	accept	whois.nic.xn--fhbei	no match for	needle verified against both probes
+xn--fiq228c5hs	accept	whois.teleinfo.cn	no matching record	needle verified against both probes
+xn--fiq64b	accept	whois.gtld.zdns.cn	the queried object does not exist	needle verified against both probes
+xn--fiqs8s	accept	whois.cnnic.cn	no matching record	needle verified against both probes
+xn--fiqz9s	accept	whois.cnnic.cn	no matching record	needle verified against both probes
+xn--fjq720a	no-server			IANA lists no WHOIS server for this TLD
+xn--flw351e	no-server			IANA lists no WHOIS server for this TLD
+xn--fpcrj9c3d	reject	whois.nixiregistry.in		no DNS-proven registered name found under .xn--fpcrj9c3d
+xn--fzc2c9e2c	no-server			IANA lists no WHOIS server for this TLD
+xn--fzys8d69uvgm	accept	whois.nic.xn--fzys8d69uvgm	domain not found	needle verified against both probes
+xn--g2xx48c	reject	whois.nic.xn--g2xx48c		free probe: back end resting after repeated failures
+xn--gckr3f0f	accept	whois.nic.xn--gckr3f0f	domain not found	needle verified against both probes
+xn--gecrj9c	reject	whois.nixiregistry.in		no DNS-proven registered name found under .xn--gecrj9c
+xn--gk3at1e	accept	whois.nic.xn--gk3at1e	domain not found	needle verified against both probes
+xn--h2breg3eve	reject	whois.nixiregistry.in		no DNS-proven registered name found under .xn--h2breg3eve
+xn--h2brj9c	reject	whois.nixiregistry.in		no DNS-proven registered name found under .xn--h2brj9c
+xn--h2brj9c8c	reject	whois.nixiregistry.in		no DNS-proven registered name found under .xn--h2brj9c8c
+xn--hxt814e	accept	whois.gtld.zdns.cn	the queried object does not exist	needle verified against both probes
+xn--i1b6b1a6a2e	accept	whois.nic.xn--i1b6b1a6a2e	domain not found	needle verified against both probes
+xn--imr513n	no-server			IANA lists no WHOIS server for this TLD
+xn--io0a7i	accept	whois.ngtld.cn	the queried object does not exist	needle verified against both probes
+xn--j1aef	accept	whois.nic.xn--j1aef	no match for	needle verified against both probes
+xn--j1amh	reject	whois.dotukr.com		no DNS-proven registered name found under .xn--j1amh
+xn--j6w193g	reject	whois.hkirc.hk		no DNS-proven registered name found under .xn--j6w193g
+xn--jlq480n2rg	no-server			IANA lists no WHOIS server for this TLD
+xn--jvr189m	accept	whois.nic.xn--jvr189m	domain not found	needle verified against both probes
+xn--kcrx77d1x4a	reject	whois.nic.xn--kcrx77d1x4a		free probe: back end resting after repeated failures
+xn--kprw13d	reject	whois.twnic.net.tw		registered google.xn--kprw13d reads as UNKNOWN (whois answered for google.台灣)
+xn--kpry57d	reject	whois.twnic.net.tw		registered google.xn--kpry57d reads as UNKNOWN (whois answered for google.台灣)
+xn--kput3i	accept	whois.nic.xn--kput3i	no matching record	needle verified against both probes
+xn--l1acc	reject	whois.mn		free probe: whois.mn: timed out
+xn--lgbbat1ad8j	reject	whois.nic.dz		no DNS-proven registered name found under .xn--lgbbat1ad8j
+xn--mgb9awbf	reject	whois.registry.om		no DNS-proven registered name found under .xn--mgb9awbf
+xn--mgba3a3ejt	no-server			IANA lists no WHOIS server for this TLD
+xn--mgba3a4f16a	reject	whois.nic.ir		no DNS-proven registered name found under .xn--mgba3a4f16a
+xn--mgba7c0bbn0a	reject	whois.nic.xn--mgba7c0bbn0a		free probe: back end resting after repeated failures
+xn--mgbaam7a8h	reject	whois.aeda.net.ae		no DNS-proven registered name found under .xn--mgbaam7a8h
+xn--mgbab2bd	accept	whois.nic.xn--mgbab2bd	the queried object does not exist	needle verified against both probes
+xn--mgbah1a3hjkrd	reject	whois.nic.mr		no DNS-proven registered name found under .xn--mgbah1a3hjkrd
+xn--mgbai9azgqp6j	no-server			IANA lists no WHOIS server for this TLD
+xn--mgbayh7gpa	no-server			IANA lists no WHOIS server for this TLD
+xn--mgbbh1a	reject	whois.nixiregistry.in		no DNS-proven registered name found under .xn--mgbbh1a
+xn--mgbbh1a71e	reject	whois.nixiregistry.in		no DNS-proven registered name found under .xn--mgbbh1a71e
+xn--mgbc0a9azcg	no-server			IANA lists no WHOIS server for this TLD
+xn--mgbca7dzdo	accept	whois.nic.xn--mgbca7dzdo	no data found	needle verified against both probes
+xn--mgbcpq6gpa1a	no-server			IANA lists no WHOIS server for this TLD
+xn--mgberp4a5d4ar	reject	whois.nic.net.sa		free probe: whois.nic.net.sa: [Errno 61] Connection refused
+xn--mgbgu82a	reject	whois.nixiregistry.in		no DNS-proven registered name found under .xn--mgbgu82a
+xn--mgbi4ecexp	reject	whois.nic.xn--mgbi4ecexp		free probe: back end resting after repeated failures
+xn--mgbpl2fh	no-server			IANA lists no WHOIS server for this TLD
+xn--mgbt3dhd	no-server			IANA lists no WHOIS server for this TLD
+xn--mgbtx2b	reject	whois.cmc.iq		free probe: resolving whois.cmc.iq: [Errno 8] nodename nor servname provided, or not known
+xn--mgbx4cd0ab	reject	whois.mynic.my		no DNS-proven registered name found under .xn--mgbx4cd0ab
+xn--mix891f	reject	whois.monic.mo		no DNS-proven registered name found under .xn--mix891f
+xn--mk1bu44c	accept	whois.nic.xn--mk1bu44c	no match for	needle verified against both probes
+xn--mxtq1m	reject	whois.nic.xn--mxtq1m		registered nic.xn--mxtq1m reads as UNKNOWN (whois answered for nic.政府)
+xn--ngbc5azd	reject	whois.nic.xn--ngbc5azd		free probe: back end resting after repeated failures
+xn--ngbe9e0a	accept	whois.nic.xn--ngbe9e0a	is available for registration	needle verified against both probes
+xn--ngbrx	accept	whois.nic.xn--ngbrx	no data found	needle verified against both probes
+xn--node	no-server			IANA lists no WHOIS server for this TLD
+xn--nqv7f	accept	whois.nic.xn--nqv7f	domain not found	needle verified against both probes
+xn--nqv7fs00ema	accept	whois.nic.xn--nqv7fs00ema	domain not found	needle verified against both probes
+xn--nyqy26a	no-server			IANA lists no WHOIS server for this TLD
+xn--o3cw4h	reject	whois.thnic.co.th		no DNS-proven registered name found under .xn--o3cw4h
+xn--ogbpf8fl	reject	whois.tld.sy		no DNS-proven registered name found under .xn--ogbpf8fl
+xn--otu796d	no-server			IANA lists no WHOIS server for this TLD
+xn--p1acf	no-server			IANA lists no WHOIS server for this TLD
+xn--p1ai	reject	whois.tcinet.ru		no DNS-proven registered name found under .xn--p1ai
+xn--pgbs0dh	reject	whois.ati.tn		unregistered nmtq49gi6crrmjij.xn--pgbs0dh reads as UNKNOWN (unrecognised whois response)
+xn--pssy2u	accept	whois.nic.xn--pssy2u	no match for	needle verified against both probes
+xn--q7ce6a	reject	whois.nic.la		no DNS-proven registered name found under .xn--q7ce6a
+xn--q9jyb4c	no-server			IANA lists no WHOIS server for this TLD
+xn--qcka1pmc	no-server			IANA lists no WHOIS server for this TLD
+xn--qxa6a	reject	whois.eu		no DNS-proven registered name found under .xn--qxa6a
+xn--qxam	no-server			IANA lists no WHOIS server for this TLD
+xn--rhqv96g	no-server			IANA lists no WHOIS server for this TLD
+xn--rovu88b	accept	whois.nic.xn--rovu88b	domain not found	needle verified against both probes
+xn--rvc1e0am3e	reject	whois.nixiregistry.in		no DNS-proven registered name found under .xn--rvc1e0am3e
+xn--s9brj9c	reject	whois.nixiregistry.in		no DNS-proven registered name found under .xn--s9brj9c
+xn--ses554g	reject	whois.nic.xn--ses554g		free probe: whois.nic.xn--ses554g: timed out
+xn--t60b56a	accept	whois.nic.xn--t60b56a	no match for	needle verified against both probes
+xn--tckwe	accept	whois.nic.xn--tckwe	no match for	needle verified against both probes
+xn--tiq49xqyj	reject	whois.nic.xn--tiq49xqyj		free probe: back end resting after repeated failures
+xn--unup4y	no-server			IANA lists no WHOIS server for this TLD
+xn--vermgensberater-ctb	accept	whois.nic.xn--vermgensberater-ctb	the queried object does not exist	needle verified against both probes
+xn--vermgensberatung-pwb	accept	whois.nic.xn--vermgensberatung-pwb	the queried object does not exist	needle verified against both probes
+xn--vhquv	no-server			IANA lists no WHOIS server for this TLD
+xn--vuq861b	accept	whois.teleinfo.cn	no matching record	needle verified against both probes
+xn--w4r85el8fhu5dnra	accept	whois.nic.xn--w4r85el8fhu5dnra	domain not found	needle verified against both probes
+xn--w4rs40l	accept	whois.nic.xn--w4rs40l	domain not found	needle verified against both probes
+xn--wgbh1c	no-server			IANA lists no WHOIS server for this TLD
+xn--wgbl6a	reject	whois.registry.qa		no DNS-proven registered name found under .xn--wgbl6a
+xn--xhq521b	accept	whois.ngtld.cn	the queried object does not exist	needle verified against both probes
+xn--xkc2al3hye2a	no-server			IANA lists no WHOIS server for this TLD
+xn--xkc2dl3a5ee0h	reject	whois.nixiregistry.in		no DNS-proven registered name found under .xn--xkc2dl3a5ee0h
+xn--y9a3aq	reject	whois.amnic.net		no DNS-proven registered name found under .xn--y9a3aq
+xn--yfro4i67o	reject	whois.zh.sgnic.sg		no DNS-proven registered name found under .xn--yfro4i67o
+xn--ygbi2ammx	reject	whois.pnina.ps		free probe: whois.pnina.ps: [Errno 61] Connection refused
+xn--zfr164b	accept	whois.nic.xn--zfr164b	the queried object does not exist	needle verified against both probes
+yachts	accept	whois.nic.yachts	the queried object does not exist	needle verified against both probes
+yahoo	accept	whois.nic.yahoo	domain not found	needle verified against both probes
+yamaxun	no-server			IANA lists no WHOIS server for this TLD
+yandex	accept	whois.nic.yandex	is available for registration	needle verified against both probes
+ye	accept	whois.y.net.ye	not found	needle verified against both probes
+yodobashi	reject	whois.nic.gmo		identical answer for a free and a registered name
+yoga	reject	whois.nic.yoga		free probe: back end resting after repeated failures
+yokohama	reject	whois.nic.yokohama		identical answer for a free and a registered name
+you	no-server			IANA lists no WHOIS server for this TLD
+youtube	no-server			IANA lists no WHOIS server for this TLD
+yun	reject	whois.teleinfo.cn		identical answer for a free and a registered name
+zappos	no-server			IANA lists no WHOIS server for this TLD
+zara	no-server			IANA lists no WHOIS server for this TLD
+zero	accept	whois.nic.zero	domain not found	needle verified against both probes
+zip	no-server			IANA lists no WHOIS server for this TLD
+zm	accept	whois.zicta.zm	the queried object does not exist	needle verified against both probes
+zuerich	accept	whois.nic.zuerich	the queried object does not exist	needle verified against both probes

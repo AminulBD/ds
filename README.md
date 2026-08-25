@@ -16,8 +16,8 @@ summary: 2 available  3 taken  0 unknown   (5 checked in 1.1s)
 Every lookup asks **RDAP** first, using the server list from the IANA bootstrap
 (cached locally for a week). TLDs with no RDAP service fall back to **WHOIS** on
 port 43, using the server and "available" needle table in the bundled
-`whois.json`. When a bundled WHOIS host is stale or missing, IANA is asked which
-server serves that TLD today.
+`whois.json` — 1358 TLDs. When a bundled WHOIS host is stale or missing, IANA is
+asked which server serves that TLD today.
 
 A lookup that cannot be answered is reported as `UNKNOWN` with the reason
 attached — never guessed as available.
@@ -131,7 +131,7 @@ time, so the binary runs from anywhere.
 
 ```sh
 ds apple --tld com,net             # a specific list
-ds apple --tld all                 # every registrable TLD (~1290 lookups)
+ds apple --tld all                 # every registrable TLD (~1330 lookups)
 ds apple --tld popular             # a curated set of ~38 common TLDs
 ds apple --tld rdap                # only TLDs that have an RDAP service
 ds apple --tld @tlds.txt           # one TLD per line, `,` and `#` comments ok
@@ -214,8 +214,8 @@ one valid JSON document.
 
 | Value | Keeps | Count under `--tld all` |
 | --- | --- | --- |
-| `any` (default) | everything | 1290 |
-| `second` | plain TLDs — `apple.com`, `apple.de` | 905 |
+| `any` (default) | everything | 1329 |
+| `second` | plain TLDs — `apple.com`, `apple.de` | 944 |
 | `third` | multi-label suffixes — `apple.co.uk`, `apple.com.au` | 385 |
 
 Handy for `--tld all`, which otherwise sweeps hundreds of restricted zones
@@ -228,8 +228,8 @@ typed out by hand is always checked as given — `--level` only filters TLD list
 what ICANN reserves for ISO 3166-1 country codes:
 
 ```sh
-ds apple --tld all --cctld                  # 504 (includes co.uk, com.au, ...)
-ds apple --tld all --cctld --level second   # 139 bare ccTLDs: de, io, jp, ...
+ds apple --tld all --cctld                  # 538 (includes co.uk, com.au, ...)
+ds apple --tld all --cctld --level second   # 173 bare ccTLDs: de, io, jp, ...
 ```
 
 `--tld-len` is the general form, measured on the last label so `co.uk` counts
@@ -237,10 +237,10 @@ as 2:
 
 | Spec | Keeps | Count under `--tld all` |
 | --- | --- | --- |
-| `--tld-len 2` | two-letter (same as `--cctld`) | 504 |
+| `--tld-len 2` | two-letter (same as `--cctld`) | 538 |
 | `--tld-len 3` | `com`, `net`, `xyz`, ... | 157 |
-| `--tld-len -3` | three characters or fewer | 661 |
-| `--tld-len 4-` | four or more | 629 |
+| `--tld-len -3` | three characters or fewer | 695 |
+| `--tld-len 4-` | four or more | 634 |
 
 ### Brand and reserved TLDs
 
@@ -263,7 +263,7 @@ ds mybrand --tld aws
 ```
 
 **They are left out of `--tld all`, `--tld rdap` and `--tld popular` by
-default** — 368 of the 1658 TLDs in `all`, so a sweep is a fifth shorter and
+default** — 368 of the 1697 TLDs in `all`, so a sweep is a fifth shorter and
 carries no dead ends. The run says so when it happens. A TLD you name yourself
 is always checked; the default only prunes the lists `ds` picks for you.
 
@@ -275,7 +275,7 @@ is always checked; the default only prunes the lists `ds` picks for you.
 | `only` | check nothing else — what a sweep is skipping |
 
 ```sh
-ds mybrand --tld all --private include      # all 1658, brands marked PRIVATE
+ds mybrand --tld all --private include      # all 1697, brands marked PRIVATE
 ds mybrand --tld all --private only         # just the 368 closed ones
 ```
 
@@ -550,6 +550,10 @@ bundled table has never heard of, or hold a corporate zone at nothing.
 * Some registries answer nobody: `.li` and `.qa` refuse public WHOIS and have no
   RDAP, and a few bundled WHOIS hosts no longer exist. Those come back `UNKNOWN`
   with the reason attached.
+* Most of the bundled table is harvested from IANA and tested against the
+  registry before being written — see
+  [The bundled WHOIS table](#the-bundled-whois-table). The older hand-written
+  entries have not been through that mill.
 * Large sweeps get rate-limited. `ds` paces itself per host, backs off on
   403/429, and stops querying a server that has refused it six times in a row
   (retrying it after 30s). Identity Digital runs ~250 gTLDs behind one RDAP
@@ -560,11 +564,44 @@ bundled table has never heard of, or hold a corporate zone at nothing.
   ds apple --tld "$(sed 's/^apple\.//' unknown.txt | paste -sd, -)"
   ```
 
+## The bundled WHOIS table
+
+Most of `whois.json` is generated rather than hand-maintained, by
+[`scripts/refresh-whois.py`](scripts/refresh-whois.py). It walks IANA's list of
+delegated TLDs, asks `whois.iana.org` which server serves each one, and then —
+the part that matters — tests every answer before believing it. For each TLD it
+asks the server about a sixteen-character random label nobody can have
+registered, and about a name the *DNS* proves is registered because it has NS
+records. A server only reaches the table if the first reads as AVAILABLE and the
+second reads as TAKEN, judged by a port of `ds`'s own classifier.
+
+The `available` needle is then chosen from a list of registry phrasings vetted by
+hand, and kept only if it is absent from the registered name's record. A needle
+is never invented by diffing two responses: the wrong needle turns a registered
+domain into an `AVAILABLE`, which is the one answer `ds` must never give. A TLD
+whose server cannot be shown to tell the two names apart is left out of the file
+rather than guessed at, and `ds` falls back to asking IANA at runtime.
+
+`scripts/whois-report.tsv` records the verdict and the reason for every TLD
+considered, so a rejection can be looked up rather than wondered about.
+
+```sh
+./scripts/refresh-whois.py all        # harvest, verify, rewrite whois.json
+cargo build --release
+./scripts/refresh-whois.py verify     # re-check the table through ds itself
+```
+
+The run is paced to be a good guest: queries to one registry are serialised with
+a gap between them, keyed on the address the server resolves to rather than its
+name, because hundreds of `whois.nic.<tld>` aliases sit on a handful of shared
+back ends. Expect it to take hours.
+
 ## Development
 
 ```sh
 cargo test
 cargo clippy --all-targets
+python3 scripts/test_whois_classify.py     # the harvest script's classifier
 man ./ds.1                 # preview the manual page
 
 node scripts/build-private-tlds.mjs    # refresh private-tlds.json from ICANN

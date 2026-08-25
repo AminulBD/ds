@@ -72,7 +72,10 @@ function rewrite(body) {
     // ../../releases -> the real releases page
     .replace(/\]\(\.\.\/\.\.\/releases\)/g, `](${REPO_URL}/releases)`)
     // repo files -> GitHub blob links
-    .replace(/\]\((LICENSE|whois\.json|pricing\.json|ds\.1)\)/g, `](${REPO_URL}/blob/main/$1)`);
+    .replace(
+      /\]\((LICENSE|whois\.json|pricing\.json|ds\.1|scripts\/[\w.-]+)\)/g,
+      `](${REPO_URL}/blob/main/$1)`,
+    );
 }
 
 await rm(outDir, { recursive: true, force: true });

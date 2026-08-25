@@ -28,3 +28,9 @@
 /site/src/content/pages/
 /site/src/data/tlds.json
 /site/src/data/readme.json
+
+# scripts/refresh-whois.py: raw IANA records and probe responses, re-fetchable
+/scripts/.whois-cache/
+
+# python bytecode from the scripts/ helpers
+__pycache__/
