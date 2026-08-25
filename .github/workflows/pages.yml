@@ -11,6 +11,7 @@ on:
       - "README.md"
       - "whois.json"
       - "pricing.json"
+      - "private-tlds.json"
       - "Cargo.toml"
       - "src/main.rs"
       - ".github/workflows/pages.yml"

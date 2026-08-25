@@ -1,6 +1,6 @@
-// Builds src/data/tlds.json: one row per TLD, unioned from the three sources
-// `ds` itself consults — the bundled whois.json and pricing.json, plus IANA's
-// RDAP bootstrap. Run by `npm run gen` (and so by predev/prebuild).
+// Builds src/data/tlds.json: one row per TLD, unioned from the sources `ds`
+// itself consults — the bundled whois.json, pricing.json and private-tlds.json,
+// plus IANA's RDAP bootstrap. Run by `npm run gen` (and so by predev/prebuild).
 
 import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
@@ -94,6 +94,15 @@ for (const [key, offers] of Object.entries(await readJson(resolve(repo, 'pricing
   });
 }
 
+// --- private-tlds.json: zones with no public registrations at all ---
+// Keyed on the last label, exactly as the CLI's lookup is: an entry covers the
+// whole TLD, so anything under it is equally closed.
+const priv = new Map();
+const privFile = await readJson(resolve(repo, 'private-tlds.json'));
+for (const e of privFile.tlds) {
+  priv.set(normalize(e.tld), { kind: e.kind, operator: e.operator ?? null });
+}
+
 // --- IANA RDAP bootstrap: [[["com","net"], ["https://..."]], ...] ---
 const rdap = new Map();
 for (const [tlds, servers] of (await bootstrap()).services) {
@@ -109,6 +118,7 @@ const rows = [...new Set([...whois.keys(), ...pricing.keys(), ...rdap.keys()])]
     const w = whois.get(tld);
     const r = rdap.get(tld);
     const p = pricing.get(tld) ?? {};
+    const v = priv.get(tld.split('.').pop());
     return {
       tld,
       // How many labels the registration sits under: `com` = 2nd level,
@@ -118,6 +128,10 @@ const rows = [...new Set([...whois.keys(), ...pricing.keys(), ...rdap.keys()])]
       // The readable form of a punycode TLD: xn--p1ai -> рф. null otherwise.
       unicode: classify(tld) === 'idn' ? domainToUnicode(tld) : null,
       cctld: classify(tld) === 'cctld',
+      // 'brand' | 'infrastructure' | 'reserved', or null where nothing says the
+      // zone is closed — which is not a claim that it is open. See src/private.rs.
+      private: v?.kind ?? null,
+      privateOperator: v?.operator ?? null,
       price: p.price ?? null,
       renew: p.renew ?? null,
       transfer: p.transfer ?? null,
@@ -141,6 +155,8 @@ const out = {
     cctld: rows.filter((r) => r.kind === 'cctld').length,
     gtld: rows.filter((r) => r.kind === 'gtld').length,
     idn: rows.filter((r) => r.kind === 'idn').length,
+    // What `--tld all` leaves out unless you pass --private include.
+    private: rows.filter((r) => r.private).length,
     second: rows.filter((r) => r.level === 2).length,
     third: rows.filter((r) => r.level === 3).length,
     // The bare ccTLDs — what `--cctld --level second` leaves you with.
@@ -156,5 +172,7 @@ const out = {
 };
 
 await writeFile(resolve(dataDir, 'tlds.json'), JSON.stringify(out));
-const { total, priced: np, cctld: nc, gtld: ng, idn: ni } = out.counts;
-console.log(`  tlds     ${total} rows — ${np} priced; ${ng} gTLD, ${nc} ccTLD, ${ni} IDN`);
+const { total, priced: np, cctld: nc, gtld: ng, idn: ni, private: nv } = out.counts;
+console.log(
+  `  tlds     ${total} rows — ${np} priced; ${ng} gTLD, ${nc} ccTLD, ${ni} IDN; ${nv} private`,
+);

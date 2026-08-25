@@ -23,6 +23,32 @@ A lookup that cannot be answered is reported as
 .B UNKNOWN
 with the reason attached, never guessed as available.
 .PP
+Some TLDs sell to nobody: a .brand gTLD such as
+.I .aws
+or
+.I .google
+is registered only by its own operator, and names such as
+.I .arpa
+or
+.I .test
+are reserved by RFC. Every lookup in such a zone truthfully answers "no such
+domain", which would read as available and lead nowhere, so
+.B ds
+reports those as
+.B PRIVATE
+with the reason attached, and leaves them out of
+.BR "\-\-tld all" ,
+.B rdap
+and
+.B popular
+unless
+.B \-\-private
+says otherwise. The classification is the Specification 13 flag in ICANN's
+published registry-agreement list, bundled as
+.IR private\-tlds.json ;
+a TLD absent from that file is not claimed to be registrable either, it is
+simply reported as the registry answered.
+.PP
 The column after the status is what the TLD costs to register for a year, in
 US dollars: the average of the prices the bundled
 .I pricing.json
@@ -55,7 +81,7 @@ is omitted.
 .TP
 .BR \-t ", " \-\-tld " " \fILIST\fR
 Comma separated TLDs, or one of
-.BR all " (every known TLD),"
+.BR all " (every registrable TLD),"
 .BR popular " (a curated set),"
 .B rdap
 (only TLDs with an RDAP service), or
@@ -85,6 +111,23 @@ Keep TLDs of this length:
 Measured on the last label, so
 .I co.uk
 counts as two.
+.TP
+.BR \-\-private " " \fIexclude\fR|\fIinclude\fR|\fIonly\fR
+What to do with TLDs the public cannot register in.
+.B exclude
+drops them,
+.B include
+checks them and still marks them
+.BR PRIVATE ,
+.B only
+checks nothing else. Left unset they are dropped from
+.BR all ", " rdap " and " popular
+\(em 368 of the 1658 TLDs in
+.B all
+\(em but a TLD named in a
+.B \-\-tld
+list of your own is still checked. Give the option explicitly to filter such a
+list as well.
 .SS Showing more
 .TP
 .B \-\-details
@@ -129,7 +172,9 @@ Print the version and exit.
 Write
 .IR available.txt ,
 .I unavailable.txt
-and, when a registry could not be reached,
+and, when they have anything in them,
+.I private.txt
+and
 .IR unknown.txt .
 With
 .B \-\-json
@@ -243,6 +288,8 @@ At least one domain is available.
 .TP
 .B 1
 None are.
+.B PRIVATE
+results do not count as available.
 .TP
 .B 2
 A startup error, such as an unusable
@@ -268,7 +315,7 @@ Custom WHOIS server tables, used automatically when present. See
 Custom price tables, used automatically when present. See
 .BR \-\-pricing\-file .
 .TP
-.IR available.txt ", " unavailable.txt ", " unknown.txt
+.IR available.txt ", " unavailable.txt ", " private.txt ", " unknown.txt
 Written in the working directory, or
 .BR \-\-out\-dir ,
 when
@@ -311,6 +358,14 @@ Everything known about one domain:
 .RS
 .EX
 ds apple.com \-\-all\-info
+.EE
+.RE
+.PP
+See which TLDs a sweep skips because nobody can register in them:
+.PP
+.RS
+.EX
+ds mybrand \-\-tld all \-\-private only
 .EE
 .RE
 .SH NOTES

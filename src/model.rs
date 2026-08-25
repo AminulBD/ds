@@ -9,6 +9,11 @@ use crate::pricing::Price;
 pub enum Status {
     Available,
     Taken,
+    /// Unregistered, but in a TLD the public cannot register in — a brand or
+    /// reserved zone. Distinct from Available because it is the opposite of an
+    /// offer, and distinct from Taken because the name is genuinely free; it
+    /// is just not free to you.
+    Private,
     Unknown,
 }
 
@@ -17,6 +22,7 @@ impl Status {
         match self {
             Status::Available => "AVAILABLE",
             Status::Taken => "TAKEN",
+            Status::Private => "PRIVATE",
             Status::Unknown => "UNKNOWN",
         }
     }
