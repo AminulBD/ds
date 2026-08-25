@@ -27,17 +27,24 @@ US dollars — see [Prices](#prices).
 
 ## Install
 
-### Quick Install (Linux & macOS)
+On macOS or Linux with [Homebrew](https://brew.sh):
+
+```sh
+brew install aminulbd/tap/ds
+```
+
+That is the one to take if you have it — upgrades come with `brew upgrade`.
+Without Homebrew, this installs the latest release into `~/.local/bin`, needing
+no root and nothing preinstalled but `curl` and `tar`:
 
 ```sh
 curl -fsSL https://raw.githubusercontent.com/aminulbd/ds/main/packaging/install.sh | sh
 ```
 
-Or on macOS or Linux with [Homebrew](https://brew.sh):
-
-```sh
-brew install aminulbd/tap/ds
-```
+It creates the directories it needs, and says so if they turn out not to be on
+your `PATH` or on the manual search path. Set `BIN_DIR` to install elsewhere,
+or run it as root to install system-wide. It is worth reading before you pipe
+it to a shell — drop the `| sh` and it just prints.
 
 Every release also ships installers and plain archives for Linux, macOS and
 Windows on x86_64, arm64 and 32-bit x86. Grab one from the
