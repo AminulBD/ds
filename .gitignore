@@ -5,6 +5,10 @@
 /unavailable.txt
 /unknown.txt
 
+/available.json
+/unavailable.json
+/unknown.json
+
 # packaging output
 /*.deb
 /*.rpm
