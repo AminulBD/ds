@@ -14,10 +14,43 @@ const host = (url: string | null) => {
 // TLD — so it says who those are, and how many TLDs more than one of them
 // quotes. If the table ever narrows back to a single registrar, saying
 // "average" would be false and the note says whose list price it is instead.
-const registrars = [...new Set(rows.flatMap((r) => r.registrars))].sort();
+const registrars = Object.keys(data.sellers).sort();
 const singleSource = registrars.length === 1 ? registrars[0] : null;
 const registrarList = new Intl.ListFormat('en', { type: 'conjunction' }).format(registrars);
-const multiPriced = rows.filter((r) => r.registrars.length > 1).length;
+const multiPriced = rows.filter((r) => r.sellers.length > 1).length;
+
+// The "sold by" filter, busiest registrar first — it is a shortcut to "what
+// can I actually buy here", so the one selling the most TLDs comes first.
+const sellerOptions = Object.entries(data.sellers).sort((a, b) => b[1] - a[1]);
+
+// Every registrar's search page, once, rather than the same template repeated
+// on each of the ~2,000 chips — the page ships one row per TLD already, so
+// what is spent per chip is spent 2,000 times.
+const searchPages: Record<string, string> = {};
+for (const r of rows) {
+  for (const sl of r.sellers) if (sl.search) searchPages[sl.registrar] = sl.search;
+}
+
+// `.com` without the `.com`: the price beside it is what the chip is for, and
+// four full hostnames per row costs more width than the suffix is worth.
+const shortName = (registrar: string) => registrar.replace(/\.com$/, '');
+
+// One entry per eligibility rule rather than per TLD, because sub-zones
+// inherit: .au's rule is also .com.au's, and printing it seven times would
+// suggest seven rules. `from` is the TLD the rule is written against.
+type Rule = { note: string; source: string; from: string };
+const groups = new Map<string, { from: string; rule: Rule; tlds: string[] }>();
+for (const r of rows) {
+  const rule = r.eligibility as Rule | null;
+  if (!rule) continue;
+  const g = groups.get(rule.from) ?? { from: rule.from, rule, tlds: [] };
+  g.tlds.push(r.tld);
+  groups.set(rule.from, g);
+}
+const ruleGroups = [...groups.values()].sort((a, b) => a.from.localeCompare(b.from));
+// .বাংলা reads better than .xn--54b7fta0cc in a list of rules.
+const readable = new Map(rows.map((r) => [r.tld, r.unicode]));
+const label = (tld: string) => `.${readable.get(tld) ?? tld}`;
 
 const SOURCE_LABEL: Record<string, string> = {
   both: 'RDAP + WHOIS',
@@ -29,15 +62,16 @@ const SOURCE_LABEL: Record<string, string> = {
 
 <Base
   title="TLD prices and registries — every TLD ds knows"
-  description={`Registration and renewal prices for ${fmt(counts.priced)} top-level domains, plus the RDAP endpoint or WHOIS server that answers for each of ${fmt(counts.total)} TLDs.`}
+  description={`Registration and renewal prices for ${fmt(counts.priced)} top-level domains, which registrars sell each one, who is eligible to register, and the RDAP endpoint or WHOIS server that answers for each of ${fmt(counts.total)} TLDs.`}
 >
   <div class="wrap page">
     <h1>TLDs &amp; prices</h1>
     <p class="lede muted">
       Every TLD <code>ds</code> carries data for — {fmt(counts.total)} of them — with what
-      each costs to register and which registry answers for it. The prices and servers are
-      read straight out of the binary's own tables, so a figure here is the figure the CLI
-      will use.
+      each costs to register, <a href="#registering">where you can buy one</a>, whether the
+      registry <a href="#who-can-register">lets everyone register</a>, and which registry
+      answers for it. All of it is read straight out of the binary's own tables, so a figure
+      here is the figure the CLI will use.
     </p>
 
     <div class="stats">
@@ -46,13 +80,14 @@ const SOURCE_LABEL: Record<string, string> = {
       <div><strong>{fmt(counts.rdap)}</strong><span>RDAP</span></div>
       <div><strong>{fmt(counts.whois)}</strong><span>WHOIS</span></div>
       <div><strong>{fmt(counts.cctld)}</strong><span>country-code</span></div>
+      <div><strong>{fmt(counts.restricted)}</strong><span>restricted</span></div>
     </div>
 
     <div class="controls">
       <label class="search">
         <span class="visually-hidden">Filter TLDs</span>
         <input
-          type="search" id="q" placeholder="Filter — try io, co.uk, or verisign"
+          type="search" id="q" placeholder="Filter — try io, co.uk, porkbun, or Canadian"
           autocomplete="off" spellcheck="false"
         />
       </label>
@@ -83,11 +118,22 @@ const SOURCE_LABEL: Record<string, string> = {
         </select>
       </label>
       <label>
-        <span class="visually-hidden">Registrability</span>
+        <span class="visually-hidden">Who can register</span>
         <select id="private">
           <option value="">Any zone</option>
           <option value="no">Excluding private ({fmt(counts.total - counts.private)})</option>
+          <option value="restricted">Restricted — eligibility rule ({fmt(counts.restricted)})</option>
           <option value="yes">Private only — .aws, .google ({fmt(counts.private)})</option>
+        </select>
+      </label>
+      <label>
+        <span class="visually-hidden">Sold by</span>
+        <select id="seller">
+          <option value="">Any registrar</option>
+          {sellerOptions.map(([name, n]) => (
+            <option value={name}>{name} ({fmt(n)})</option>
+          ))}
+          <option value="none">Nobody in the table ({fmt(counts.unsold)})</option>
         </select>
       </label>
       <label class="check">
@@ -98,6 +144,19 @@ const SOURCE_LABEL: Record<string, string> = {
       </p>
     </div>
 
+    <div class="namebar" id="registering">
+      <label for="name">Register at</label>
+      <input
+        type="text" id="name" placeholder="mybrand" autocomplete="off" spellcheck="false"
+        aria-describedby="name-hint"
+      />
+      <p class="faint" id="name-hint">
+        A name here points every registrar link at its search for{' '}
+        <code id="name-example">that name</code> — the same page{' '}
+        <code id="name-command">ds mybrand --tld de --where</code> would hand you.
+      </p>
+    </div>
+
     <div class="table-scroll">
       <table id="tbl">
         <thead>
@@ -105,6 +164,7 @@ const SOURCE_LABEL: Record<string, string> = {
             <th aria-sort="ascending"><button type="button" data-sort="tld">TLD</button></th>
             <th class="num"><button type="button" data-sort="price">Register</button></th>
             <th class="num"><button type="button" data-sort="renew">Renew</button></th>
+            <th><button type="button" data-sort="sellers">Register at</button></th>
             <th><button type="button" data-sort="source">Source</button></th>
             <th>Registry</th>
           </tr>
@@ -121,7 +181,10 @@ const SOURCE_LABEL: Record<string, string> = {
               data-kind={r.kind}
               data-level={r.level}
               data-private={r.private ? 'yes' : 'no'}
-              data-search={`${r.tld} ${r.unicode ?? ''} ${host(r.rdapServer) ?? ''} ${r.whoisHost ?? ''} ${r.privateOperator ?? ''}`.toLowerCase()}
+              data-restricted={r.eligibility ? 'yes' : 'no'}
+              data-sellers={r.sellers.map((sl) => sl.registrar).join(' ')}
+              data-sellcount={r.sellers.length}
+              data-search={`${r.tld} ${r.unicode ?? ''} ${host(r.rdapServer) ?? ''} ${r.whoisHost ?? ''} ${r.privateOperator ?? ''} ${r.sellers.map((sl) => sl.registrar).join(' ')} ${r.eligibility?.note ?? ''}`.toLowerCase()}
             >
               <th scope="row" class="tld">
                 {r.unicode ? (
@@ -137,9 +200,35 @@ const SOURCE_LABEL: Record<string, string> = {
                       : 'Reserved — no public registrations'}
                   >private</span>
                 )}
+                {r.eligibility && (
+                  <a
+                    class="tag tag-restricted"
+                    href={`#rule-${r.eligibility.from}`}
+                    title={`${r.eligibility.note}${
+                      r.eligibility.from === r.tld ? '' : ` (the rule .${r.eligibility.from} sets)`
+                    }`}
+                  >restricted</a>
+                )}
               </th>
               <td class="num">{money(r.price)}</td>
               <td class="num faint">{money(r.renew)}</td>
+              <td class="sellers">
+                {r.sellers.length === 0 ? (
+                  <span class="faint" title="No registrar in the bundled price table quotes this TLD">—</span>
+                ) : (
+                  r.sellers.map((sl) =>
+                    sl.home ? (
+                      <a
+                        class="seller" href={sl.home} data-r={sl.registrar}
+                        target="_blank" rel="noopener nofollow" title={sl.registrar}
+                      >{shortName(sl.registrar)} <span class="seller-price">{money(sl.price)}</span></a>
+                    ) : (
+                      <span class="seller" title={sl.registrar}
+                      >{shortName(sl.registrar)} <span class="seller-price">{money(sl.price)}</span></span>
+                    ),
+                  )
+                )}
+              </td>
               <td>
                 <span class={`tag tag-${r.source}`}>{SOURCE_LABEL[r.source]}</span>
               </td>
@@ -150,6 +239,47 @@ const SOURCE_LABEL: Record<string, string> = {
       </table>
       <p class="empty" id="empty" hidden>Nothing matches that filter.</p>
     </div>
+
+    <section class="who" id="who-can-register">
+      <h2>Who can register</h2>
+      <p class="muted intro">
+        {fmt(counts.restricted)} of these TLDs are not open to everyone: the registry asks
+        for residency, a local company, a trade licence or an accreditation before it will
+        sell you a name. A domain reported <code>AVAILABLE</code> under one of them means the
+        label is free, not that you may have it. {ruleGroups.length} rules cover the{' '}
+        {fmt(counts.restricted)}, because sub-zones inherit — <code>.com.au</code> is{' '}
+        <code>.au</code>'s rule.
+      </p>
+      <dl class="rules">
+        {ruleGroups.map((g) => (
+          <div class="rule" id={`rule-${g.from}`}>
+            <dt>
+              <span class="rule-tld">{label(g.from)}</span>
+              {g.tlds.length > 1 && (
+                <span class="rule-also faint">
+                  and {g.tlds.filter((t) => t !== g.from).slice(0, 6).map((t) => label(t)).join(', ')}
+                  {g.tlds.length > 7 && <> +{g.tlds.length - 7} more</>}
+                </span>
+              )}
+            </dt>
+            <dd>
+              {g.rule.note}
+              <a class="rule-src" href={g.rule.source} target="_blank" rel="noopener">
+                {host(g.rule.source)}
+              </a>
+            </dd>
+          </div>
+        ))}
+      </dl>
+      <p class="faint after">
+        These notes are hand-maintained — no registry publishes its rules in a form a program
+        can read — so each one carries the page it was taken from, and that page, not this
+        table, is the authority. They were last checked on {data.eligibilityChecked}, they say
+        what kind of gate exists rather than the exact legal test, and they cover the
+        restricted TLDs a registrar is likely to offer you. <strong>A TLD missing from this
+        list is not thereby open.</strong>
+      </p>
+    </section>
 
     <section class="notes prose">
       <h2>About this data</h2>
@@ -178,6 +308,26 @@ const SOURCE_LABEL: Record<string, string> = {
           <a href="/docs/choosing-the-source#your-own-prices">Your own prices</a>.
         </li>
         <li>
+          <strong>Register at is evidence, not a guess.</strong> Each name there is a
+          registrar whose own price list carries the TLD, cheapest first — nobody quotes a
+          price for something they cannot sell you, which is why <code>.de</code> lists three
+          and <code>.fr</code> two. It is the same list <code>ds --where</code> prints; put a
+          name in the box above the table and each one becomes that registrar's search for
+          it. A <code>—</code> means no registrar in the bundled table quotes
+          the TLD — {fmt(counts.unsold)} of these rows — which is a gap in the table as
+          often as it is a TLD nobody sells. See{' '}
+          <a href="/docs/showing-more#where-to-register">Where to register</a>.
+        </li>
+        <li>
+          <strong>Restricted</strong> marks the {fmt(counts.restricted)} TLDs whose registry
+          will not sell to just anyone — <code>.eu</code> wants an EU registrant,{' '}
+          <code>.ca</code> a Canadian one, <code>.bank</code> a bank. The tag links to the
+          rule and the registry page it came from, all of which are listed under{' '}
+          <a href="#who-can-register">Who can register</a>. Availability and eligibility are
+          different questions, and <code>ds</code> answers the first: it prints the rule
+          beside the name rather than filtering the TLD out.
+        </li>
+        <li>
           <strong>Source</strong> is which protocol answers: RDAP endpoints come from{' '}
           <a href="https://data.iana.org/rdap/dns.json">IANA's bootstrap</a>, refreshed when this
           page is built; WHOIS servers come from the bundled <code>whois.json</code>. RDAP is
@@ -186,10 +336,10 @@ const SOURCE_LABEL: Record<string, string> = {
         <li>
           <strong>Type and level are separate filters</strong>, as they are in the CLI:
           type is measured on the last label (the TLD of <code>co.uk</code> is <code>uk</code>),
-          level is where the name actually sits. So country-code plus second level gives the
-          {fmt(counts.rows2ndCctld)} bare ccTLDs — <code>.de</code>, <code>.io</code>,
-          <code>.jp</code> — while country-code alone also sweeps in <code>.co.uk</code> and
-          <code>.com.au</code>. The CLI spells the same pair
+          level is where the name actually sits. So country-code plus second level gives the{' '}
+          {fmt(counts.rows2ndCctld)} bare ccTLDs — <code>.de</code>, <code>.io</code>,{' '}
+          <code>.jp</code> — while country-code alone also sweeps in <code>.co.uk</code> and{' '}
+          <code>.com.au</code>. The CLI spells the same pair{' '}
           <code>--cctld --level second</code>.
         </li>
         <li>
@@ -202,11 +352,11 @@ const SOURCE_LABEL: Record<string, string> = {
         </li>
         <li>
           <strong>This table is slightly wider than <code>--tld all</code></strong>. That sweep
-          covers the {fmt(counts.total - counts.none)} TLDs with a registry to ask;
+          covers the {fmt(counts.total - counts.none)} TLDs with a registry to ask;{' '}
           {counts.none} more are priced in the bundled table but have neither an RDAP endpoint
           nor a WHOIS server on file — resold third-level suffixes like <code>.co.com</code>,
           and country codes a registrar will sell you whose registry publishes no public
-          lookup at all, like <code>.al</code> and <code>.ao</code>. They are listed here, tagged
+          lookup at all, like <code>.al</code> and <code>.ao</code>. They are listed here, tagged{' '}
           <span class="tag tag-none">neither</span>, and asking for one by name still works if
           IANA can name a server for it.
         </li>
@@ -218,7 +368,7 @@ const SOURCE_LABEL: Record<string, string> = {
           <a href="https://www.icann.org/resources/registries/gtlds/v2/gtlds.json">
             published registry-agreement list
           </a>, where a Specification 13 exemption means exactly that. <code>ds</code> reports
-          those <code>PRIVATE</code> instead of <code>AVAILABLE</code> and leaves them out of
+          those <code>PRIVATE</code> instead of <code>AVAILABLE</code> and leaves them out of{' '}
           <code>--tld all</code>; see{' '}
           <a href="/docs/choosing-tlds#brand-and-reserved-tlds">Brand and reserved TLDs</a>. An
           untagged row is not a promise that the TLD is on sale — only that nothing says it is
@@ -237,6 +387,8 @@ const SOURCE_LABEL: Record<string, string> = {
     </section>
   </div>
 
+  <script type="application/json" id="search-pages" set:html={JSON.stringify(searchPages)} />
+
   <script>
     const tbody = document.querySelector<HTMLTableSectionElement>('#tbl tbody')!;
     const allRows = Array.from(tbody.rows);
@@ -245,7 +397,11 @@ const SOURCE_LABEL: Record<string, string> = {
     const kind = document.querySelector<HTMLSelectElement>('#kind')!;
     const level = document.querySelector<HTMLSelectElement>('#level')!;
     const priv = document.querySelector<HTMLSelectElement>('#private')!;
+    const seller = document.querySelector<HTMLSelectElement>('#seller')!;
     const priced = document.querySelector<HTMLInputElement>('#priced')!;
+    const name = document.querySelector<HTMLInputElement>('#name')!;
+    const example = document.querySelector<HTMLElement>('#name-example')!;
+    const command = document.querySelector<HTMLElement>('#name-command')!;
     const count = document.querySelector<HTMLParagraphElement>('#count')!;
     const empty = document.querySelector<HTMLParagraphElement>('#empty')!;
 
@@ -260,6 +416,7 @@ const SOURCE_LABEL: Record<string, string> = {
       const k = kind.value;
       const lvl = level.value;
       const pv = priv.value;
+      const sv = seller.value;
       const onlyPriced = priced.checked;
       let shown = 0;
 
@@ -271,7 +428,10 @@ const SOURCE_LABEL: Record<string, string> = {
         if (ok && src === 'none') ok = d.source === 'none';
         if (ok && k) ok = d.kind === k;
         if (ok && lvl) ok = d.level === lvl;
-        if (ok && pv) ok = d.private === pv;
+        // The zone select mixes two questions — closed to everyone, or open to
+        // some — because both answer "could I register here at all".
+        if (ok && pv) ok = pv === 'restricted' ? d.restricted === 'yes' : d.private === pv;
+        if (ok && sv) ok = sv === 'none' ? d.sellcount === '0' : (d.sellers ?? '').split(' ').includes(sv);
         if (ok && onlyPriced) ok = d.price !== '';
         row.hidden = !ok;
         if (ok) shown++;
@@ -290,6 +450,12 @@ const SOURCE_LABEL: Record<string, string> = {
 
       const sorted = [...allRows].sort((a, b) => {
         const A = a.dataset, B = b.dataset;
+        if (key === 'sellers') {
+          const x = Number(A.sellcount), y = Number(B.sellcount);
+          // Ascending here means *most* registrars first: sorting the TLDs
+          // nobody sells to the top would be a column of dashes.
+          return (y - x) * sortDir || A.tld!.localeCompare(B.tld!);
+        }
         if (key === 'price' || key === 'renew') {
           const x = num(A[key]), y = num(B[key]);
           // Unpriced TLDs always sort last, whichever way the column is going.
@@ -321,11 +487,47 @@ const SOURCE_LABEL: Record<string, string> = {
       clearTimeout(t);
       t = window.setTimeout(apply, 90);
     });
-    [source, kind, level, priv, priced].forEach((el) => el.addEventListener('change', apply));
+    [source, kind, level, priv, seller, priced].forEach((el) => el.addEventListener('change', apply));
 
-    // Deep-link support: /tlds?q=io
-    const initial = new URLSearchParams(location.search).get('q');
+    // --- registrar links -------------------------------------------------
+    // Each link points at the registrar's own site until a name is given, and
+    // at that registrar's search for name.tld once one is — the same page
+    // `ds <name> --tld <tld> --where` hands you.
+    const searchPages: Record<string, string> = JSON.parse(
+      document.querySelector<HTMLScriptElement>('#search-pages')!.textContent!,
+    );
+    const links = Array.from(document.querySelectorAll<HTMLAnchorElement>('a.seller')).map((a) => ({
+      a,
+      tld: (a.closest('tr') as HTMLTableRowElement).dataset.tld!,
+      registrar: a.dataset.r!,
+    }));
+
+    /** What a registrar's search will accept: a label, not a sentence. */
+    const clean = (s: string) => s.trim().toLowerCase().replace(/[^a-z0-9-]/g, '');
+
+    function fillLinks() {
+      const n = clean(name.value);
+      example.textContent = n ? `${n}.de` : 'that name';
+      command.textContent = `ds ${n || 'mybrand'} --tld de --where`;
+      for (const { a, tld, registrar } of links) {
+        const tpl = searchPages[registrar];
+        a.href = n && tpl ? tpl.replace('{domain}', `${n}.${tld}`) : `https://${registrar}/`;
+      }
+    }
+
+    let nt: number;
+    name.addEventListener('input', () => {
+      clearTimeout(nt);
+      nt = window.setTimeout(fillLinks, 150);
+    });
+
+    // Deep-link support: /tlds?q=io&name=mybrand
+    const params = new URLSearchParams(location.search);
+    const initial = params.get('q');
     if (initial) { q.value = initial; }
+    const initialName = params.get('name');
+    if (initialName) { name.value = clean(initialName); }
+    fillLinks();
     apply();
   </script>
 </Base>
@@ -335,7 +537,7 @@ const SOURCE_LABEL: Record<string, string> = {
   .lede { font-size: 1.05rem; max-width: 70ch; margin-top: -.5rem; }
 
   .stats {
-    display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 1rem;
+    display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 1rem;
     padding: 1.25rem 0; border-block: 1px solid var(--border); margin: 1.75rem 0;
   }
   @media (max-width: 640px) { .stats { grid-template-columns: repeat(3, 1fr); gap: 1rem; } }
@@ -425,6 +627,65 @@ const SOURCE_LABEL: Record<string, string> = {
   .tag-whois { color: var(--unknown);   border-color: color-mix(in srgb, var(--unknown) 40%, transparent); }
   .tag-none  { color: var(--fg-faint); }
   .tag-private { color: var(--taken); border-color: color-mix(in srgb, var(--taken) 40%, transparent); margin-left: .4rem; }
+  .tag-restricted {
+    color: var(--unknown); border-color: color-mix(in srgb, var(--unknown) 40%, transparent);
+    margin-left: .4rem; text-decoration: none;
+  }
+  a.tag-restricted:hover { background: color-mix(in srgb, var(--unknown) 12%, transparent); }
+  a.tag-restricted:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+  /* The name box sits with the column it drives rather than in the filter bar:
+     it changes where the links go, not which rows are shown. */
+  .namebar {
+    display: flex; flex-wrap: wrap; align-items: baseline; gap: .5rem .75rem;
+    margin: 0 0 .75rem;
+  }
+  .namebar label { font-size: .85rem; font-weight: 600; color: var(--fg-muted); }
+  .namebar input {
+    font: inherit; font-family: var(--mono); font-size: .88rem;
+    padding: .35rem .6rem; border-radius: 6px; width: 11rem;
+    border: 1px solid var(--border-strong); background: var(--surface); color: var(--fg);
+  }
+  .namebar input:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+  .namebar p { margin: 0; font-size: .82rem; flex: 1 1 20rem; }
+
+  /* Chips, not a list: four registrars on one line beats four lines per row
+     across 1,800 rows. */
+  #tbl .sellers { max-width: 24rem; }
+  .seller {
+    display: inline-block; margin: .1rem .3rem .1rem 0;
+    font-family: var(--mono); font-size: .78rem; white-space: nowrap;
+    padding: .1rem .4rem; border-radius: 4px;
+    border: 1px solid var(--border); color: var(--fg-muted); text-decoration: none;
+  }
+  a.seller:hover { border-color: var(--border-strong); color: var(--fg); background: var(--bg-soft); }
+  a.seller:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+  .seller-price { color: var(--fg-faint); font-variant-numeric: tabular-nums; }
+
+  .who { margin-top: 3rem; }
+  .who .intro, .who .after { max-width: var(--measure); }
+  .who .after { font-size: .88rem; margin-top: 1.25rem; }
+  .rules {
+    margin: 1.5rem 0 0; border: 1px solid var(--border); border-radius: var(--radius);
+    overflow: hidden;
+  }
+  /* The restricted tags in the table link down here, and the filter bar is
+     still pinned over the page — clear both it and the site header. */
+  .rule { display: grid; grid-template-columns: 14rem 1fr; gap: 0 1.25rem; padding: .8rem 1rem; scroll-margin-top: 9rem; }
+  .rule + .rule { border-top: 1px solid var(--border); }
+  .rule:target { background: var(--bg-soft); box-shadow: inset 3px 0 0 var(--accent); }
+  .rule dt { display: flex; flex-direction: column; gap: .15rem; min-width: 0; }
+  .rule dd { margin: 0; font-size: .92rem; }
+  .rule-tld { font-family: var(--mono); font-weight: 550; font-size: .92rem; }
+  .rule-also { font-size: .76rem; font-family: var(--mono); line-height: 1.4; }
+  .rule-src { display: block; margin-top: .3rem; font-size: .78rem; font-family: var(--mono); }
+  @media (max-width: 720px) {
+    /* The filter bar stops being sticky here, so only the header is in the way. */
+    .rule { scroll-margin-top: 5rem; }
+  }
+  @media (max-width: 640px) {
+    .rule { grid-template-columns: 1fr; gap: .35rem; }
+  }
 
   .empty { padding: 2rem; text-align: center; color: var(--fg-muted); }
   .notes { margin-top: 3rem; max-width: var(--measure); }

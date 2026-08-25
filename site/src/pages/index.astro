@@ -33,6 +33,10 @@ const features = [
     body: `Registration and renewal prices for ${fmt(counts.priced)} TLDs ship inside the binary, from ${'$'}${priceRange.min} to ${'$'}${fmt(priceRange.max)} a year. Bring your own table when you have real quotes.`,
   },
   {
+    title: 'Where to register, and who may',
+    body: `--where names the registrars whose own price list proves they sell the TLD, cheapest first, and prints the registry's eligibility rule before them — ${fmt(counts.restricted)} TLDs want residency, a local company or an accreditation before they will sell you a name.`,
+  },
+  {
     title: 'Paces itself',
     body: 'Hundreds of TLDs sit behind a handful of servers. ds caps concurrency per host, backs off on 403 and 429, and stops querying a server that keeps refusing rather than burning the run on doomed retries.',
   },

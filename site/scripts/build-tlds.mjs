@@ -1,10 +1,11 @@
 // Builds src/data/tlds.json: one row per TLD, unioned from the sources `ds`
-// itself consults — the bundled whois.json, pricing.json and private-tlds.json,
-// plus IANA's RDAP bootstrap. Run by `npm run gen` (and so by predev/prebuild).
+// itself consults — the bundled whois.json, pricing.json, private-tlds.json and
+// eligibility.json, plus IANA's RDAP bootstrap. Run by `npm run gen` (and so by
+// predev/prebuild).
 
 import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
-import { fileURLToPath, domainToUnicode } from 'node:url';
+import { fileURLToPath, domainToASCII, domainToUnicode } from 'node:url';
 import { dirname, resolve } from 'node:path';
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -13,8 +14,50 @@ const dataDir = resolve(here, '../src/data');
 const BOOTSTRAP_URL = 'https://data.iana.org/rdap/dns.json';
 const FALLBACK = resolve(dataDir, 'rdap-dns.json');
 
-/** `.CO.UK` / `co.uk` / `.com` -> `co.uk` / `com`. Mirrors normalize_tld in src/tlds.rs. */
-const normalize = (s) => s.trim().replace(/^\.+|\.+$/g, '').toLowerCase();
+/**
+ * `.CO.UK` / `co.uk` / `.com` -> `co.uk` / `com`, as normalize_tld in
+ * src/tlds.rs does, plus the punycode the CLI applies to every name it looks
+ * up: whois.json spells one TLD `.বাংলা` where pricing.json and
+ * eligibility.json spell it `xn--54b7fta0cc`, and without this the two halves
+ * land on two rows that each know half the story.
+ */
+const normalize = (s) => {
+  const bare = s.trim().replace(/^\.+|\.+$/g, '').toLowerCase();
+  return domainToASCII(bare) || bare;
+};
+
+/**
+ * Where a registrar's search lives, mirroring SEARCH_PAGES in src/registration.rs
+ * so the site links a name to the same page `ds ... --where` would. `{domain}`
+ * is filled in by the visitor's own name on the page; a registrar with no entry
+ * is still named, and links to its own site.
+ */
+const SEARCH_PAGES = {
+  'namecheap.com': 'https://www.namecheap.com/domains/registration/results/?domain={domain}',
+  'porkbun.com': 'https://porkbun.com/checkout/search?q={domain}',
+  'dynadot.com': 'https://www.dynadot.com/domain/search?domain={domain}',
+  'namesilo.com': 'https://www.namesilo.com/domain/search-domains?query={domain}',
+};
+
+/** A registrar named by hostname gets a link home; a trading name gets none. */
+const homepage = (registrar) =>
+  /^[a-z0-9-]+(\.[a-z0-9-]+)+$/.test(registrar) ? `https://${registrar}/` : null;
+
+/**
+ * Look a TLD up longest suffix first — `com.au`, then `au` — exactly as
+ * lookup_suffix in src/tlds.rs does, so a sub-zone inherits the rule above it.
+ * Returns the entry and the TLD it was found under.
+ */
+function lookupSuffix(tld, table) {
+  let rest = tld;
+  for (;;) {
+    const hit = table.get(rest);
+    if (hit) return { hit, from: rest };
+    const dot = rest.indexOf('.');
+    if (dot < 0) return null;
+    rest = rest.slice(dot + 1);
+  }
+}
 
 /**
  * Sort a TLD into one of three mutually exclusive kinds, measured on the last
@@ -91,11 +134,16 @@ for (const [key, offers] of Object.entries(await readJson(resolve(repo, 'pricing
     renew: mean('renew'),
     transfer: mean('transfer'),
     // Whoever quoted a *registration* price, which is what the column shows —
-    // the same count the CLI reports as `registrars`. A registrar that only
-    // published a renewal is in the file but not behind that figure.
-    registrars: [
-      ...new Set(offers.filter((o) => typeof o?.prices?.regular === 'number').map((o) => o.register).filter(Boolean)),
-    ],
+    // the same list `--where` reads to say who sells the TLD, cheapest first.
+    // A registrar that only published a renewal is in the file but behind
+    // neither the figure nor the "register at" column. Mirrors summarise() in
+    // src/pricing.rs, negative prices and anonymous quotes included.
+    sellers: offers
+      .filter((o) => typeof o?.prices?.regular === 'number' && Number.isFinite(o.prices.regular) && o.prices.regular >= 0)
+      .map((o) => ({ registrar: String(o.register ?? '').trim().toLowerCase(), price: Math.round(o.prices.regular * 100) / 100 }))
+      .filter((o) => o.registrar)
+      .sort((a, b) => a.price - b.price || a.registrar.localeCompare(b.registrar))
+      .map((o) => ({ ...o, search: SEARCH_PAGES[o.registrar] ?? null, home: homepage(o.registrar) })),
   });
 }
 
@@ -107,6 +155,19 @@ const privFile = await readJson(resolve(repo, 'private-tlds.json'));
 for (const e of privFile.tlds) {
   priv.set(normalize(e.tld), { kind: e.kind, operator: e.operator ?? null });
 }
+
+// --- eligibility.json: who a registry will actually sell to ---
+// Hand-maintained, unlike every other table here, and read longest suffix
+// first so com.au inherits .au's Australian presence rule. See src/registration.rs.
+const eligibility = new Map();
+const eligFile = await readJson(resolve(repo, 'eligibility.json'));
+for (const [tld, rule] of Object.entries(eligFile.tlds)) {
+  eligibility.set(normalize(tld), rule);
+}
+// "Sources last checked 2026-08-25." from the file's own preamble, so the page
+// dates the rules by when they were verified rather than by when it was built.
+const eligChecked =
+  [eligFile._about ?? []].flat().join(' ').match(/last checked (\d{4}-\d{2}-\d{2})/)?.[1] ?? null;
 
 // --- IANA RDAP bootstrap: [[["com","net"], ["https://..."]], ...] ---
 const rdap = new Map();
@@ -140,7 +201,17 @@ const rows = [...new Set([...whois.keys(), ...pricing.keys(), ...rdap.keys()])]
       price: p.price ?? null,
       renew: p.renew ?? null,
       transfer: p.transfer ?? null,
-      registrars: p.registrars ?? [],
+      // The registrars whose published price proves they sell this TLD,
+      // cheapest first — what `--where` prints as `register at`. Empty means
+      // nobody in the table quotes it, not that nobody sells it.
+      sellers: p.sellers ?? [],
+      // The registry's own rule about who may register, plus `from`: the TLD
+      // the rule was found under, which for com.au is au. null where the
+      // hand-maintained list has no entry — which is not a claim of openness.
+      eligibility: (() => {
+        const e = lookupSuffix(tld, eligibility);
+        return e ? { note: e.hit.note, source: e.hit.source, from: e.from } : null;
+      })(),
       // Mirrors the real fall-through: RDAP first, WHOIS second.
       source: r && w ? 'both' : r ? 'rdap' : w ? 'whois' : 'none',
       rdapServer: r ?? null,
@@ -168,7 +239,19 @@ const out = {
     rows2ndCctld: rows.filter((r) => r.kind === 'cctld' && r.level === 2).length,
     // Priced, but with no registry to ask — so outside what `--tld all` sweeps.
     none: rows.filter((r) => r.source === 'none').length,
+    // TLDs carrying an eligibility rule, their own or one inherited from above.
+    restricted: rows.filter((r) => r.eligibility).length,
+    // TLDs nobody in the price table sells, so `--where` has no one to name.
+    unsold: rows.filter((r) => r.sellers.length === 0).length,
   },
+  // Registrar -> how many TLDs it quotes a registration price for.
+  sellers: Object.fromEntries(
+    [...rows.flatMap((r) => r.sellers.map((s) => s.registrar))]
+      .sort()
+      .reduce((m, name) => m.set(name, (m.get(name) ?? 0) + 1), new Map()),
+  ),
+  // When the eligibility notes were last checked against the registry pages.
+  eligibilityChecked: eligChecked,
   priceRange: {
     min: Math.min(...priced.map((r) => r.price)),
     max: Math.max(...priced.map((r) => r.price)),
@@ -177,7 +260,10 @@ const out = {
 };
 
 await writeFile(resolve(dataDir, 'tlds.json'), JSON.stringify(out));
-const { total, priced: np, cctld: nc, gtld: ng, idn: ni, private: nv } = out.counts;
+const { total, priced: np, cctld: nc, gtld: ng, idn: ni, private: nv, restricted: nr } = out.counts;
 console.log(
-  `  tlds     ${total} rows — ${np} priced; ${ng} gTLD, ${nc} ccTLD, ${ni} IDN; ${nv} private`,
+  `  tlds     ${total} rows — ${np} priced; ${ng} gTLD, ${nc} ccTLD, ${ni} IDN; ${nv} private, ${nr} restricted`,
+);
+console.log(
+  `  sellers  ${Object.entries(out.sellers).map(([r, n]) => `${r} ${n}`).join(', ')}`,
 );
