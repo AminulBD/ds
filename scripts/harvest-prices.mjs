@@ -32,6 +32,18 @@
 //              and quotes in USD. robots.txt allows it; requests are
 //              rate-limited and carry an honest User-Agent.
 //
+//   get.bd     https://get.bd/pricing.php
+//              A BTCL-accredited registrar, and the only source found that
+//              prices the .bd family at all — the second-level zones
+//              (.com.bd, .org.bd, ...) that a Bangladeshi actually registers
+//              are absent from every USD source. Server-rendered HTML; the
+//              page answers 406 to a plain request and needs a browser
+//              User-Agent and Accept header, so it gets one. The page states
+//              the prices are BTCL's, not the registrar's own markup.
+//
+//              It quotes BDT, so it is the one source that is converted —
+//              see PRICES, HONESTLY below.
+//
 //   namecheap  NOT harvested. Namecheap's price list page answers 403 to
 //              anything without a browser fingerprint, and their pricing API
 //              needs an account key plus an IP allowlist. The namecheap.com
@@ -42,8 +54,16 @@
 //
 // PRICES, HONESTLY
 //
-//   * Every source above quotes USD. Nothing is currency-converted, and a
-//     source that did not quote USD would be left out rather than mixed in.
+//   * Every source above quotes USD except get.bd, which quotes BDT. That one
+//     is converted, because the alternative is that ds prices .bd off a single
+//     foreign reseller at eight times the registry's own list price and prices
+//     .com.bd not at all. Conversion is not silent: each converted offer keeps
+//     the figure the source published, the rate, and the date, in a `quoted`
+//     block beside the USD `prices`, so a reader can tell a derived number
+//     from a quoted one and re-derive the original. The rate is fetched at run
+//     time from a named source and the run fails rather than fall back to a
+//     stale constant. A converted price still drifts between harvests; the
+//     `quoted.as_of` date is what says how far.
 //   * `prices.regular` is the registrar's published *first-year* list price,
 //     which at every registrar can sit well below the renewal price (.site is
 //     a couple of dollars to register and forty-odd to renew). It is the
@@ -58,7 +78,7 @@
 
 import { readFile, writeFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { domainToASCII, fileURLToPath } from 'node:url';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const repo = resolve(here, '..');
@@ -68,6 +88,20 @@ const ROOT_ZONE_URL = 'https://data.iana.org/TLD/tlds-alpha-by-domain.txt';
 const PORKBUN_URL = 'https://api.porkbun.com/api/json/v3/pricing/get';
 const D101_SITEMAP = 'https://www.101domain.com/sitemap.xml';
 const D101_PAGE = (tld) => `https://www.101domain.com/${tld}.htm`;
+const GETBD_URL = 'https://get.bd/pricing.php';
+// exchangerate-api's free endpoint: no key, dated, and it names its provider
+// in the response. Fetched per run so no rate is ever baked into the repo.
+const FX_URL = 'https://open.er-api.com/v6/latest/USD';
+
+// get.bd answers 406 to anything that does not look like a browser. This is
+// not a paywall or a robots.txt refusal — the page is public and linked from
+// their nav — so it gets browser headers rather than being dropped.
+const BROWSER_HEADERS = {
+  'user-agent':
+    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36',
+  accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+  'accept-language': 'en-US,en;q=0.9',
+};
 
 // --- options ---------------------------------------------------------------
 
@@ -79,7 +113,7 @@ const flag = (name, fallback) => {
 const has = (name) => args.includes(`--${name}`);
 
 const opts = {
-  sources: String(flag('sources', 'porkbun,101domain')).split(',').map((s) => s.trim()).filter(Boolean),
+  sources: String(flag('sources', 'porkbun,101domain,getbd')).split(',').map((s) => s.trim()).filter(Boolean),
   out: resolve(repo, flag('out', 'pricing.json')),
   // Milliseconds between the *start* of one 101domain request and the next.
   // ~2.5 req/s over ~1,300 pages: a few minutes, and gentle on the host.
@@ -89,7 +123,7 @@ const opts = {
 };
 
 if (has('help')) {
-  console.log(`usage: node scripts/harvest-prices.mjs [--sources porkbun,101domain]
+  console.log(`usage: node scripts/harvest-prices.mjs [--sources porkbun,101domain,getbd]
        [--out pricing.json] [--delay ms] [--concurrency n] [--dry-run]`);
   process.exit(0);
 }
@@ -108,11 +142,14 @@ const money = (v) => {
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
-async function get(url, { as = 'text', retries = 2 } = {}) {
+async function get(url, { as = 'text', retries = 2, headers } = {}) {
   for (let attempt = 0; ; attempt++) {
     try {
       const res = await fetch(url, {
-        headers: { 'user-agent': UA, accept: as === 'json' ? 'application/json' : 'text/html,*/*' },
+        headers: headers ?? {
+          'user-agent': UA,
+          accept: as === 'json' ? 'application/json' : 'text/html,*/*',
+        },
         signal: AbortSignal.timeout(30_000),
       });
       if (res.status === 404) return null; // A page that is not there is an answer.
@@ -279,7 +316,91 @@ function parse101(html, expected) {
   };
 }
 
-const SOURCES = { porkbun, '101domain': d101domain };
+/**
+ * Today's USD rate for `code`, from a named, dated source.
+ *
+ * Deliberately has no fallback. A stale hardcoded rate would keep the harvest
+ * green while quietly writing wrong prices, which is worse than not writing
+ * them: if the rate cannot be had, the run stops and .bd keeps whatever it had
+ * before.
+ */
+async function usdRate(code) {
+  const json = await get(FX_URL, { as: 'json' });
+  const rate = Number(json?.rates?.[code]);
+  if (json?.result !== 'success' || !Number.isFinite(rate) || rate <= 0) {
+    throw new Error(`${FX_URL}: no usable ${code} rate in the response`);
+  }
+  // A rate off by an order of magnitude turns a $12 domain into $120 without
+  // anything looking wrong, so bound it rather than trust the feed blindly.
+  if (rate < 1 || rate > 100_000) throw new Error(`${FX_URL}: implausible USD->${code} rate ${rate}`);
+  return {
+    rate,
+    // ISO, like the `generated` stamp in private-tlds.json — a date in a data
+    // file should sort and parse, not just read.
+    as_of: Number.isFinite(json.time_last_update_unix)
+      ? new Date(json.time_last_update_unix * 1000).toISOString().slice(0, 10)
+      : null,
+    provider: json.provider ?? FX_URL,
+  };
+}
+
+/**
+ * get.bd's price list — one card per extension:
+ *
+ *   <h3 ...>.com.bd</h3>
+ *   <span ...>৳805</span> <span ...>/1st yr</span>
+ *   <p ...>Renew: ৳1,840/yr</p>
+ *
+ * The page publishes no transfer price for any extension, so none is recorded
+ * rather than one being guessed from the registration price.
+ */
+async function getbd(root) {
+  const [html, fx] = await Promise.all([
+    get(GETBD_URL, { headers: BROWSER_HEADERS }),
+    usdRate('BDT'),
+  ]);
+  console.log(`  get.bd   1 USD = ${fx.rate} BDT (${fx.provider}, ${fx.as_of ?? 'undated'})`);
+
+  const offers = new Map();
+  let skipped = 0;
+  for (const card of html.split(/<h3\b/).slice(1)) {
+    const heading = card.match(/^[^>]*>\s*(\.[^<\s]+)\s*</)?.[1];
+    if (!heading) continue;
+    // The page prints Unicode; pricing.json is keyed in punycode like the
+    // eight other IDN TLDs already in it, so .বাংলা lands as xn--54b7fta0cc.
+    const tld = normalize(domainToASCII(normalize(heading)) || heading);
+    if (!tld || !root.has(apex(tld))) {
+      skipped++;
+      continue;
+    }
+    const taka = (re) => money(card.match(re)?.[1]?.replace(/,/g, ''));
+    const regularBdt = taka(/৳\s*([\d,]+)\s*<\/span>/);
+    const renewBdt = taka(/Renew:\s*৳\s*([\d,]+)/);
+    if (regularBdt === null) continue;
+
+    const usd = (bdt) => (bdt === null ? null : Math.round((bdt / fx.rate) * 100) / 100);
+    offers.set(tld, {
+      register: 'get.bd',
+      prices: { regular: usd(regularBdt), renew: usd(renewBdt), transfer: null },
+      // What the source actually said, so the conversion is checkable and a
+      // re-harvest converts BDT again rather than USD-of-a-USD.
+      quoted: {
+        currency: 'BDT',
+        regular: regularBdt,
+        renew: renewBdt,
+        rate: fx.rate,
+        as_of: fx.as_of,
+        source: GETBD_URL,
+      },
+    });
+  }
+
+  if (!offers.size) throw new Error('get.bd: no prices parsed — the page has most likely been reshaped');
+  console.log(`  get.bd   ${offers.size} TLDs priced, converted from BDT${skipped ? ` (${skipped} headings skipped)` : ''}`);
+  return offers;
+}
+
+const SOURCES = { porkbun, '101domain': d101domain, getbd };
 
 // --- merge and write -------------------------------------------------------
 
@@ -341,7 +462,11 @@ const out = {};
 for (const tld of [...table.keys()].sort()) {
   const offers = [...table.get(tld).values()]
     .sort((a, b) => a.register.localeCompare(b.register))
-    .map((o) => ({ register: o.register, prices: clean(o.prices) }))
+    // `quoted` rides along untouched, both for offers harvested this run and
+    // for ones carried over from a source this run did not touch — dropping it
+    // would strip the provenance off every converted price the moment someone
+    // re-harvested porkbun alone.
+    .map((o) => ({ register: o.register, prices: clean(o.prices), ...(o.quoted ? { quoted: o.quoted } : {}) }))
     .filter((o) => Object.keys(o.prices).length);
   if (offers.length) out[tld] = offers;
 }

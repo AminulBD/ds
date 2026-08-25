@@ -43,6 +43,54 @@
       "note": "US nexus: the registrant must live in, be organised in, or have a genuine connection to the United States",
       "source": "https://www.about.us/policies"
     },
+    "bd": {
+      "note": "Bangladeshi presence: a citizen with an NID or passport, a business with a trade licence, a registered NGO, a government body, or a foreign entity acting through a local representative",
+      "source": "https://get.bd/policy.php"
+    },
+    "com.bd": {
+      "note": "Bangladeshi presence plus a registered business: a trade licence or certificate of incorporation",
+      "source": "https://get.bd/documents.php"
+    },
+    "net.bd": {
+      "note": "Bangladeshi presence plus a registered business: a trade licence or certificate of incorporation",
+      "source": "https://get.bd/documents.php"
+    },
+    "co.bd": {
+      "note": "Bangladeshi presence plus a registered business: a trade licence or certificate of incorporation",
+      "source": "https://get.bd/documents.php"
+    },
+    "ai.bd": {
+      "note": "Bangladeshi presence plus a registered business: a trade licence or certificate of incorporation",
+      "source": "https://get.bd/documents.php"
+    },
+    "org.bd": {
+      "note": "registered Bangladeshi NGOs, trusts and non-profits only; resale, parking for profit and leasing are prohibited",
+      "source": "https://get.bd/policy.php"
+    },
+    "edu.bd": {
+      "note": "Bangladeshi educational institutions only; resale, parking for profit and leasing are prohibited",
+      "source": "https://get.bd/policy.php"
+    },
+    "sch.bd": {
+      "note": "Bangladeshi schools and educational institutions only",
+      "source": "https://get.bd/documents.php"
+    },
+    "id.bd": {
+      "note": "individual Bangladeshi citizens only, aged 18 or over; resale, parking for profit and leasing are prohibited",
+      "source": "https://get.bd/policy.php"
+    },
+    "gov.bd": {
+      "note": "Bangladeshi government and semi-government bodies only; not sold to the public and not on the registry's price list",
+      "source": "https://get.bd/policy.php"
+    },
+    "mil.bd": {
+      "note": "Bangladeshi armed forces only; not sold to the public and not on the registry's price list",
+      "source": "https://www.iana.org/domains/root/db/bd.html"
+    },
+    "xn--54b7fta0cc": {
+      "note": "Bangladeshi presence, as for .bd; the label must be in Bengali script, and Latin characters are not accepted",
+      "source": "https://get.bd/policy.php"
+    },
     "br": {
       "note": "Brazilian presence: a CPF or CNPJ tax registration is required, and a foreign company needs a local representative",
       "source": "https://registro.br/dominio/regras/"
