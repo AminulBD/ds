@@ -11,6 +11,8 @@ mod pricing;
 mod private;
 mod rdap;
 mod registration;
+#[cfg(feature = "serve")]
+mod serve;
 mod tlds;
 mod whois;
 
@@ -38,6 +40,9 @@ use whois::TldInfo;
 const USER_AGENT: &str = concat!("ds/", env!("CARGO_PKG_VERSION"), " (domain-search)");
 
 #[derive(Parser, Debug)]
+// `ds serve` is a subcommand, but `names` is a required positional: without
+// this a subcommand would still be told to provide one.
+#[cfg_attr(feature = "serve", command(subcommand_negates_reqs = true))]
 #[command(
     name = "ds",
     version,
@@ -56,6 +61,12 @@ const USER_AGENT: &str = concat!("ds/", env!("CARGO_PKG_VERSION"), " (domain-sea
                   ds apple.com --details --registry"
 )]
 struct Args {
+    /// Subcommands. Only `serve`, and only in a build with that feature on,
+    /// so a default build's parsing is exactly what it was before.
+    #[cfg(feature = "serve")]
+    #[command(subcommand)]
+    command: Option<Command>,
+
     /// Name(s) to check: `apple`, `apple,orange,bangla`, `@names.txt`, or
     /// several arguments. A full domain (`apple.com`) is checked as-is when
     /// --tld is omitted.
@@ -214,6 +225,16 @@ struct Args {
     version: Option<bool>,
 }
 
+/// The one subcommand `ds` has. A bare name still parses as a name, so
+/// `ds apple --tld com` is untouched; the cost is that the *name* `serve`
+/// now needs `ds serve.com` or `ds -- serve`.
+#[cfg(feature = "serve")]
+#[derive(clap::Subcommand, Debug)]
+enum Command {
+    /// Serve the domain checks over HTTP instead of checking a name.
+    Serve(serve::ServeArgs),
+}
+
 /// Which level of the tree a name is registered at.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, ValueEnum)]
 enum Level {
@@ -303,9 +324,10 @@ enum ListMode {
 }
 
 /// Which lookup source a run is allowed to use.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, ValueEnum)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default, ValueEnum)]
 enum Source {
     /// RDAP, then the bundled WHOIS table, then an IANA referral.
+    #[default]
     Auto,
     /// RDAP only.
     Rdap,
@@ -315,8 +337,38 @@ enum Source {
 
 static COLOR: AtomicBool = AtomicBool::new(false);
 
+/// The flags that change what a single lookup does, split out of `Args` so
+/// that something other than the CLI — `ds serve` — can drive `check` without
+/// having to fabricate a whole command line.
+#[derive(Debug, Clone, Copy, Default)]
+struct Lookup {
+    source: Source,
+    whois: bool,
+    details: bool,
+    registry: bool,
+    show_where: bool,
+    no_iana: bool,
+    raw: bool,
+    json: bool,
+}
+
+impl From<&Args> for Lookup {
+    fn from(a: &Args) -> Self {
+        Self {
+            source: a.source,
+            whois: a.whois,
+            details: a.details,
+            registry: a.registry,
+            show_where: a.show_where,
+            no_iana: a.no_iana,
+            raw: a.raw,
+            json: a.json,
+        }
+    }
+}
+
 struct Ctx {
-    args: Args,
+    opts: Lookup,
     client: reqwest::Client,
     limiter: HostLimiter,
     bootstrap: Bootstrap,
@@ -369,6 +421,14 @@ async fn main() {
 
 async fn run() -> Result<()> {
     let mut args = Args::parse();
+
+    // The server takes the process over, so it is dispatched before any of the
+    // CLI's own setup runs.
+    #[cfg(feature = "serve")]
+    if let Some(Command::Serve(serve_args)) = args.command.take() {
+        return serve::run(serve_args).await;
+    }
+
     if args.all_info {
         args.details = true;
         args.registry = true;
@@ -509,7 +569,7 @@ async fn run() -> Result<()> {
 
     let ctx = Arc::new(Ctx {
         limiter: HostLimiter::new(args.per_host),
-        args,
+        opts: Lookup::from(&args),
         client,
         bootstrap,
         registry,
@@ -533,7 +593,7 @@ async fn run() -> Result<()> {
 
     while let Some((i, result)) = stream.next().await {
         if !quiet && !json && !(available_only && result.status != Status::Available) {
-            print_result(&ctx.args, &result);
+            print_result(&args, &result);
         }
         results.push((i, result));
     }
@@ -546,8 +606,8 @@ async fn run() -> Result<()> {
     }
 
     // Saving is opt-in; asking for a directory or an append is asking to save.
-    let written = if ctx.args.save || ctx.args.out_dir.is_some() || ctx.args.append {
-        save(&ctx.args, &results)?
+    let written = if args.save || args.out_dir.is_some() || args.append {
+        save(&args, &results)?
     } else {
         Vec::new()
     };
@@ -789,7 +849,7 @@ fn dedup(items: Vec<String>) -> Vec<String> {
 
 async fn check(ctx: &Ctx, domain: String, tld: String) -> CheckResult {
     let started = Instant::now();
-    let args = &ctx.args;
+    let args = &ctx.opts;
 
     let mut status = Status::Unknown;
     let mut method = Method::None;
@@ -1565,5 +1625,34 @@ mod tests {
         let names = expand_names(&args(&[&format!("@{}", path.display())])).unwrap();
         std::fs::remove_file(&path).ok();
         assert_eq!(names, ["apple", "orange", "bangla", "english"]);
+    }
+
+    /// Adding a subcommand to a command whose only positional is a required
+    /// list of names is the risky part of `ds serve`, so it is pinned here.
+    #[cfg(feature = "serve")]
+    #[test]
+    fn the_serve_subcommand_leaves_name_parsing_alone() {
+        let a = Args::try_parse_from(["ds", "apple", "--tld", "com"]).unwrap();
+        assert!(a.command.is_none());
+        assert_eq!(a.names, ["apple"]);
+        assert_eq!(a.tld.as_deref(), Some("com"));
+
+        // Names that happen to collide with a flag value are unaffected too.
+        let many = Args::try_parse_from(["ds", "apple", "serverless", "--tld", "com"]).unwrap();
+        assert_eq!(many.names, ["apple", "serverless"]);
+
+        // `ds` with nothing at all still asks for a name rather than starting
+        // a server or doing nothing.
+        assert!(Args::try_parse_from(["ds"]).is_err());
+
+        let s = Args::try_parse_from(["ds", "serve", "--port", "9000"]).unwrap();
+        assert!(matches!(s.command, Some(Command::Serve(_))));
+        assert!(s.names.is_empty());
+
+        // The cost of the subcommand: checking the *name* `serve` needs `--`
+        // (or a TLD on the end).
+        let escaped = Args::try_parse_from(["ds", "--", "serve"]).unwrap();
+        assert!(escaped.command.is_none());
+        assert_eq!(escaped.names, ["serve"]);
     }
 }
