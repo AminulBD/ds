@@ -457,13 +457,14 @@ async function main() {
       ...(g?.removalDate ? { removed: g.removalDate } : {}),
       in_root_zone: inRootZone,
       categories: categorize(tld, { rootDb: db, icann: g, inRootZone }),
+      // What the TLD is for, from the hand-maintained taxonomy. Next to
+      // `categories` because they read together, but deliberately its own
+      // field: one is a fact about the root zone, the other is a reading.
+      ...(topics.has(tld) ? { topics: topics.get(tld) } : {}),
       // From the TLD's own IANA delegation record, under --deep. Absent
       // otherwise, so a shallow run does not read as a registry with nothing
       // published about it.
       ...(deep.has(tld) ? { delegation: deep.get(tld) } : {}),
-      // What the TLD is for, from the hand-maintained taxonomy. Deliberately a
-      // separate field from `categories`: one is a fact, the other a reading.
-      ...(topics.has(tld) ? { topics: topics.get(tld) } : {}),
     };
   }
 
