@@ -147,9 +147,23 @@ Query WHOIS as well and print the raw record.
 Look up A, AAAA, NS, MX, TXT, CNAME and SOA records.
 .TP
 .B \-\-where
-For available domains, print the registry operator, its official registration
-page (both from IANA's record for the TLD) and registrar searches with the name
-filled in.
+For available domains, print the registry operator and its official registration
+page (both from IANA's record for the TLD), any registration restriction the
+TLD carries, and the registrars that sell it.
+.IP
+The registrars are those that publish a price for the TLD in the bundled
+.IR pricing.json ,
+cheapest first, each with its search page and its own price: a published price
+is evidence that the registrar can sell you the name, and a TLD none of them
+price says so rather than offering links that lead nowhere.
+.IP
+A restriction is printed before them, from the bundled
+.IR eligibility.json ,
+together with the registry page it was taken from \(em a name being free says
+nothing about whether the registry would let you have it. That file is
+hand-maintained and not exhaustive: a TLD missing from it is not thereby open.
+Both tables are bundled, so this part of the output survives
+.BR \-\-no\-iana .
 .TP
 .B \-\-raw
 Include the raw RDAP JSON.
@@ -246,9 +260,13 @@ uses the custom table alone.
 .BR \-\-pricing\-file " " \fIPATH\fR
 Custom price table, in the same format as the bundled
 .IR pricing.json :
-a TLD mapped to a list of registrar entries, each with a register label and a
+a TLD mapped to a list of registrar entries, each with a register name and a
 prices object holding regular and renew. Where several registrars quote a TLD,
 the column shows the mean. Any price may be omitted or null for "not sold".
+The register name is what
+.B \-\-where
+reports as selling the TLD, so an entry without one still counts toward the
+column but claims nothing about where to buy the name.
 Without this option
 .I ./pricing.json
 and
@@ -265,8 +283,9 @@ uses the custom table alone, so TLDs it does not price show
 .TP
 .B \-\-no\-iana
 Never query whois.iana.org: no referral when a bundled WHOIS host is stale, and
-no registry names for
-.BR \-\-where .
+no registry name or URL for
+.BR \-\-where ,
+which still prints the restrictions and registrars from its bundled tables.
 .TP
 .B \-\-refresh
 Re-download the IANA RDAP bootstrap file.

@@ -34,7 +34,7 @@ Options:
           Look up A/AAAA/NS/MX/TXT/CNAME/SOA records
 
       --where
-          For available domains, show the registry and where to register them
+          For available domains, show the registry, any registration restriction, and the registrars that sell the TLD
 
       --all-info
           Shorthand for --details --registry --whois --dns-records --where
