@@ -142,6 +142,28 @@ const whoisDiffers = Boolean(ianaWhois && row.whoisHost && ianaWhois !== row.who
 const ianaRdapHost = host(deleg?.rdap ?? null);
 const rdapDiffers = Boolean(ianaRdapHost && host(row.rdapServer) && ianaRdapHost !== host(row.rdapServer));
 
+// The root zone itself, via scripts/build-root-zone.mjs. The section above is
+// IANA's *record* of the delegation, edited by hand; this is the delegation —
+// the NS and DS records a resolver is handed when it asks the root. null where
+// the root does not carry the apex at all, and null everywhere if the site was
+// built without root-zone.json.
+const meta = data.rootZone;
+const rz = row.rootZone;
+/** The zone the delegation belongs to: .uk for co.uk, which has none of its own. */
+const rzFrom = rz && rz.from !== row.tld ? `.${rz.from}` : name;
+const rzInherited = Boolean(rz && rz.from !== row.tld);
+const withV6 = rz ? rz.ns.filter((n) => n.v6.length > 0).length : 0;
+const withGlue = rz ? rz.ns.filter((n) => n.v4.length + n.v6.length > 0).length : 0;
+// IANA's delegation record and the zone are the same delegation written twice,
+// so where the two lists of name servers differ one of them is behind. Say
+// which names sit on which rather than printing both as though they agreed.
+const zoneNs = rz?.ns.map((n) => n.host) ?? [];
+const ianaNs: string[] = deleg?.nameservers ?? [];
+const nsOnlyIana = rz ? ianaNs.filter((h) => !zoneNs.includes(h)) : [];
+const nsOnlyZone = ianaNs.length > 0 ? zoneNs.filter((h) => !ianaNs.includes(h)) : [];
+const algorithms = (meta?.algorithms ?? {}) as Record<string, string>;
+const digests = (meta?.digests ?? {}) as Record<string, string>;
+
 const KIND_LABEL: Record<string, string> = {
   gtld: 'Generic top-level domain',
   cctld: 'Country-code top-level domain',
@@ -262,6 +284,19 @@ const jsonLd = {
       </p>
     )}
 
+    {/* The root zone is the one hard test of whether a name resolves. A row
+        that is priced and looked up but absent from it is worth saying out
+        loud, because every other section on the page will look normal. */}
+    {meta && !rz && (
+      <p class="callout callout-warn">
+        <strong>The root zone does not delegate .{row.apex}.</strong> It is in the tables <code>ds</code> bundles —
+        something prices it or names a server for it — but the root published on {meta.generated}, serial{' '}
+        <code>{meta.serial}</code>, carries no delegation for it, so nothing under {name} resolves in the public DNS.
+        Usually that means an alternative-root or blockchain name that reached a registrar's price feed; see{' '}
+        <a href="/root-zone/#coverage">what the root zone carries</a>.
+      </p>
+    )}
+
     {/* A closed zone has no prices and never will, so four dashes would be a
         row of nothing: it gets the facts it does have instead. */}
     <dl class="facts">
@@ -300,6 +335,19 @@ const jsonLd = {
         <dt>Lookup</dt>
         <dd class="small">{SOURCE_LABEL[row.source]}<span class="unit">{row.source === 'none' ? 'no public service' : 'answers for it'}</span></dd>
       </div>
+      {rz && (
+        <div>
+          <dt>DNSSEC</dt>
+          <dd class="small">
+            {rz.signed ? 'Signed' : 'Unsigned'}
+            <span class="unit">
+              {rz.signed
+                ? `${rz.ds.length} DS record${rz.ds.length === 1 ? '' : 's'} in the root`
+                : 'no DS in the root'}
+            </span>
+          </dd>
+        </div>
+      )}
       <div>
         <dt>Level</dt>
         <dd class="small">{row.level === 3 ? 'Third' : 'Second'}<span class="unit">{example}</span></dd>
@@ -664,6 +712,124 @@ const jsonLd = {
       </section>
     )}
 
+    {rz && meta && (
+      <section class="rootzone">
+        <h2 id="root-zone">In the root zone</h2>
+        <p class="muted intro">
+          The delegation itself, read out of <a href="/root-zone/">the root zone</a> — serial{' '}
+          <code>{meta.serial}</code>, on {meta.generated}. The registry section above is IANA's record of what{' '}
+          {rzFrom} was delegated to; this is what the root actually answers with when a resolver asks it where{' '}
+          {rzFrom} lives.
+          {rzInherited && (
+            <> {name} is not in the root zone — nothing below the top level is. It resolves because {rzFrom} does,
+            on {rzFrom}'s servers.</>
+          )}
+        </p>
+
+        <dl class="servers">
+          <div>
+            <dt>Delegated to</dt>
+            <dd>
+              <ul class="glue">
+                {rz.ns.map((n) => (
+                  <li>
+                    <code class="server">{n.host}</code>
+                    {[...n.v4, ...n.v6].map((a) => <span class="addr">{a}</span>)}
+                    {n.v4.length + n.v6.length === 0 && (
+                      <span class="addr addr-none" title="This server's own name sits under another TLD, so its address is that TLD's to publish">
+                        no glue
+                      </span>
+                    )}
+                  </li>
+                ))}
+              </ul>
+              <span class="faint">
+                The {rz.ns.length} name server{rz.ns.length === 1 ? '' : 's'} the root hands out for {rzFrom}
+                {withGlue > 0 && (
+                  <>, with the glue addresses that come with them —{' '}
+                  {withV6 === rz.ns.length
+                    ? <>every one of them answers over IPv6</>
+                    : withV6 === 0
+                      ? <>none of them has an IPv6 address in the zone</>
+                      : <>{withV6} of them answer over IPv6</>}</>
+                )}.
+                {withGlue < rz.ns.length && (
+                  <> A server marked <em>no glue</em> is named under another TLD, so the root leaves its address for
+                  that TLD to publish.</>
+                )} None of this is what <code>ds</code> queries: these servers know which names exist, not who
+                registered them.
+              </span>
+            </dd>
+          </div>
+          <div>
+            <dt>DNSSEC</dt>
+            <dd>
+              {rz.signed ? (
+                <>
+                  <span class="server-name">
+                    Signed — {rz.ds.length} DS record{rz.ds.length === 1 ? '' : 's'} in the root
+                  </span>
+                  <ul class="ds">
+                    {rz.ds.map((d) => (
+                      <li>
+                        <span class="ds-key">key {d.keyTag}</span>
+                        <span class="faint">
+                          {algorithms[String(d.algorithm)] ?? `algorithm ${d.algorithm}`} ·{' '}
+                          {digests[String(d.digestType)] ?? `digest type ${d.digestType}`}
+                        </span>
+                        <code class="digest">{d.digest}</code>
+                      </li>
+                    ))}
+                  </ul>
+                  <span class="faint">
+                    Each one is a fingerprint of {rzFrom}'s own signing key, published by the root and signed with
+                    the root's key — which is how a resolver that trusts only{' '}
+                    <a href="/root-zone/#anchors">one key</a> can prove an answer under {name} came from its
+                    registry and was not tampered with in transit. It says nothing about who owns a name or whether
+                    one is free.
+                  </span>
+                </>
+              ) : (
+                <>
+                  <span class="server-name">Unsigned</span>
+                  <span class="faint">
+                    The root publishes no DS record for {rzFrom}, so the chain of signatures stops at the root and a
+                    resolver has no way to prove an answer under {name} is genuine — it takes it on trust, as all of
+                    the DNS did before DNSSEC. {fmt(meta.counts.unsigned)} of the {fmt(meta.counts.delegated)} TLDs
+                    in the root are in the same position. Names here still work; they are just not verifiable.
+                  </span>
+                </>
+              )}
+            </dd>
+          </div>
+        </dl>
+
+        {(nsOnlyIana.length > 0 || nsOnlyZone.length > 0) && (
+          <p class="callout callout-warn">
+            <strong>The record and the zone disagree.</strong>{' '}
+            {nsOnlyIana.length > 0 && (
+              <>IANA's delegation record still lists{' '}
+              {nsOnlyIana.map((h, i) => <>{i > 0 ? ', ' : ''}<code>{h}</code></>)}, which the root zone does not
+              carry. </>
+            )}
+            {nsOnlyZone.length > 0 && (
+              <>The root zone answers with{' '}
+              {nsOnlyZone.map((h, i) => <>{i > 0 ? ', ' : ''}<code>{h}</code></>)}, which the record does not
+              name. </>
+            )}
+            The zone is what resolvers use, so it is the one that counts; the record is maintained by hand and lags
+            a change of servers.
+          </p>
+        )}
+
+        <p class="faint after">
+          Ask the root yourself — no registry involved, and the same records this section was built from:{' '}
+          <code>dig +norec @a.root-servers.net {rz.from}. NS</code> and{' '}
+          <code>dig +norec @a.root-servers.net {rz.from}. DS</code>.
+        </p>
+      </section>
+    )}
+
     <section class="related">
       <h2 id="related">Related zones</h2>
       <div class="rel-grid">
@@ -816,10 +982,11 @@ const jsonLd = {
   .callout-private { border-left-color: var(--taken); }
   .callout-warn { border-left-color: var(--unknown); }
 
-  /* Six cells on a priced TLD, four on a closed one — auto-fit sizes both
-     without a column count that only suits one of them. */
+  /* Seven cells on a priced TLD, five on a closed one — auto-fit sizes both
+     without a column count that only suits one of them. The track is just
+     narrow enough that seven still land on one row at full width. */
   .facts {
-    display: grid; grid-template-columns: repeat(auto-fit, minmax(8.5rem, 1fr)); gap: 1rem;
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(7.4rem, 1fr)); gap: 1rem;
     padding: 1.25rem 0; border-block: 1px solid var(--border); margin: 1.75rem 0 0;
   }
   .facts .wide { grid-column: span 2; }
@@ -893,6 +1060,24 @@ const jsonLd = {
   /* Name servers are a list, not a sentence — thirteen of them for .com. */
   .ns { display: flex !important; flex-wrap: wrap; gap: .3rem .6rem; margin-top: 0 !important; }
   .ns code { font-size: .82rem; color: var(--fg-muted); }
+
+  /* The root-zone section reuses .servers too. A name server is a host and its
+     addresses, which is one line each rather than a paragraph of hostnames. */
+  .glue { list-style: none; margin: 0; padding: 0; display: grid; gap: .3rem; }
+  .glue li { display: flex; flex-wrap: wrap; align-items: baseline; gap: .35rem .6rem; min-width: 0; }
+  .glue .server { font-size: .86rem; color: var(--fg); }
+  .addr {
+    font-family: var(--mono); font-size: .78rem; color: var(--fg-faint);
+    word-break: break-all;
+  }
+  .addr-none { font-style: italic; }
+  .ds { list-style: none; margin: .5rem 0 0; padding: 0; display: grid; gap: .5rem; }
+  .ds li { display: grid; gap: .1rem .5rem; min-width: 0; }
+  .ds .ds-key { font-family: var(--mono); font-size: .86rem; }
+  .ds .faint { font-size: .8rem; }
+  /* A SHA-256 digest is 64 characters and belongs to nobody's line length —
+     it wraps, in the smallest size that stays readable. */
+  .digest { font-size: .72rem; color: var(--fg-faint); word-break: break-all; line-height: 1.5; }
 
   .taxonomy { display: grid; gap: 1.5rem; margin-top: 1.5rem; }
   @media (min-width: 720px) { .taxonomy { grid-template-columns: 1fr 1fr; gap: 2rem; } }

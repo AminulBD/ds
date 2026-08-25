@@ -4,12 +4,12 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "prebuild": "node scripts/build-docs.mjs && node scripts/build-tlds.mjs && node scripts/build-cli.mjs && node scripts/build-release.mjs && node scripts/build-og.mjs",
-    "predev": "node scripts/build-docs.mjs && node scripts/build-tlds.mjs && node scripts/build-cli.mjs && node scripts/build-release.mjs && node scripts/build-og.mjs",
+    "prebuild": "node scripts/build-docs.mjs && node scripts/build-root-zone.mjs && node scripts/build-tlds.mjs && node scripts/build-cli.mjs && node scripts/build-release.mjs && node scripts/build-og.mjs",
+    "predev": "node scripts/build-docs.mjs && node scripts/build-root-zone.mjs && node scripts/build-tlds.mjs && node scripts/build-cli.mjs && node scripts/build-release.mjs && node scripts/build-og.mjs",
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "gen": "node scripts/build-docs.mjs && node scripts/build-tlds.mjs && node scripts/build-cli.mjs && node scripts/build-release.mjs && node scripts/build-og.mjs"
+    "gen": "node scripts/build-docs.mjs && node scripts/build-root-zone.mjs && node scripts/build-tlds.mjs && node scripts/build-cli.mjs && node scripts/build-release.mjs && node scripts/build-og.mjs"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.3",

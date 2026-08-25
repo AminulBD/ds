@@ -27,6 +27,8 @@
 /site/src/content/docs/
 /site/src/content/pages/
 /site/src/data/tlds.json
+# fetched from IANA on every build — ~700 KB that would change most days
+/site/src/data/root-zone.json
 
 # scripts/refresh-whois.py: raw IANA records and probe responses, re-fetchable
 /scripts/.whois-cache/

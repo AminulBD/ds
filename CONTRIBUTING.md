@@ -134,6 +134,18 @@ never edited by hand.
   matching page under `docs/`, and `ds.1`.
 * `cd site && npm run gen` regenerates the site's content without building it,
   which is the quick way to check a docs change.
+* Two files under `site/src/data/` are fetched from IANA rather than derived
+  from the repo. `rdap-dns.json`, the RDAP bootstrap, is small and is committed
+  so a build still works when IANA is unreachable. `root-zone.json` — the root
+  zone, root hints, trust anchors and delegated-TLD list, parsed by
+  [`site/scripts/build-root-zone.mjs`](site/scripts/build-root-zone.mjs) — is
+  gitignored instead: it is ~700 KB and the root's serial moves most days, so
+  it is fetched by the Pages workflow on every deploy. Locally the copy an
+  earlier build left behind is reused for a day — `node
+  site/scripts/build-root-zone.mjs --force` refetches — so a `npm run dev`
+  does not pull two megabytes off InterNIC each time it restarts. A build with
+  no network and no local copy fails rather than publishing the site with those
+  sections missing.
 
 ## Commits and pull requests
 

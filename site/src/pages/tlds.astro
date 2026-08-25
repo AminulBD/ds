@@ -129,6 +129,17 @@ const SOURCE_LABEL: Record<string, string> = {
         </select>
       </label>
       <label>
+        <span class="visually-hidden">DNSSEC</span>
+        <select id="dnssec">
+          <option value="">Any DNSSEC</option>
+          <option value="signed">Signed — DS in the root ({fmt(counts.signed)})</option>
+          <option value="unsigned">Unsigned ({fmt(counts.inRoot - counts.signed)})</option>
+          {counts.notDelegated > 0 && (
+            <option value="none">Not in the root zone ({fmt(counts.notDelegated)})</option>
+          )}
+        </select>
+      </label>
+      <label>
         <span class="visually-hidden">Sold by</span>
         <select id="seller">
           <option value="">Any registrar</option>
@@ -184,6 +195,7 @@ const SOURCE_LABEL: Record<string, string> = {
               data-level={r.level}
               data-private={r.private ? 'yes' : 'no'}
               data-restricted={r.eligibility ? 'yes' : 'no'}
+              data-dnssec={r.rootZone ? (r.rootZone.signed ? 'signed' : 'unsigned') : 'none'}
               data-sellers={r.sellers.map((sl) => sl.registrar).join(' ')}
               data-sellcount={r.sellers.length}
               data-search={`${r.tld} ${r.unicode ?? ''} ${host(r.rdapServer) ?? ''} ${r.whoisHost ?? ''} ${r.privateOperator ?? ''} ${r.sellers.map((sl) => sl.registrar).join(' ')} ${r.eligibility?.note ?? ''}`.toLowerCase()}
@@ -379,6 +391,17 @@ const SOURCE_LABEL: Record<string, string> = {
           closed.
         </li>
         <li>
+          <strong>Whether a TLD is signed comes from the root zone</strong>, not from us:{' '}
+          {fmt(counts.signed)} of these rows have a DS record in the root, which is what lets a resolver prove an
+          answer under them is genuine. A sub-zone is counted on its apex's record — <code>.co.uk</code> is secured
+          by <code>.uk</code>'s. The zone is also the one hard test of whether a TLD exists at all, and{' '}
+          {counts.notDelegated > 0 ? (
+            <>{fmt(counts.notDelegated)} of these rows fail it</>
+          ) : (
+            <>every row here passes it</>
+          )} — see <a href="/root-zone/">the root zone</a>.
+        </li>
+        <li>
           A few registries answer nobody: <code>.li</code> and <code>.qa</code> refuse public
           WHOIS and have no RDAP, so <code>ds</code> reports them <code>UNKNOWN</code> rather
           than guessing.
@@ -401,6 +424,7 @@ const SOURCE_LABEL: Record<string, string> = {
     const kind = document.querySelector<HTMLSelectElement>('#kind')!;
     const level = document.querySelector<HTMLSelectElement>('#level')!;
     const priv = document.querySelector<HTMLSelectElement>('#private')!;
+    const dnssec = document.querySelector<HTMLSelectElement>('#dnssec')!;
     const seller = document.querySelector<HTMLSelectElement>('#seller')!;
     const priced = document.querySelector<HTMLInputElement>('#priced')!;
     const name = document.querySelector<HTMLInputElement>('#name')!;
@@ -420,6 +444,7 @@ const SOURCE_LABEL: Record<string, string> = {
       const k = kind.value;
       const lvl = level.value;
       const pv = priv.value;
+      const ds = dnssec.value;
       const sv = seller.value;
       const onlyPriced = priced.checked;
       let shown = 0;
@@ -435,6 +460,7 @@ const SOURCE_LABEL: Record<string, string> = {
         // The zone select mixes two questions — closed to everyone, or open to
         // some — because both answer "could I register here at all".
         if (ok && pv) ok = pv === 'restricted' ? d.restricted === 'yes' : d.private === pv;
+        if (ok && ds) ok = d.dnssec === ds;
         if (ok && sv) ok = sv === 'none' ? d.sellcount === '0' : (d.sellers ?? '').split(' ').includes(sv);
         if (ok && onlyPriced) ok = d.price !== '';
         row.hidden = !ok;
@@ -491,7 +517,7 @@ const SOURCE_LABEL: Record<string, string> = {
       clearTimeout(t);
       t = window.setTimeout(apply, 90);
     });
-    [source, kind, level, priv, seller, priced].forEach((el) => el.addEventListener('change', apply));
+    [source, kind, level, priv, dnssec, seller, priced].forEach((el) => el.addEventListener('change', apply));
 
     // --- registrar links -------------------------------------------------
     // Each link points at the registrar's own site until a name is given, and
