@@ -12,6 +12,7 @@ on:
       - "whois.json"
       - "pricing.json"
       - "private-tlds.json"
+      - "eligibility.json"
       - "Cargo.toml"
       - "src/main.rs"
       - ".github/workflows/pages.yml"
