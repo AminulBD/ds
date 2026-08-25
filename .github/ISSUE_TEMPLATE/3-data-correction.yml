@@ -1,0 +1,68 @@
+name: TLD data correction
+description: A price, an eligibility rule, a WHOIS server, or something in the A–Z of TLDs is wrong or missing.
+title: "Data: <tld> "
+labels: ["data"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Every row in these files is meant to be traceable to a source, so a correction
+        needs one too — the page that says otherwise is what settles it.
+
+  - type: input
+    id: tld
+    attributes:
+      label: Which TLD
+      placeholder: com.bd
+    validations:
+      required: true
+
+  - type: dropdown
+    id: file
+    attributes:
+      label: Which file
+      options:
+        - pricing.json — the price column (generated)
+        - whois.json — WHOIS server or "available" needle (generated)
+        - private-tlds.json — brand / reserved classification (generated)
+        - tld-facts.json — registry, type, delegation record (generated)
+        - eligibility.json — who may register (hand-maintained)
+        - tld-categories.json — what the TLD is for (hand-maintained)
+        - not sure
+    validations:
+      required: true
+
+  - type: textarea
+    id: wrong
+    attributes:
+      label: What ds says now
+      description: The line of output, or the entry in the file.
+      render: text
+    validations:
+      required: true
+
+  - type: textarea
+    id: right
+    attributes:
+      label: What it should say
+    validations:
+      required: true
+
+  - type: input
+    id: source
+    attributes:
+      label: Source
+      description: >-
+        The registry page, the registrar's price list, the IANA or ICANN record. A
+        correction without a citable source cannot go in — see CONTRIBUTING.md.
+      placeholder: https://www.example-registry.example/policy
+    validations:
+      required: true
+
+  - type: markdown
+    attributes:
+      value: |
+        The four generated files are rebuilt by the scripts in `scripts/` rather than
+        edited by hand, so a fix there may mean fixing the harvester. The two
+        hand-maintained ones (`eligibility.json`, `tld-categories.json`) take a pull
+        request directly.

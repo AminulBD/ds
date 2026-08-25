@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Documentation
+    url: https://ds.aminul.dev/docs/usage
+    about: The flags, the TLD lists, the price column and the HTTP API are all documented here.
+  - name: Installing ds
+    url: https://ds.aminul.dev/install
+    about: Homebrew, the install script, .deb, .rpm, .dmg, .msi and the Windows notes.
+  - name: Contributing
+    url: https://github.com/AminulBD/ds/blob/main/CONTRIBUTING.md
+    about: How to build and test ds, how the bundled data files are generated, and what a good pull request looks like.

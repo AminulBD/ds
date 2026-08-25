@@ -19,15 +19,14 @@
 /staging/
 /dmg/
 
-# website (site/) — node deps, build output, and files generated from the
-# README / whois.json / pricing.json by site/scripts/*.mjs
+# website (site/) — node deps, build output, and files generated from
+# docs/ / whois.json / pricing.json by site/scripts/*.mjs
 /site/node_modules/
 /site/dist/
 /site/.astro/
 /site/src/content/docs/
 /site/src/content/pages/
 /site/src/data/tlds.json
-/site/src/data/readme.json
 
 # scripts/refresh-whois.py: raw IANA records and probe responses, re-fetchable
 /scripts/.whois-cache/

@@ -8,7 +8,7 @@ on:
     # Only the paths the site is actually built from.
     paths:
       - "site/**"
-      - "README.md"
+      - "docs/**"
       - "whois.json"
       - "pricing.json"
       - "private-tlds.json"

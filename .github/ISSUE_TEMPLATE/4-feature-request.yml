@@ -1,0 +1,41 @@
+name: Feature request
+description: Suggest a flag, an output format, or something ds cannot do yet.
+title: "Feature: "
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What are you trying to do
+      description: >-
+        The task, not the flag — what you are trying to get done, and where `ds` stops
+        being useful. That is usually enough to find a better answer than the one
+        either of us started with.
+    validations:
+      required: true
+
+  - type: textarea
+    id: idea
+    attributes:
+      label: What you have in mind
+      description: A flag, an output field, a subcommand — sketch the command line if you can.
+      placeholder: |
+        ds mybrand --tld popular --sort price
+    validations:
+      required: true
+
+  - type: textarea
+    id: workaround
+    attributes:
+      label: What you do instead today
+      description: A shell pipeline, `--json` plus `jq`, another tool — anything that works now.
+
+  - type: markdown
+    attributes:
+      value: |
+        Two things shape what gets accepted, so they are worth knowing up front:
+
+        * **`ds` never guesses.** Anything that would make a lookup report `AVAILABLE`
+          on less than the registry's own answer is out, however convenient.
+        * **The default build stays small and dependency-light.** A feature that needs a
+          new crate is likelier to land behind a cargo feature, the way `ds serve` did.

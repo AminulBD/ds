@@ -1,0 +1,86 @@
+name: Wrong lookup result
+description: ds reported AVAILABLE, TAKEN, PRIVATE or UNKNOWN for a domain, and the answer is wrong.
+title: "Wrong result for <domain>: "
+labels: ["bug", "lookup"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        A registered domain reported `AVAILABLE` is the one answer `ds` must never
+        give, so this report takes priority over everything else. The registry's own
+        answer is what settles it — `--registry --raw` below is the important part.
+
+  - type: input
+    id: domain
+    attributes:
+      label: The domain
+      description: The exact name you looked up.
+      placeholder: mybrand.co.uk
+    validations:
+      required: true
+
+  - type: dropdown
+    id: reported
+    attributes:
+      label: What ds reported
+      options:
+        - AVAILABLE
+        - TAKEN
+        - PRIVATE
+        - UNKNOWN
+    validations:
+      required: true
+
+  - type: dropdown
+    id: expected
+    attributes:
+      label: What it should have been
+      options:
+        - AVAILABLE
+        - TAKEN
+        - PRIVATE
+        - UNKNOWN
+    validations:
+      required: true
+
+  - type: textarea
+    id: evidence
+    attributes:
+      label: How you know
+      description: >-
+        A registrar's search page, a WHOIS record, the fact that the name resolves —
+        whatever shows the real state of the name.
+    validations:
+      required: true
+
+  - type: textarea
+    id: output
+    attributes:
+      label: Output with --registry --raw
+      description: >-
+        Re-run with `--registry` (which server answered) and `--raw` (the RDAP record,
+        if RDAP answered), and paste the whole thing. Add `--whois` if the lookup went
+        over WHOIS. This is what turns the report into a test fixture.
+      render: text
+      placeholder: |
+        $ ds mybrand --tld co.uk --registry --raw
+        ...
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: Output of `ds --version`.
+      placeholder: ds 0.1.5
+    validations:
+      required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Anything else
+      description: >-
+        Does it happen every time? Only in a large sweep? Only from one network?
+        A registry that rate-limits behaves differently under `--tld all`.

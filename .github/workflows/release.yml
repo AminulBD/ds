@@ -107,6 +107,7 @@ jobs:
           name="ds-${DS_TAG}-${{ matrix.target }}"
           mkdir -p "staging/$name"
           cp "target/${{ matrix.target }}/release/ds" README.md LICENSE ds.1 "staging/$name/"
+          cp -R docs "staging/$name/docs"
           tar -czf "$name.tar.gz" -C staging "$name"
 
       - name: Archive (windows)
@@ -118,6 +119,7 @@ jobs:
           New-Item -ItemType Directory -Path "staging/$name" -Force | Out-Null
           Copy-Item "target/${{ matrix.target }}/release/ds.exe" "staging/$name/"
           Copy-Item "README.md","LICENSE" "staging/$name/"
+          Copy-Item "docs" "staging/$name/docs" -Recurse
           Compress-Archive -Path "staging/$name" -DestinationPath "$name.zip"
 
       - name: Package .deb and .rpm
@@ -135,6 +137,7 @@ jobs:
           name="ds-${DS_TAG}-${{ matrix.target }}"
           mkdir -p dmg
           cp "target/${{ matrix.target }}/release/ds" ds.1 README.md LICENSE dmg/
+          cp -R docs dmg/docs
           cp packaging/macos-install.sh dmg/install.sh
           chmod +x dmg/install.sh
           hdiutil create -volname "ds ${DS_TAG}" \

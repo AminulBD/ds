@@ -1,0 +1,72 @@
+name: Bug report
+description: Something else is broken — a crash, a flag that misbehaves, bad output, an install problem.
+title: "Bug: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        For a lookup that returned the wrong status, use **Wrong lookup result** instead —
+        it asks for the registry evidence that report needs.
+
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: What you saw, and what you expected instead.
+    validations:
+      required: true
+
+  - type: textarea
+    id: repro
+    attributes:
+      label: The command, and what it printed
+      description: The exact command line and its output, unedited.
+      render: text
+      placeholder: |
+        $ ds apple --tld all --level second
+        ...
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: Output of `ds --version`.
+      placeholder: ds 0.1.5
+    validations:
+      required: true
+
+  - type: dropdown
+    id: install
+    attributes:
+      label: How you installed it
+      options:
+        - Homebrew
+        - packaging/install.sh
+        - .deb
+        - .rpm
+        - .dmg (macOS)
+        - .msi (Windows)
+        - .tar.gz / .zip archive
+        - built from source with cargo
+        - other
+    validations:
+      required: true
+
+  - type: input
+    id: platform
+    attributes:
+      label: OS and version
+      placeholder: macOS 15.5 (arm64), Ubuntu 24.04 (x86_64), Windows 11 (x86_64)
+    validations:
+      required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Anything else
+      description: >-
+        A proxy or firewall in the way, a corporate DNS resolver, `NO_COLOR`, an unusual
+        terminal — anything that might matter.
