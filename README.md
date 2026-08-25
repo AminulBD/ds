@@ -592,6 +592,12 @@ node scripts/harvest-tld-facts.mjs --deep      # and the delegation records (~1,
 node scripts/test-tld-facts-parse.mjs          # both parsers and the taxonomy, offline
 ```
 
+Every TLD's own page on the site carries all of it — the registry, its country
+and site, the servers it tells IANA it runs, its name servers and delegation
+dates, and both kinds of category. Where the site's copy of a WHOIS host and
+IANA's disagree, the page says so rather than printing two and leaving you to
+spot it.
+
 Both IANA sources are web pages, which is the brittle part — the harvest
 refuses to write if it parses fewer than half the TLDs the root zone lists, a
 delegation record that will not load costs that one TLD its extra fields rather

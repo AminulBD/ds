@@ -104,6 +104,44 @@ const cheapest = withPrice[0] ?? null;
 // the file but is not evidence that it sells the TLD, so it is listed apart.
 const renewOnly = offers.filter((o) => o.register === null);
 
+// tld-facts.json, via build-tlds.mjs. `from` is the TLD the facts were read
+// off — the apex for a sub-zone, because IANA publishes one delegation record
+// per root-zone TLD and .co.uk's registry is .uk's.
+const facts = row.facts;
+const deleg = facts?.delegation ?? null;
+const inherited = facts !== null && facts.from !== row.tld;
+const factsOf = inherited ? `.${facts!.from}` : name;
+// The hand-maintained subject taxonomy. Empty for most TLDs on purpose: a name
+// that does not say what it is for is left unclassified rather than guessed.
+const topicNames = data.topicNames as Record<string, { name: string; desc: string }>;
+const topics = (facts?.topics ?? []).filter((t) => t in topicNames);
+// What each derived category means, stated once in the data file.
+const categoryRules = data.categoryRules as Record<string, string>;
+const categories = (facts?.categories ?? []).filter((c) => c in categoryRules);
+
+/** IANA's own spelling of the type, for the line under the heading. */
+const TYPE_LABEL: Record<string, string> = {
+  generic: 'a generic TLD',
+  'country-code': 'a country-code TLD',
+  sponsored: 'a sponsored TLD',
+  'generic-restricted': 'a generic-restricted TLD',
+  infrastructure: 'the infrastructure TLD',
+  test: 'an IDN evaluation TLD',
+};
+
+// IANA publishes the registry's own servers; ds uses the bootstrap and the
+// bundled table. They usually agree. Where they do not, the page says so
+// rather than printing two hostnames and leaving the reader to notice.
+/** "United Kingdom of Great Britain and Northern Ireland (the)" -> without the
+ *  trailing article. IANA uses ISO 3166's official names and the data keeps
+ *  them verbatim; only the sentence here drops it. */
+const country = deleg?.country?.replace(/\s*\(the\)$/, '') ?? null;
+
+const ianaWhois = deleg?.whois ?? null;
+const whoisDiffers = Boolean(ianaWhois && row.whoisHost && ianaWhois !== row.whoisHost);
+const ianaRdapHost = host(deleg?.rdap ?? null);
+const rdapDiffers = Boolean(ianaRdapHost && host(row.rdapServer) && ianaRdapHost !== host(row.rdapServer));
+
 const KIND_LABEL: Record<string, string> = {
   gtld: 'Generic top-level domain',
   cctld: 'Country-code top-level domain',
@@ -199,6 +237,9 @@ const jsonLd = {
         {row.sellers.length > 0 && (
           <span class="tag">sold by {row.sellers.length} registrar{row.sellers.length === 1 ? '' : 's'}</span>
         )}
+        {topics.map((t) => (
+          <a class="tag tag-topic" href="#registry" title={topicNames[t].desc}>{topicNames[t].name}</a>
+        ))}
       </p>
     </header>
 
@@ -501,6 +542,128 @@ const jsonLd = {
       )}
     </section>
 
+    {facts && (
+      <section class="registry">
+        <h2 id="registry">The registry</h2>
+        <p class="muted intro">
+          From <a href={`https://www.iana.org/domains/root/db/${facts.from}.html`}>IANA's delegation record</a> for{' '}
+          {factsOf}
+          {inherited && (
+            <> — {name} is a zone under it, so the registry, the servers and the dates below are {factsOf}'s</>
+          )}. {facts.type && TYPE_LABEL[facts.type] && <>{name} is {TYPE_LABEL[facts.type]}.</>}
+          {!facts.inRootZone && (
+            <> <strong>It is no longer in the root zone</strong>{facts.removed ? <>, removed on {facts.removed}</> : null} —
+            it resolved once and does not now.</>
+          )}
+        </p>
+
+        <dl class="servers">
+          {deleg?.manager && (
+            <div>
+              <dt>Run by</dt>
+              <dd>
+                <span class="server-name">{deleg.manager}</span>
+                <span class="faint">
+                  {country && <>Based in {country}. </>}
+                  {facts.registry && facts.registry !== deleg.manager && (
+                    <>ICANN records the contracted registry operator as <strong>{facts.registry}</strong>{facts.registry.endsWith('.') ? '' : '.'}{' '}</>
+                  )}
+                  {deleg.registered && <>Delegated {deleg.registered}</>}
+                  {deleg.registered && deleg.updated && <>, record last updated {deleg.updated}</>}
+                  {deleg.registered && '.'}
+                </span>
+              </dd>
+            </div>
+          )}
+          {deleg?.url && (
+            <div>
+              <dt>Registry site</dt>
+              <dd>
+                <a class="server" href={deleg.url} rel="noopener nofollow">{host(deleg.url) ?? deleg.url}</a>
+                <span class="faint">
+                  Where the registry documents {factsOf} — its rules, its accredited registrars, and any launch
+                  phases. Not a shop: registries sell wholesale to registrars, not to you.
+                </span>
+              </dd>
+            </div>
+          )}
+          {(ianaWhois || deleg?.rdap) && (
+            <div>
+              <dt>Published services</dt>
+              <dd>
+                <code class="server">{[deleg?.rdap && (ianaRdapHost ?? deleg.rdap), ianaWhois].filter(Boolean).join('  ·  ')}</code>
+                <span class="faint">
+                  What the registry itself tells IANA it runs.
+                  {whoisDiffers && (
+                    <> <strong>Note:</strong> the bundled table asks <code>{row.whoisHost}</code> instead — one of
+                    them is out of date, and <code>ds</code> falls back to asking IANA when a bundled host goes
+                    stale.</>
+                  )}
+                  {rdapDiffers && (
+                    <> <strong>Note:</strong> IANA's bootstrap points RDAP at <code>{host(row.rdapServer)}</code>,
+                    which is not the host on the delegation record.</>
+                  )}
+                  {!whoisDiffers && !rdapDiffers && <> They agree with what <code>ds</code> asks.</>}
+                </span>
+              </dd>
+            </div>
+          )}
+          {deleg?.nameservers?.length > 0 && (
+            <div>
+              <dt>Name servers</dt>
+              <dd>
+                <span class="ns">
+                  {deleg.nameservers.map((n: string) => <code class="server">{n}</code>)}
+                </span>
+                <span class="faint">
+                  The {deleg.nameservers.length} authoritative server{deleg.nameservers.length === 1 ? '' : 's'} for
+                  the {factsOf} zone — what the root delegates to. Nothing <code>ds</code> queries directly; they are
+                  what makes a registered name resolve.
+                </span>
+              </dd>
+            </div>
+          )}
+        </dl>
+
+        {(categories.length > 0 || topics.length > 0) && (
+          <div class="taxonomy">
+            {categories.length > 0 && (
+              <div class="taxo">
+                <h3>What it is</h3>
+                <p class="faint">Derived from the root zone and ICANN's registry list — each one is a fact with a source.</p>
+                <ul class="rules">
+                  {categories.map((c) => (
+                    <li>
+                      <code>{c}</code>{' '}
+                      <span class="faint" set:html={
+                        categoryRules[c]
+                          .replace(/[&<>]/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' })[ch]!)
+                          .replace(/`([^`]+)`/g, '<code>$1</code>')
+                      } />
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+            {topics.length > 0 && (
+              <div class="taxo">
+                <h3>What it is for</h3>
+                <p class="faint">
+                  Our reading, not a fact — nothing in the root zone says what a TLD means. Hand-maintained in{' '}
+                  <a href="https://github.com/AminulBD/ds/blob/main/tld-categories.json">tld-categories.json</a>.
+                </p>
+                <ul class="rules">
+                  {topics.map((t) => (
+                    <li><strong>{topicNames[t].name}</strong> <span class="faint">{topicNames[t].desc}</span></li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div>
+        )}
+      </section>
+    )}
+
     <section class="related">
       <h2 id="related">Related zones</h2>
       <div class="rel-grid">
@@ -722,6 +885,23 @@ const jsonLd = {
   .servers dd > span { display: block; font-size: .84rem; margin-top: .35rem; }
   .servers code { white-space: normal; word-break: break-all; }
   @media (max-width: 560px) { .servers > div { grid-template-columns: 1fr; gap: .3rem; } }
+
+  /* The registry section reuses .servers; these are the bits it adds. */
+  .tag-topic { color: var(--fg-muted); text-decoration: none; }
+  .tag-topic:hover { color: var(--fg); border-color: var(--fg-faint); }
+  .servers .server-name { display: block; font-size: .95rem; font-weight: 600; }
+  /* Name servers are a list, not a sentence — thirteen of them for .com. */
+  .ns { display: flex !important; flex-wrap: wrap; gap: .3rem .6rem; margin-top: 0 !important; }
+  .ns code { font-size: .82rem; color: var(--fg-muted); }
+
+  .taxonomy { display: grid; gap: 1.5rem; margin-top: 1.5rem; }
+  @media (min-width: 720px) { .taxonomy { grid-template-columns: 1fr 1fr; gap: 2rem; } }
+  .taxo h3 { font-size: .95rem; margin: 0 0 .25rem; }
+  .taxo > p { margin: 0 0 .6rem; font-size: .84rem; }
+  .rules { list-style: none; margin: 0; padding: 0; display: grid; gap: .5rem; }
+  .rules li { font-size: .88rem; line-height: 1.45; }
+  .rules code { font-size: .82rem; }
+  .rules .faint { display: block; font-size: .84rem; }
 
   .rel-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr)); gap: 1.5rem 2rem; }
   .rel h3 { margin: 0 0 .6rem; font-size: .82rem; text-transform: uppercase; letter-spacing: .04em; color: var(--fg-muted); }

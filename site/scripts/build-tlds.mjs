@@ -2,6 +2,12 @@
 // itself consults — the bundled whois.json, pricing.json, private-tlds.json and
 // eligibility.json, plus IANA's RDAP bootstrap. Run by `npm run gen` (and so by
 // predev/prebuild).
+//
+// tld-facts.json and tld-categories.json join them: what kind of TLD it is,
+// who runs it and how to reach them, and what the TLD is for. Those are keyed
+// on root-zone TLDs only, so a sub-zone inherits from its apex — co.uk's
+// registry is .uk's — and `facts.from` says which TLD the facts were read off,
+// the same way eligibility does it.
 
 import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
@@ -209,6 +215,46 @@ for (const [tld, rule] of Object.entries(eligFile.tlds)) {
 const eligChecked =
   [eligFile._about ?? []].flat().join(' ').match(/last checked (\d{4}-\d{2}-\d{2})/)?.[1] ?? null;
 
+// --- tld-facts.json: what a TLD is, who runs it, and what it is for ---
+// Keyed on root-zone TLDs, so it is read apex-first for a sub-zone. Optional:
+// the site still builds without it, just without this section on the pages.
+let facts = { tlds: {}, categories: {}, topics: {} };
+try {
+  facts = await readJson(resolve(repo, 'tld-facts.json'));
+  const withTopics = Object.values(facts.tlds).filter((f) => f.topics?.length).length;
+  const withDelegation = Object.values(facts.tlds).filter((f) => f.delegation).length;
+  console.log(
+    `  facts    ${Object.keys(facts.tlds).length} TLDs — ${withDelegation} with a delegation record, ${withTopics} with a subject`,
+  );
+} catch (err) {
+  console.warn(`  facts    WARNING: no tld-facts.json (${err.message}) — pages will omit registry facts`);
+}
+
+/**
+ * The facts for a TLD, apex-first. `.co.uk` has no delegation record of its
+ * own — the one IANA publishes for `.uk` is the registry that runs it — so it
+ * inherits, and `from` says so rather than letting the page imply co.uk has
+ * its own entry in the root zone.
+ */
+function factsFor(tld) {
+  const apex = tld.split('.').pop();
+  const key = tld in facts.tlds ? tld : apex in facts.tlds ? apex : null;
+  if (!key) return null;
+  const f = facts.tlds[key];
+  return {
+    from: key,
+    type: f.type ?? null,
+    sponsor: f.sponsor ?? null,
+    registry: f.registry ?? null,
+    delegated: f.delegated ?? null,
+    removed: f.removed ?? null,
+    inRootZone: f.in_root_zone !== false,
+    categories: f.categories ?? [],
+    topics: f.topics ?? [],
+    delegation: f.delegation ?? null,
+  };
+}
+
 // --- IANA RDAP bootstrap: [[["com","net"], ["https://..."]], ...] ---
 const rdap = new Map();
 for (const [tlds, servers] of (await bootstrap()).services) {
@@ -270,6 +316,11 @@ const rows = [...new Set([...whois.keys(), ...pricing.keys(), ...rdap.keys()])]
       // and the caveat whois.json attaches to the zone where it has one.
       whoisNeedle: w?.needle ?? null,
       whoisComment: w?.comment ?? null,
+      // From tld-facts.json: the IANA type, the organisation that runs the
+      // zone and where to reach it, the derived `categories`, and the
+      // hand-maintained `topics`. `from` is the TLD it was read off — the apex
+      // for a sub-zone. null if tld-facts.json is not present.
+      facts: factsFor(tld),
     };
   });
 
@@ -296,6 +347,13 @@ const out = {
     restricted: rows.filter((r) => r.eligibility).length,
     // TLDs nobody in the price table sells, so `--where` has no one to name.
     unsold: rows.filter((r) => r.sellers.length === 0).length,
+    // Rows carrying registry facts, their own or their apex's.
+    withFacts: rows.filter((r) => r.facts).length,
+    // Rows whose registry publishes a delegation record with something in it.
+    withDelegation: rows.filter((r) => r.facts?.delegation).length,
+    // Rows with a subject. Far short of the total on purpose: a TLD whose name
+    // does not say what it is for is left unclassified rather than guessed.
+    withTopics: rows.filter((r) => r.facts?.topics.length).length,
   },
   // Registrar -> how many TLDs it quotes a registration price for.
   sellers: Object.fromEntries(
@@ -305,6 +363,11 @@ const out = {
   ),
   // When the eligibility notes were last checked against the registry pages.
   eligibilityChecked: eligChecked,
+  // What each derived category means, stated once rather than on every row.
+  categoryRules: facts.categories ?? {},
+  // The subject taxonomy's own names and descriptions. Unlike everything else
+  // here it is hand-maintained — see tld-categories.json.
+  topicNames: facts.topics ?? {},
   priceRange: {
     min: Math.min(...priced.map((r) => r.price)),
     max: Math.max(...priced.map((r) => r.price)),
@@ -320,3 +383,20 @@ console.log(
 console.log(
   `  sellers  ${Object.entries(out.sellers).map(([r, n]) => `${r} ${n}`).join(', ')}`,
 );
+const { withFacts, withDelegation, withTopics } = out.counts;
+console.log(
+  `  facts    ${withFacts} rows carry registry facts — ${withDelegation} a delegation record, ${withTopics} a subject`,
+);
+
+// A row IANA has never heard of is not a TLD. Porkbun's feed carries Handshake
+// names alongside real ones and the root-zone filter in
+// scripts/harvest-prices.mjs is what keeps them out of pricing.json; anything
+// that gets through lands here, priced and unresolvable, so say so rather than
+// shipping it as a page that looks like every other page.
+const unknown = rows.filter((r) => !r.facts);
+if (unknown.length) {
+  console.warn(
+    `  facts    WARNING: ${unknown.length} row(s) not in IANA's root database: ${unknown.map((r) => r.tld).join(', ')}` +
+      ' — most likely non-root names that got past the root-zone filter in scripts/harvest-prices.mjs',
+  );
+}

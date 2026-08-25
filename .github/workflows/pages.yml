@@ -13,6 +13,8 @@ on:
       - "pricing.json"
       - "private-tlds.json"
       - "eligibility.json"
+      - "tld-facts.json"
+      - "tld-categories.json"
       - "Cargo.toml"
       - "src/main.rs"
       - ".github/workflows/pages.yml"
