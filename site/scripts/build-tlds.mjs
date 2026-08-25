@@ -3,6 +3,12 @@
 // eligibility.json, plus IANA's RDAP bootstrap. Run by `npm run gen` (and so by
 // predev/prebuild).
 //
+// src/data/root-zone.json — built by build-root-zone.mjs from the files IANA
+// publishes at https://www.iana.org/domains/root/files — joins on what the root
+// zone itself says about a TLD: the name servers it is delegated to, their glue
+// addresses, and the DS record that makes it DNSSEC-signed. Keyed on root-zone
+// TLDs, so a sub-zone reads its apex's delegation, the same way facts do.
+//
 // tld-facts.json and tld-categories.json join them: what kind of TLD it is,
 // who runs it and how to reach them, and what the TLD is for. Those are keyed
 // on root-zone TLDs only, so a sub-zone inherits from its apex — co.uk's
@@ -230,6 +236,48 @@ try {
   console.warn(`  facts    WARNING: no tld-facts.json (${err.message}) — pages will omit registry facts`);
 }
 
+// --- root-zone.json: the root zone's own record of the delegation ---
+// Built by build-root-zone.mjs, which runs first; committed, so this is here
+// even with IANA unreachable. Optional in the same way tld-facts.json is: the
+// site builds without it, just without the root-zone section on the pages.
+let root = null;
+try {
+  root = await readJson(resolve(dataDir, 'root-zone.json'));
+  console.log(
+    `  root     serial ${root.zone.serial} — ${root.counts.delegated} TLDs delegated, ${root.counts.signed} signed`,
+  );
+} catch (err) {
+  console.warn(`  root     WARNING: no root-zone.json (${err.message}) — pages will omit the root zone`);
+}
+
+/**
+ * What the root zone publishes for a TLD, read apex-first: `.co.uk` has no
+ * delegation of its own, so what makes it resolve is `.uk`'s, and `from` says
+ * so. null means the root has never heard of the apex — a name that cannot
+ * resolve however many registrars sell it.
+ */
+function rootZoneFor(tld) {
+  const apex = tld.split('.').pop();
+  const entry = root?.tlds[apex];
+  if (!entry) return null;
+  const addrs = (host) => root.nameservers[host] ?? [];
+  return {
+    from: apex,
+    ns: entry.ns.map((host) => ({
+      host,
+      // Glue: the addresses the root hands out for a server inside the zone it
+      // serves. Empty for a server that lives elsewhere — `.dev` is served by
+      // ns-tld1.charlestonroadregistry.com, whose address is `.com`'s to give.
+      v4: addrs(host).filter((a) => !a.includes(':')),
+      v6: addrs(host).filter((a) => a.includes(':')),
+    })),
+    // The fingerprints of the TLD's key-signing key. Empty means unsigned:
+    // DNSSEC validation stops at the root for every name under it.
+    ds: entry.ds.map(([keyTag, algorithm, digestType, digest]) => ({ keyTag, algorithm, digestType, digest })),
+    signed: entry.ds.length > 0,
+  };
+}
+
 /**
  * The facts for a TLD, apex-first. `.co.uk` has no delegation record of its
  * own — the one IANA publishes for `.uk` is the registry that runs it — so it
@@ -316,6 +364,11 @@ const rows = [...new Set([...whois.keys(), ...pricing.keys(), ...rdap.keys()])]
       // and the caveat whois.json attaches to the zone where it has one.
       whoisNeedle: w?.needle ?? null,
       whoisComment: w?.comment ?? null,
+      // From the root zone: the name servers the TLD is delegated to, their
+      // glue, and its DS records. `from` is the apex it was read off. null
+      // where the root does not carry the apex at all — the one hard test of
+      // whether a TLD resolves.
+      rootZone: rootZoneFor(tld),
       // From tld-facts.json: the IANA type, the organisation that runs the
       // zone and where to reach it, the derived `categories`, and the
       // hand-maintained `topics`. `from` is the TLD it was read off — the apex
@@ -347,6 +400,11 @@ const out = {
     restricted: rows.filter((r) => r.eligibility).length,
     // TLDs nobody in the price table sells, so `--where` has no one to name.
     unsold: rows.filter((r) => r.sellers.length === 0).length,
+    // Rows the root zone delegates, via their apex, and how many of those are
+    // signed. A row that is neither is a name nothing in the DNS resolves.
+    inRoot: rows.filter((r) => r.rootZone).length,
+    signed: rows.filter((r) => r.rootZone?.signed).length,
+    notDelegated: rows.filter((r) => !r.rootZone).length,
     // Rows carrying registry facts, their own or their apex's.
     withFacts: rows.filter((r) => r.facts).length,
     // Rows whose registry publishes a delegation record with something in it.
@@ -361,6 +419,19 @@ const out = {
       .sort()
       .reduce((m, name) => m.set(name, (m.get(name) ?? 0) + 1), new Map()),
   ),
+  // The root zone's own header, so a page can date what it shows and name the
+  // algorithm a DS record uses without carrying the whole file. Everything
+  // per-TLD is already on the rows; src/data/root-zone.json holds the rest —
+  // the root servers, the trust anchors and the delegated-TLD list.
+  rootZone: root
+    ? {
+        generated: root.generated,
+        serial: root.zone.serial,
+        counts: root.counts,
+        algorithms: root.algorithms,
+        digests: root.digests,
+      }
+    : null,
   // When the eligibility notes were last checked against the registry pages.
   eligibilityChecked: eligChecked,
   // What each derived category means, stated once rather than on every row.
@@ -383,6 +454,12 @@ console.log(
 console.log(
   `  sellers  ${Object.entries(out.sellers).map(([r, n]) => `${r} ${n}`).join(', ')}`,
 );
+if (root) {
+  const { inRoot, signed, notDelegated } = out.counts;
+  console.log(
+    `  root     ${inRoot} rows delegated in the root zone — ${signed} signed, ${notDelegated} the root does not carry`,
+  );
+}
 const { withFacts, withDelegation, withTopics } = out.counts;
 console.log(
   `  facts    ${withFacts} rows carry registry facts — ${withDelegation} a delegation record, ${withTopics} a subject`,
@@ -398,5 +475,15 @@ if (unknown.length) {
   console.warn(
     `  facts    WARNING: ${unknown.length} row(s) not in IANA's root database: ${unknown.map((r) => r.tld).join(', ')}` +
       ' — most likely non-root names that got past the root-zone filter in scripts/harvest-prices.mjs',
+  );
+}
+// The same question asked of the zone rather than the database, which is the
+// harder test: the database is a record of a delegation, the zone is the
+// delegation. A row missing here does not resolve today, whoever sells it.
+const undelegated = root ? rows.filter((r) => !r.rootZone) : [];
+if (undelegated.length) {
+  console.warn(
+    `  root     WARNING: ${undelegated.length} row(s) the root zone does not delegate: ${undelegated.map((r) => r.tld).join(', ')}` +
+      ' — priced or looked up, but nothing under them resolves',
   );
 }

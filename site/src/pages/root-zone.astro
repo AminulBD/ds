@@ -1,0 +1,405 @@
+---
+import Base from '../layouts/Base.astro';
+import root from '../data/root-zone.json';
+import data from '../data/tlds.json';
+
+// Both files are generated: src/data/root-zone.json by scripts/build-root-zone.mjs
+// from the four files at iana.org/domains/root/files, and src/data/tlds.json by
+// scripts/build-tlds.mjs from the tables ds bundles. This page is the one place
+// the two are compared — what the root delegates against what ds can look up.
+
+const fmt = (n: number) => n.toLocaleString('en-US');
+const pct = (n: number, of: number) => Math.round((n / of) * 100);
+
+const { counts, hints, anchors, list, zone } = root;
+const tlds = Object.entries(root.tlds);
+const algorithms = root.algorithms as Record<string, string>;
+const digests = root.digests as Record<string, string>;
+
+// The root's own keys. The KSK is the one a trust anchor covers and the one
+// that changes once in a decade; the ZSK signs the zone and rolls quarterly.
+const ksks = zone.keys.filter((k) => k.kind === 'KSK');
+const zsks = zone.keys.filter((k) => k.kind === 'ZSK');
+/** The anchor in force — no end date — as against the ones since retired. */
+const live = anchors.filter((a) => !a.validUntil);
+const retired = anchors.filter((a) => a.validUntil);
+/** An anchor is only useful if the key it names is in the zone. */
+const inZone = (keyTag: number) => ksks.some((k) => k.keyTag === keyTag);
+
+// Signing algorithms across the whole root, commonest first. Every TLD's DS
+// record names one, and the mix is the shape of the migration off RSA.
+const algoUse = Object.entries(root.algorithmUse)
+  .map(([alg, n]) => ({ alg: Number(alg), n: n as number, name: algorithms[alg] ?? `algorithm ${alg}` }))
+  .sort((a, b) => b.n - a.n);
+const algoMax = Math.max(...algoUse.map((a) => a.n));
+
+const unsigned = tlds.filter(([, e]) => e.ds.length === 0).map(([t]) => t);
+
+// --- what ds knows against what the root delegates -------------------------
+// A row's TLD, so `co.uk` counts as covered and `uk` counts once.
+const rows = new Map(data.rows.map((r) => [r.tld, r]));
+/** Delegated, but nothing in ds's tables prices it or names a server for it. */
+const uncovered = tlds.map(([t]) => t).filter((t) => !rows.has(t));
+/** The other direction: a row the root has never heard of. */
+const undelegated = data.rows.filter((r) => !r.rootZone).map((r) => r.tld);
+/** The readable form of a punycode TLD, where the row has one. */
+const label = (tld: string) => `.${rows.get(tld)?.unicode ?? tld}`;
+
+const title = 'The root zone — what the DNS actually delegates';
+const description =
+  `The ${fmt(counts.delegated)} top-level domains the root zone delegates today, from serial ${zone.serial}: ` +
+  `${fmt(counts.signed)} of them DNSSEC-signed, the ${fmt(counts.nameservers)} name servers they run on, ` +
+  `the thirteen root servers and the trust anchors at the top of it all.`;
+---
+
+<Base title={title} description={description}>
+  <div class="wrap page">
+    <h1>The root zone</h1>
+    <p class="lede muted">
+      Every domain name is answered by starting at the root, which knows one thing: which servers to ask about each
+      top-level domain. That list is a file — about two megabytes of it — published by IANA and served by the
+      thirteen root servers, and it is the only authority on what a TLD <em>is</em>. A name a registrar will happily
+      sell you but the root does not carry cannot resolve. This page is that file, read at build time: serial{' '}
+      <code>{zone.serial}</code>, on {root.generated}.
+    </p>
+
+    <dl class="facts">
+      <div>
+        <dt>Delegated</dt>
+        <dd>{fmt(counts.delegated)}<span class="unit">TLDs in the root</span></dd>
+      </div>
+      <div>
+        <dt>Signed</dt>
+        <dd>{fmt(counts.signed)}<span class="unit">{pct(counts.signed, counts.delegated)}% with a DS record</span></dd>
+      </div>
+      <div>
+        <dt>Name servers</dt>
+        <dd>{fmt(counts.nameservers)}<span class="unit">{fmt(counts.delegations)} delegations</span></dd>
+      </div>
+      <div>
+        <dt>Glue</dt>
+        <dd>{fmt(counts.glue4 + counts.glue6)}<span class="unit">{fmt(counts.glue6)} of them IPv6</span></dd>
+      </div>
+      <div>
+        <dt>Covered by <code>ds</code></dt>
+        <dd>{fmt(counts.delegated - uncovered.length)}<span class="unit">of {fmt(counts.delegated)} TLDs</span></dd>
+      </div>
+    </dl>
+
+    <section class="servers-sec">
+      <h2 id="servers">The thirteen root servers</h2>
+      <p class="muted intro">
+        Thirteen names, twelve organisations, and — through anycast — well over a thousand physical machines
+        answering on those addresses around the world. Thirteen because that was as many as would fit in a 512-byte
+        DNS response when the number was fixed, and it has not needed to change since. Every resolver on the
+        internet is born knowing these addresses; everything else it learns by asking.
+      </p>
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>Server</th>
+              <th>IPv4</th>
+              <th>IPv6</th>
+              <th>Run by</th>
+            </tr>
+          </thead>
+          <tbody>
+            {hints.servers.map((s) => (
+              <tr>
+                <th scope="row" class="mono">{s.host}</th>
+                <td class="mono">{s.v4.join(', ') || '—'}</td>
+                <td class="mono">{s.v6.join(', ') || '—'}</td>
+                <td class="faint">
+                  {s.operator ?? (s.formerly ? <>was <span class="mono">{s.formerly.toLowerCase()}</span></> : '—')}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <p class="faint after">
+        From the root hints file, last updated {hints.updated}
+        {hints.serial && <> against root zone serial <code>{hints.serial}</code></>}. Four of the thirteen name
+        their operator in the file itself; the rest give only the hostname the server answered on before the{' '}
+        <code>.root-servers.net</code> names existed, which is the only attribution the file carries.
+      </p>
+    </section>
+
+    <section class="dnssec">
+      <h2 id="dnssec">DNSSEC</h2>
+      <p class="muted intro">
+        The root signs its own records and publishes a <abbr title="Delegation Signer">DS</abbr> record — a
+        fingerprint of the TLD's signing key — for each signed TLD. That is what lets a resolver follow one chain of
+        signatures from a key it was configured with all the way down to an answer, and refuse anything that does
+        not verify. {fmt(counts.signed)} of the {fmt(counts.delegated)} delegated TLDs are signed
+        ({pct(counts.signed, counts.delegated)}%); the other {fmt(counts.unsigned)} are not, and names under them
+        are taken on trust.
+      </p>
+
+      <div class="split">
+        <div>
+          <h3 id="anchors">Trust anchors</h3>
+          <p class="faint">
+            The keys IANA publishes for the root itself — the one thing a validating resolver has to be told rather
+            than look up. Everything else in the DNS is verified by following signatures down from here.
+          </p>
+          <ul class="keys">
+            {[...live, ...retired].map((a) => (
+              <li class={a.validUntil ? 'key retired' : 'key'}>
+                <span class="key-tag">key {a.keyTag}</span>
+                <span class="faint">
+                  {algorithms[String(a.algorithm)] ?? `algorithm ${a.algorithm}`} ·{' '}
+                  {digests[String(a.digestType)] ?? `digest type ${a.digestType}`} · from {a.validFrom}
+                  {a.validUntil
+                    ? <> until {a.validUntil} — retired</>
+                    : inZone(a.keyTag)
+                      ? <> — in force, and in the zone</>
+                      : <> — in force, but not currently in the zone</>}
+                </span>
+                <code class="digest">{a.digest}</code>
+              </li>
+            ))}
+          </ul>
+          <p class="faint after">
+            The root's own key-signing {ksks.length === 1 ? 'key is' : 'keys are'}{' '}
+            {ksks.map((k, i) => (
+              <>{i > 0 ? (i === ksks.length - 1 ? ' and ' : ', ') : ''}<code>{k.keyTag}</code></>
+            ))} and it signs the zone with zone-signing {zsks.length === 1 ? 'key' : 'keys'}{' '}
+            {zsks.map((k, i) => (
+              <>{i > 0 ? (i === zsks.length - 1 ? ' and ' : ', ') : ''}<code>{k.keyTag}</code></>
+            ))}, all{' '}
+            {algorithms[String(zone.keys[0].algorithm)]}. Key tags are computed from the keys in the zone by{' '}
+            <a href="https://github.com/AminulBD/ds/blob/main/site/scripts/build-root-zone.mjs">the build script</a>,
+            so an anchor that stopped matching the zone would show up here rather than being taken on faith.
+          </p>
+        </div>
+
+        <div>
+          <h3>What the TLDs sign with</h3>
+          <p class="faint">
+            One row per algorithm, counted over the {fmt(counts.ds)} DS records in the root — a signed TLD often
+            publishes two while it rolls a key.
+          </p>
+          <ul class="bars">
+            {algoUse.map((a) => (
+              <li>
+                <span class="bar-label">{a.name}</span>
+                <span class="bar"><span class="bar-fill" style={`width: ${(a.n / algoMax) * 100}%`} /></span>
+                <span class="bar-n">{fmt(a.n)}</span>
+              </li>
+            ))}
+          </ul>
+          <p class="faint after">
+            RSA still signs most of the root, but the elliptic-curve algorithms — smaller keys, smaller answers —
+            are where new TLDs go.
+          </p>
+        </div>
+      </div>
+
+      <h3 id="unsigned">The {fmt(counts.unsigned)} unsigned TLDs</h3>
+      <p class="faint intro">
+        No DS record in the root, so validation stops at the top: a resolver cannot tell a genuine answer under one
+        of these from a forged one. Names under them resolve perfectly well — this is how all of the DNS worked
+        before 2010 — but nothing about the answer is provable.
+      </p>
+      <ul class="chips">
+        {unsigned.map((t) => (
+          <li>
+            {rows.has(t)
+              ? <a class="chip" href={`/tlds/${t}/`}>{label(t)}</a>
+              : <span class="chip chip-plain">{label(t)}</span>}
+          </li>
+        ))}
+      </ul>
+    </section>
+
+    <section class="coverage">
+      <h2 id="coverage">What the root carries, and what <code>ds</code> knows</h2>
+      <p class="muted intro">
+        The root zone is the list of TLDs that exist; the tables <code>ds</code> bundles are the list it can look
+        something up in. They are not the same list, and the gaps in both directions are worth naming — the whole
+        point of building this page from the zone is that it can contradict us.
+      </p>
+
+      <div class="split">
+        <div>
+          <h3>Delegated, but not in <code>ds</code></h3>
+          <p class="faint">
+            {fmt(uncovered.length)} TLDs the root delegates that <code>ds</code> has no row for: no registry service
+            in the bundled WHOIS table, none in IANA's RDAP bootstrap, and no registrar pricing them. Mostly
+            country codes whose registry publishes nothing public — and a run of IDN ccTLDs. A name under one of
+            these is a name <code>ds</code> cannot answer for at all.
+          </p>
+          <ul class="chips">
+            {uncovered.map((t) => <li><span class="chip chip-plain">.{t}</span></li>)}
+          </ul>
+        </div>
+        <div>
+          <h3>In <code>ds</code>, but not delegated</h3>
+          {undelegated.length === 0 ? (
+            <p class="faint">
+              Nothing — every row in the table is a TLD the root zone delegates today.
+            </p>
+          ) : (
+            <>
+              <p class="faint">
+                {fmt(undelegated.length)} row{undelegated.length === 1 ? '' : 's'} the root has never heard of.
+                These reach the table through a registrar's price feed — some sell alternative-root and blockchain
+                names alongside real TLDs — and they are worth showing rather than quietly dropping: whatever you
+                can buy there, nothing under them resolves in the DNS.
+              </p>
+              <ul class="chips">
+                {undelegated.map((t) => <li><a class="chip" href={`/tlds/${t}/`}>{label(t)}</a></li>)}
+              </ul>
+            </>
+          )}
+          <h3 class="second">Signed, of the ones <code>ds</code> carries</h3>
+          <p class="faint">
+            {fmt(data.counts.signed)} of the {fmt(data.counts.inRoot)} rows that the root delegates are signed —
+            counted per row, so <code>.co.uk</code> counts <code>.uk</code>'s DS record, which is the one that
+            actually secures it.
+          </p>
+        </div>
+      </div>
+
+      {(root.disagree.zoneOnly.length > 0 || root.disagree.listOnly.length > 0) && (
+        <p class="callout">
+          <strong>The zone and IANA's TLD list disagree today.</strong>{' '}
+          {root.disagree.zoneOnly.length > 0 && (
+            <>In the zone but not the list:{' '}
+            {root.disagree.zoneOnly.map((t, i) => <>{i > 0 ? ', ' : ''}<code>.{t}</code></>)}. </>
+          )}
+          {root.disagree.listOnly.length > 0 && (
+            <>In the list but not the zone:{' '}
+            {root.disagree.listOnly.map((t, i) => <>{i > 0 ? ', ' : ''}<code>.{t}</code></>)}. </>
+          )}
+          Both are cut from the same root, so this normally means one of the two was published a few hours before a
+          delegation changed.
+        </p>
+      )}
+    </section>
+
+    <section class="sources prose">
+      <h2 id="sources">Where this comes from</h2>
+      <p>
+        Four files, fetched from IANA every time the site is built and parsed into the numbers above — so what you
+        are reading is the root as it stood when this page was last deployed, not a copy of it kept in the repository
+        going stale. Nothing here is our reading of anything: it is the zone, printed.
+      </p>
+      <ul class="files">
+        <li>
+          <a href={root.sources.zone.url}>root.zone</a> — the zone itself, and everything on this page about
+          individual TLDs: their name servers, the glue addresses, the DS records.
+        </li>
+        <li>
+          <a href={root.sources.hints.url}>named.root</a> — the root hints: the thirteen servers and their
+          addresses, which is what a resolver starts life knowing.
+        </li>
+        <li>
+          <a href={root.sources.anchors.url}>root-anchors.xml</a> — the trust anchors, the keys DNSSEC validation
+          begins from.
+        </li>
+        <li>
+          <a href={root.sources.list.url}>tlds-alpha-by-domain.txt</a> — IANA's plain list of delegated TLDs, at
+          version <code>{list.version}</code>, {fmt(list.count)} entries. Used here as a second opinion on the
+          zone's own count.
+        </li>
+      </ul>
+      <p>
+        All four are linked from <a href="https://www.iana.org/domains/root/files">IANA's root files page</a>. Per-TLD
+        registry details — who runs a zone, where its registry is, what it costs — come from elsewhere and are on{' '}
+        <a href="/tlds/">the TLD table</a> and each TLD's own page.
+      </p>
+      <p class="faint">
+        Read on {root.generated}
+        {Object.values(root.sources).some((s) => !s.live) && (
+          <> — some of it carried over from an earlier build, because a fetch failed during that one</>
+        )}.
+      </p>
+    </section>
+  </div>
+</Base>
+
+<style>
+  .page { padding: 2.5rem 1.5rem 1rem; max-width: 62rem; }
+  .lede { font-size: 1.05rem; max-width: var(--measure); }
+
+  section { margin-top: 3rem; }
+  section > p, .intro, .after { max-width: var(--measure); }
+  .after { font-size: .88rem; margin-top: 1rem; }
+  h2 { margin-top: 0; }
+  h3 { font-size: .95rem; margin: 0 0 .35rem; }
+  h3.second { margin-top: 1.75rem; }
+
+  .facts {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(8.5rem, 1fr)); gap: 1rem;
+    padding: 1.25rem 0; border-block: 1px solid var(--border); margin: 1.75rem 0 0;
+  }
+  .facts div { min-width: 0; }
+  .facts dt { color: var(--fg-muted); font-size: .78rem; text-transform: uppercase; letter-spacing: .04em; }
+  .facts dd {
+    margin: .15rem 0 0; font-family: var(--mono); font-size: 1.3rem;
+    letter-spacing: -.02em; font-variant-numeric: tabular-nums;
+  }
+  .facts .unit { display: block; font-family: var(--sans); font-size: .75rem; color: var(--fg-faint); letter-spacing: 0; }
+
+  .table-scroll { overflow-x: auto; border: 1px solid var(--border); border-radius: var(--radius); margin-top: 1.25rem; }
+  table { width: 100%; border-collapse: collapse; font-size: .9rem; }
+  th, td { text-align: left; padding: .5rem .75rem; border-bottom: 1px solid var(--border); white-space: nowrap; }
+  thead th { background: var(--bg-soft); font-size: .78rem; text-transform: uppercase; letter-spacing: .04em; color: var(--fg-muted); }
+  tbody tr:last-child th, tbody tr:last-child td { border-bottom: 0; }
+  /* A hostname is a hostname — the global th style shouts it in capitals. */
+  tbody th[scope="row"] { text-transform: none; letter-spacing: normal; font-weight: 500; color: var(--fg); font-size: .9rem; }
+  .mono { font-family: var(--mono); font-size: .84rem; font-weight: 500; }
+
+  /* Two columns where there is room, one where there is not — the pairs here
+     are read side by side but neither depends on the other. */
+  .split { display: grid; gap: 2rem; margin-top: 1.5rem; }
+  @media (min-width: 780px) { .split { grid-template-columns: 1fr 1fr; } }
+  .split p { max-width: var(--measure); font-size: .88rem; }
+
+  .keys { list-style: none; margin: .75rem 0 0; padding: 0; display: grid; gap: .75rem; }
+  .key { display: grid; gap: .1rem; }
+  .key-tag { font-family: var(--mono); font-size: .88rem; }
+  .key .faint { font-size: .8rem; }
+  .key.retired .key-tag { color: var(--fg-faint); text-decoration: line-through; }
+  /* Inline code is nowrap by default; a 64-character digest has to wrap or it
+     drags the whole column past the edge of a phone. */
+  .digest { font-size: .72rem; color: var(--fg-faint); white-space: normal; word-break: break-all; line-height: 1.5; }
+
+  .bars { list-style: none; margin: .75rem 0 0; padding: 0; display: grid; gap: .45rem; }
+  /* minmax(0, …) rather than 1fr: an algorithm name is long enough that its
+     min-content width would otherwise push the row past a phone screen. */
+  .bars li { display: grid; grid-template-columns: minmax(0, 11rem) minmax(0, 1fr) 3rem; align-items: center; gap: .6rem; font-size: .82rem; }
+  .bar-label { color: var(--fg-muted); overflow-wrap: anywhere; }
+  .bar { background: var(--border); border-radius: 3px; height: .55rem; overflow: hidden; }
+  /* One TLD out of 1,480 is a sliver of a pixel; a count that exists should
+     still show as a mark rather than as nothing. */
+  .bar-fill { display: block; height: 100%; min-width: 3px; background: var(--accent); }
+  .bar-n { font-family: var(--mono); font-variant-numeric: tabular-nums; text-align: right; color: var(--fg-muted); }
+  @media (max-width: 480px) {
+    .bars li { grid-template-columns: minmax(0, 1fr) 2.5rem; }
+    .bars .bar { grid-column: 1 / -1; }
+  }
+
+  .chips { list-style: none; padding: 0; margin: 1rem 0 0; display: flex; flex-wrap: wrap; gap: .4rem; }
+  .chip {
+    display: inline-flex; align-items: baseline; gap: .4rem;
+    border: 1px solid var(--border); border-radius: 5px; padding: .2rem .5rem;
+    font-family: var(--mono); font-size: .82rem; text-decoration: none; color: var(--fg);
+  }
+  a.chip:hover { border-color: var(--accent); }
+  /* A TLD with no page of its own — nothing to link to, so it does not pretend. */
+  .chip-plain { color: var(--fg-muted); border-style: dashed; }
+
+  .callout {
+    border: 1px solid var(--border); border-left: 3px solid var(--unknown);
+    background: var(--bg-soft); border-radius: var(--radius);
+    padding: .9rem 1.1rem; margin: 1.75rem 0 0; font-size: .95rem; max-width: var(--measure);
+  }
+  .callout code { margin-right: .25rem; }
+
+  .files { padding-left: 1.1rem; }
+  .files li { margin: .4rem 0; }
+</style>
