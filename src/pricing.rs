@@ -4,6 +4,12 @@
 //! mean over the registrars that quote one. Amounts are USD, as published by
 //! the registrars; they are a snapshot, not a quote.
 //!
+//! `regular` is a registrar's published *first-year* list price, which is
+//! routinely well below what the name costs to keep — `.site` is a couple of
+//! dollars to register and forty-odd to renew. That is the shelf price, not a
+//! coupon: `scripts/harvest-prices.mjs` takes standing list prices only and
+//! drops discount codes. `renew` is carried beside it so the gap is visible.
+//!
 //! Like `whois.json`, the file is embedded at compile time so the binary stays
 //! self-contained; a custom table in the same format can be loaded over it.
 
@@ -27,8 +33,8 @@ struct RawOffer {
 
 #[derive(Debug, Default, Deserialize)]
 struct RawPrices {
-    /// List price for the first year. Null where the registrar does not sell
-    /// the TLD directly.
+    /// Published list price for the first year — not the yearly cost, which
+    /// is `renew`. Null where the registrar does not sell the TLD directly.
     #[serde(default)]
     regular: Option<f64>,
     #[serde(default)]
@@ -157,11 +163,14 @@ fn average(offers: &[RawOffer]) -> Option<Price> {
     })
 }
 
+/// Rounded to cents: the mean of three prices is still money, and `--json`
+/// should not report a renewal of 19.279999999999998.
 fn mean(values: &[f64]) -> Option<f64> {
     if values.is_empty() {
         return None;
     }
-    Some(values.iter().sum::<f64>() / values.len() as f64)
+    let mean = values.iter().sum::<f64>() / values.len() as f64;
+    Some((mean * 100.0).round() / 100.0)
 }
 
 #[cfg(test)]
@@ -173,6 +182,30 @@ mod tests {
         let p = Prices::load().unwrap();
         assert!(p.len() > 400, "{} TLDs priced", p.len());
         assert!(p.lookup("com").unwrap().register > 0.0);
+    }
+
+    /// The table is a mean over registrars, so it has to actually hold more
+    /// than one of them — a single-registrar file would make `registrars: n`
+    /// and the word "average" a lie.
+    #[test]
+    fn bundled_table_quotes_several_registrars() {
+        let p = Prices::load().unwrap();
+        let multi = p.by_tld.values().filter(|v| v.registrars > 1).count();
+        assert!(
+            multi > 400,
+            "only {multi} TLDs have more than one registrar quoting them"
+        );
+        assert!(p.lookup("com").unwrap().registrars > 1);
+    }
+
+    /// The point of harvesting more registrars: TLDs one of them does not
+    /// sell now have a price from one that does.
+    #[test]
+    fn bundled_table_reaches_past_one_registrars_catalogue() {
+        let p = Prices::load().unwrap();
+        for tld in ["cn", "nu"] {
+            assert!(p.lookup(tld).is_some(), ".{tld} should be priced");
+        }
     }
 
     #[test]
@@ -188,6 +221,64 @@ mod tests {
         assert_eq!(com.renew, Some(20.0));
         assert_eq!(com.registrars, 2);
         assert_eq!(com.label(), "$15.00");
+    }
+
+    /// The two means are taken over whoever quoted that particular figure, so
+    /// a registrar that only publishes a renewal still counts towards `renew`
+    /// without inflating `registrars`, and one that only publishes a
+    /// registration price leaves `renew` to the others.
+    #[test]
+    fn each_mean_counts_only_the_registrars_that_quoted_it() {
+        let p = Prices::parse(
+            r#"{"com": [{"register": "a.example", "prices": {"regular": 10.0}},
+                        {"register": "b.example", "prices": {"regular": 30.0, "renew": 40.0}},
+                        {"register": "c.example", "prices": {"renew": 60.0}}]}"#,
+        )
+        .unwrap();
+
+        let com = p.lookup("com").unwrap();
+        assert_eq!(com.register, 20.0);
+        assert_eq!(com.registrars, 2, "c.example quoted no registration price");
+        assert_eq!(com.renew, Some(50.0), "but it does count towards renewal");
+    }
+
+    /// Three registrars is the shape the bundled table is now in; the mean
+    /// must not be thrown off by the order they appear in.
+    #[test]
+    fn averages_are_order_independent() {
+        let offers = |a: &str, b: &str, c: &str| {
+            format!(
+                r#"{{"com": [{{"register": "{a}.example", "prices": {{"regular": 11.0, "renew": 12.0}}}},
+                            {{"register": "{b}.example", "prices": {{"regular": 14.0, "renew": 18.0}}}},
+                            {{"register": "{c}.example", "prices": {{"regular": 20.0, "renew": 30.0}}}}]}}"#
+            )
+        };
+        let one = Prices::parse(&offers("a", "b", "c")).unwrap();
+        let other = Prices::parse(&offers("c", "a", "b")).unwrap();
+
+        assert_eq!(one.lookup("com").unwrap().register, 15.0);
+        assert_eq!(one.lookup("com").unwrap().label(), "$15.00");
+        assert_eq!(
+            one.lookup("com").unwrap().renew,
+            other.lookup("com").unwrap().renew
+        );
+        assert_eq!(one.lookup("com").unwrap().registrars, 3);
+    }
+
+    /// Thirds of a dollar do not divide evenly, and `--json` should not say
+    /// so: the mean is money and comes back rounded to cents.
+    #[test]
+    fn means_are_rounded_to_cents() {
+        let p = Prices::parse(
+            r#"{"com": [{"register": "a.example", "prices": {"regular": 14.99, "renew": 19.99}},
+                        {"register": "b.example", "prices": {"regular": 14.98, "renew": 18.48}},
+                        {"register": "c.example", "prices": {"regular": 11.08, "renew": 11.08}}]}"#,
+        )
+        .unwrap();
+
+        let com = p.lookup("com").unwrap();
+        assert_eq!(com.register, 13.68);
+        assert_eq!(com.renew, Some(16.52));
     }
 
     #[test]

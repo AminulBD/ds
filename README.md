@@ -4,11 +4,11 @@ A small Rust CLI that checks domain availability across many TLDs at once.
 
 ```console
 $ ds mybrand --tld com,net,io,de,co.uk
-+ mybrand.io                       AVAILABLE    $65.98 whois     512ms
-+ mybrand.de                       AVAILABLE     $6.98 whois     331ms
-- mybrand.com                      TAKEN        $14.98 rdap      504ms
-- mybrand.net                      TAKEN        $14.98 rdap      503ms
-- mybrand.co.uk                    TAKEN         $7.48 rdap      869ms
++ mybrand.io                       AVAILABLE    $54.70 whois     512ms
++ mybrand.de                       AVAILABLE     $6.29 whois     331ms
+- mybrand.com                      TAKEN        $13.68 rdap      504ms
+- mybrand.net                      TAKEN        $14.83 rdap      503ms
+- mybrand.co.uk                    TAKEN         $6.08 rdap      869ms
 
 summary: 2 available  3 taken  0 unknown   (5 checked in 1.1s)
 ```
@@ -22,8 +22,9 @@ asked which server serves that TLD today.
 A lookup that cannot be answered is reported as `UNKNOWN` with the reason
 attached — never guessed as available.
 
-The column after the status is what the TLD costs to register for a year, in
-US dollars — see [Prices](#prices).
+The column after the status is what the TLD costs to register for its first
+year, in US dollars, averaged over the registrars that sell it — see
+[Prices](#prices).
 
 ## Install
 
@@ -142,16 +143,16 @@ Results stream in as they arrive. `+` is available, `-` is taken, `!` is a TLD
 you cannot register in, `?` could not be answered:
 
 ```
-+ mybrand.dev                      AVAILABLE    $15.98 rdap      415ms
-- apple.com                        TAKEN        $14.98 rdap      978ms
++ mybrand.dev                      AVAILABLE    $14.74 rdap      415ms
+- apple.com                        TAKEN        $13.68 rdap      978ms
 ! mybrand.aws                      PRIVATE           - rdap      312ms  .aws is a brand TLD — only AWS Registry LLC registers names there (ICANN Spec 13)
 ? google.pt                        UNKNOWN           - -        3548ms  whois: connecting to whois.dns.pt:43: timed out
 
 summary: 1 available  1 taken  1 private  1 unknown   (4 checked in 3.5s)
 ```
 
-The fourth column is the average yearly registration price for the TLD; `-`
-means no price is on file for it.
+The fourth column is the average first-year registration price for the TLD; `-`
+means no registrar in the bundled table prices it.
 
 The exit code is `0` if anything is available, `1` if nothing is, `2` on a
 startup error — so `ds mybrand --tld com -q && echo free` works in a script.
@@ -312,7 +313,7 @@ ds apple --tld com --details --registry --dns-records
 ```
 
 ```
-- apple.com                        TAKEN        $14.98 rdap      978ms
+- apple.com                        TAKEN        $13.68 rdap      978ms
     rdap: https://rdap.verisign.com/com/v1/
     registrar    Nom-iq Ltd. dba COM LAUDE
     created      1987-02-19T05:00:00Z
@@ -333,7 +334,7 @@ ds mynewbrand --tld com,de --where
 ```
 
 ```
-+ mynewbrand.de                    AVAILABLE     $6.98 whois     858ms
++ mynewbrand.de                    AVAILABLE     $6.29 whois     858ms
     registry     DENIC eG
     registry url http://www.denic.de/
     register at  https://porkbun.com/checkout/search?q=mynewbrand.de
@@ -354,34 +355,67 @@ registrars carry the TLD; their pages will say.
 ## Prices
 
 The price column is the average first-year registration price for the TLD, in
-**USD**, from the bundled `pricing.json` — 569 TLDs, from `$1.78` to `$2998.00`.
+**USD**, from the bundled `pricing.json` — 870 TLDs, from `$5.33` to `$7138.99`.
 The file lists one entry per registrar per TLD, so where several registrars
 quote a price the column is the mean of them:
 
 ```json
 {
   "com": [
-    { "register": "namecheap.com", "prices": { "regular": 14.98, "renew": 18.48, "transfer": 14.98 } }
+    { "register": "101domain.com", "prices": { "regular": 14.99, "renew": 19.99, "transfer": 13.99 } },
+    { "register": "namecheap.com", "prices": { "regular": 14.98, "renew": 18.48, "transfer": 14.98 } },
+    { "register": "porkbun.com",   "prices": { "regular": 11.08, "renew": 11.08, "transfer": 11.08 } }
   ]
 }
 ```
 
 Multi-label suffixes are looked up longest-first, as for WHOIS servers, so
-`.co.uk` gets its own price rather than `.uk`'s. A TLD nobody in the table
-prices — `.nu`, `.cn` and a handful of others — shows `-`.
+`.co.uk` gets its own price rather than `.uk`'s. A TLD none of them price shows
+`-`, which is still most of the root: `ds` knows of far more TLDs than anyone
+publishes a retail price for.
 
 Treat these as list prices, not quotes. They are a snapshot of published
-registrar pricing: first-year promotions, ICANN fees, taxes and premium names
-all move the real number, and a registry may not sell the TLD to you at all
+registrar pricing: `regular` is the **first year**, which is routinely a
+fraction of what the name then costs to keep — `.site` is a couple of dollars
+to register and forty-odd to renew — so read it next to `renew` rather than as
+a yearly cost. ICANN fees, taxes, premium names and time-limited promotions all
+move the real number again, and a registry may not sell the TLD to you at all
 (see [Where to register](#where-to-register)). `--json` carries the renewal
-price and the currency alongside the registration one:
+price, the currency and how many registrars went into the mean:
 
 ```json
-"price": { "register": 14.98, "renew": 18.48, "currency": "USD", "registrars": 1 }
+"price": { "register": 13.68, "renew": 16.52, "currency": "USD", "registrars": 3 }
 ```
 
 Prices you have actually been quoted beat a bundled snapshot — see
 [Your own prices](#your-own-prices) for how to supply them.
+
+### Where the prices come from
+
+`pricing.json` is harvested from registrars, not registries. Registries sell
+wholesale to accredited registrars under contract and, outside the ICANN gTLD
+agreements whose fees are per-registry PDFs rather than a feed, they publish no
+retail price at all — there is no price a registry charges *you*. So the table
+is the mean over the registrars that will actually sell you the name:
+
+| Source | TLDs | How |
+| --- | --- | --- |
+| [101domain](https://www.101domain.com/pricing.htm) | 754 | one page per TLD, enumerated from their sitemap |
+| [Porkbun](https://api.porkbun.com/api/json/v3/pricing/get) | 634 | public JSON pricing endpoint, no key |
+| [Namecheap](https://www.namecheap.com/domains/full-domain-pricing-list/) | 569 | earlier manual snapshot; their list page and API are both closed to scripts |
+
+Everything is quoted in USD at the source; nothing is currency-converted, and a
+source that quoted anything else would be left out rather than mixed in. Coupon
+codes and banner promotions are not scraped — only standing shelf prices.
+
+`scripts/harvest-prices.mjs` rebuilds the file, and documents each source and
+its limits at the top:
+
+```sh
+node scripts/harvest-prices.mjs --dry-run          # fetch and report, write nothing
+node scripts/harvest-prices.mjs --sources porkbun  # one source (a single request)
+node scripts/harvest-prices.mjs                    # all of them; the crawl takes ~20 min
+```
 
 ## Choosing the source
 
@@ -601,11 +635,17 @@ back ends. Expect it to take hours.
 ```sh
 cargo test
 cargo clippy --all-targets
-python3 scripts/test_whois_classify.py     # the harvest script's classifier
-man ./ds.1                 # preview the manual page
+python3 scripts/test_whois_classify.py  # the harvest script's classifier
+man ./ds.1                             # preview the manual page
 
 node scripts/build-private-tlds.mjs    # refresh private-tlds.json from ICANN
+node scripts/harvest-prices.mjs        # rebuild pricing.json from the registrars
 ```
+
+`pricing.json` is embedded with `include_str!` and stored verbatim, so the
+binary grows by whatever the file grows by — going from one registrar to three
+took it from 94 KB to 299 KB, and a stripped release build from 4.18 MB to
+4.38 MB.
 
 ## Releases
 

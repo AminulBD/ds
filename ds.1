@@ -49,17 +49,20 @@ published registry-agreement list, bundled as
 a TLD absent from that file is not claimed to be registrable either, it is
 simply reported as the registry answered.
 .PP
-The column after the status is what the TLD costs to register for a year, in
-US dollars: the average of the prices the bundled
+The column after the status is what the TLD costs to register for its first
+year, in US dollars: the mean over the registrars the bundled
 .I pricing.json
 lists for it, or
 .B \-
-for a TLD it does not price. Multi-label suffixes are matched longest-first, so
+for a TLD none of them price. Multi-label suffixes are matched longest-first, so
 .I co.uk
 gets its own price rather than
 .IR uk 's.
-These are published list prices, not quotes: promotions, taxes, registry fees
-and premium names all move the real figure; supply prices of your own with
+These are published list prices, not quotes, and the first year is often far
+cheaper than the years after it \(em see the renewal price in
+.BR \-\-json .
+Promotions, taxes, registry fees and premium names all move the real figure;
+supply prices of your own with
 .BR \-\-pricing\-file .
 .SH ARGUMENTS
 .TP

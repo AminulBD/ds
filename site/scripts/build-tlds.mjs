@@ -90,7 +90,12 @@ for (const [key, offers] of Object.entries(await readJson(resolve(repo, 'pricing
     price: mean('regular'),
     renew: mean('renew'),
     transfer: mean('transfer'),
-    registrars: [...new Set(offers.map((o) => o?.register).filter(Boolean))],
+    // Whoever quoted a *registration* price, which is what the column shows —
+    // the same count the CLI reports as `registrars`. A registrar that only
+    // published a renewal is in the file but not behind that figure.
+    registrars: [
+      ...new Set(offers.filter((o) => typeof o?.prices?.regular === 'number').map((o) => o.register).filter(Boolean)),
+    ],
   });
 }
 
