@@ -218,16 +218,24 @@ pub fn referred_server(host: String) -> WhoisServer {
 }
 
 /// Some registries need a query prefix/suffix rather than a bare domain.
+///
+/// These rules are matched on the end of the hostname, not anywhere inside it.
+/// A registry's *name* is often also a TLD, and every gTLD publishes a
+/// `whois.nic.<tld>`: a rule of `host.contains("jprs")` catches JPRS' server
+/// for `.jp` and also `whois.nic.jprs`, the unrelated server for the `.jprs`
+/// gTLD. The latter does not understand the `/e` suffix and answers "the
+/// queried object does not exist" to every query that carries it — which reads
+/// as AVAILABLE for a name that is registered.
 fn format_query(host: &str, domain: &str) -> String {
     let h = host.to_ascii_lowercase();
-    if h.contains("verisign-grs") || h.contains("crsnic") || h.contains("internic") {
+    if h.ends_with("verisign-grs.com") || h.ends_with("crsnic.net") || h.ends_with("internic.net") {
         // Ask for the registry record rather than a fuzzy match.
         format!("domain {domain}\r\n")
-    } else if h.contains("denic") {
+    } else if h.ends_with("denic.de") {
         format!("-T dn {domain}\r\n")
-    } else if h.contains("jprs") {
+    } else if h.ends_with("jprs.jp") {
         format!("{domain}/e\r\n")
-    } else if h.contains("whois.arnes.si") || h.contains("dk-hostmaster") {
+    } else if h.ends_with("arnes.si") || h.ends_with("dk-hostmaster.dk") {
         format!("--show-handles {domain}\r\n")
     } else {
         format!("{domain}\r\n")
@@ -680,6 +688,28 @@ mod tests {
     }
 
     #[test]
+    fn query_prefixes_match_the_registry_not_a_lookalike_tld() {
+        // The registries that need a special query still get one.
+        assert_eq!(format_query("whois.jprs.jp", "apple.jp"), "apple.jp/e\r\n");
+        assert_eq!(
+            format_query("whois.denic.de", "apple.de"),
+            "-T dn apple.de\r\n"
+        );
+        assert_eq!(
+            format_query("whois.verisign-grs.com", "apple.com"),
+            "domain apple.com\r\n"
+        );
+
+        // ...but a gTLD whose name merely contains a registry's does not.
+        // `whois.nic.jprs` answers "the queried object does not exist" to
+        // anything ending in `/e`, so the old contains() rule turned every
+        // registered .jprs domain into an AVAILABLE.
+        for host in ["whois.nic.jprs", "whois.nic.denic", "whois.nic.internic"] {
+            assert_eq!(format_query(host, "nic.jprs"), "nic.jprs\r\n", "{host}");
+        }
+    }
+
+    #[test]
     fn parses_the_iana_tld_record() {
         let raw = "domain:       DE\n\
                    organisation: DENIC eG\n\
@@ -756,6 +786,43 @@ mod tests {
         assert_eq!(d.expires.as_deref(), Some("2027-02-20T05:00:00Z"));
         assert_eq!(d.nameservers, vec!["a.ns.apple.com", "b.ns.apple.com"]);
         assert_eq!(d.dnssec, Some(false));
+    }
+
+    /// `scripts/refresh-whois.py` decides which harvested servers are safe to
+    /// put in `whois.json` by running a Python port of `classify()` over the
+    /// responses it collected. That verdict is only worth anything while the
+    /// port still matches this file, so the marker tables are compared here.
+    /// If this fails, `scripts/whois_classify.py` needs the same edit.
+    #[test]
+    fn harvest_script_classifier_is_in_sync() {
+        const PY: &str = include_str!("../scripts/whois_classify.py");
+
+        for (name, markers) in [
+            ("TAKEN_MARKERS", TAKEN_MARKERS),
+            ("STRONG_FREE_MARKERS", STRONG_FREE_MARKERS),
+            ("FREE_MARKERS", FREE_MARKERS),
+            ("REFUSAL_MARKERS", REFUSAL_MARKERS),
+            ("ERROR_MARKERS", ERROR_MARKERS),
+        ] {
+            // Anchored at a line start: `FREE_MARKERS` is a suffix of
+            // `STRONG_FREE_MARKERS`.
+            let head = format!("\n{name} = [");
+            let start = PY
+                .find(&head)
+                .unwrap_or_else(|| panic!("{name} is missing from scripts/whois_classify.py"));
+            let body = &PY[start + head.len()..];
+            let body = &body[..body.find("\n]").expect("unterminated list")];
+
+            let ported: Vec<&str> = body
+                .lines()
+                .filter_map(|l| l.trim().strip_prefix('"')?.strip_suffix("\","))
+                .collect();
+
+            assert_eq!(
+                ported, markers,
+                "{name} differs between src/whois.rs and scripts/whois_classify.py"
+            );
+        }
     }
 
     #[test]

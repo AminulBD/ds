@@ -1429,5 +1429,2240 @@
     "extensions": ".bd,.com.bd,.net.bd,.org.bd,.edu.bd,.gov.bd,.ac.bd,.mil.bd,.info.bd,.tv.bd,.co.bd,.ai.bd,.sch.bd,.id.bd,.বাংলা",
     "uri": "socket://whois.get.bd",
     "available": "Domain is available"
+  },
+  {
+    "extensions": ".aaa",
+    "uri": "socket://whois.nic.aaa",
+    "available": "no data found"
+  },
+  {
+    "extensions": ".aarp",
+    "uri": "socket://whois.nic.aarp",
+    "available": "no data found"
+  },
+  {
+    "extensions": ".abb",
+    "uri": "socket://whois.nic.abb",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".abbott",
+    "uri": "socket://whois.nic.abbott",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".abc",
+    "uri": "socket://whois.nic.abc",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".abogado",
+    "uri": "socket://whois.nic.abogado",
+    "available": "no data found"
+  },
+  {
+    "extensions": ".abudhabi",
+    "uri": "socket://whois.nic.abudhabi",
+    "available": "no data found"
+  },
+  {
+    "extensions": ".accenture",
+    "uri": "socket://whois.nic.accenture",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".aeg",
+    "uri": "socket://whois.nic.aeg",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".afl",
+    "uri": "socket://whois.nic.afl",
+    "available": "no data found"
+  },
+  {
+    "extensions": ".africa",
+    "uri": "socket://whois.nic.africa",
+    "available": "no information was found matching that query"
+  },
+  {
+    "extensions": ".agakhan",
+    "uri": "socket://whois.nic.agakhan",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".ai",
+    "uri": "socket://whois.nic.ai",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".airbus",
+    "uri": "socket://whois.nic.airbus",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".airtel",
+    "uri": "socket://whois.nic.airtel",
+    "available": "no data found"
+  },
+  {
+    "extensions": ".akdn",
+    "uri": "socket://whois.nic.akdn",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".alibaba",
+    "uri": "socket://whois.nic.alibaba",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".alipay",
+    "uri": "socket://whois.nic.alipay",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".allfinanz",
+    "uri": "socket://whois.nic.allfinanz",
+    "available": "the queried object does not exist"
+  },
+  {
+    "extensions": ".allstate",
+    "uri": "socket://whois.nic.allstate",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".ally",
+    "uri": "socket://whois.nic.ally",
+    "available": "no data found"
+  },
+  {
+    "extensions": ".alsace",
+    "uri": "socket://whois.nic.alsace",
+    "available": "not found"
+  },
+  {
+    "extensions": ".alstom",
+    "uri": "socket://whois.nic.alstom",
+    "available": "the queried object does not exist"
+  },
+  {
+    "extensions": ".americanfamily",
+    "uri": "socket://whois.nic.americanfamily",
+    "available": "no data found"
+  },
+  {
+    "extensions": ".amfam",
+    "uri": "socket://whois.nic.amfam",
+    "available": "no data found"
+  },
+  {
+    "extensions": ".amsterdam",
+    "uri": "socket://whois.nic.amsterdam",
+    "available": "domain status: free"
+  },
+  {
+    "extensions": ".anz",
+    "uri": "socket://whois.nic.anz",
+    "available": "no data found"
+  },
+  {
+    "extensions": ".aol",
+    "uri": "socket://whois.nic.aol",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".aquarelle",
+    "uri": "socket://whois.nic.aquarelle",
+    "available": "the queried object does not exist"
+  },
+  {
+    "extensions": ".arab",
+    "uri": "socket://whois.nic.arab",
+    "available": "no data found"
+  },
+  {
+    "extensions": ".arte",
+    "uri": "socket://whois.nic.arte",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".asda",
+    "uri": "socket://whois.nic.asda",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".audi",
+    "uri": "socket://whois.nic.audi",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".auspost",
+    "uri": "socket://whois.nic.auspost",
+    "available": "no data found"
+  },
+  {
+    "extensions": ".auto",
+    "uri": "socket://whois.nic.auto",
+    "available": "the queried object does not exist"
+  },
+  {
+    "extensions": ".autos",
+    "uri": "socket://whois.nic.autos",
+    "available": "the queried object does not exist"
+  },
+  {
+    "extensions": ".aw",
+    "uri": "socket://whois.nic.aw",
+    "available": "is free"
+  },
+  {
+    "extensions": ".baby",
+    "uri": "socket://whois.nic.baby",
+    "available": "the queried object does not exist"
+  },
+  {
+    "extensions": ".baidu",
+    "uri": "socket://whois.gtld.knet.cn",
+    "available": "the queried object does not exist"
+  },
+  {
+    "extensions": ".bank",
+    "uri": "socket://whois.nic.bank",
+    "available": "no data found"
+  },
+  {
+    "extensions": ".barcelona",
+    "uri": "socket://whois.nic.barcelona",
+    "available": "the queried object does not exist"
+  },
+  {
+    "extensions": ".barclaycard",
+    "uri": "socket://whois.nic.barclaycard",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".barclays",
+    "uri": "socket://whois.nic.barclays",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".barefoot",
+    "uri": "socket://whois.nic.barefoot",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".baseball",
+    "uri": "socket://whois.nic.baseball",
+    "available": "no data found"
+  },
+  {
+    "extensions": ".basketball",
+    "uri": "socket://whois.nic.basketball",
+    "available": "no data found"
+  },
+  {
+    "extensions": ".bauhaus",
+    "uri": "socket://whois.nic.bauhaus",
+    "available": "the queried object does not exist"
+  },
+  {
+    "extensions": ".bayern",
+    "uri": "socket://whois.nic.bayern",
+    "available": "the queried object does not exist"
+  },
+  {
+    "extensions": ".bbt",
+    "uri": "socket://whois.nic.bbt",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".bcg",
+    "uri": "socket://whois.nic.bcg",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".bcn",
+    "uri": "socket://whois.nic.bcn",
+    "available": "the queried object does not exist"
+  },
+  {
+    "extensions": ".beats",
+    "uri": "socket://whois.nic.beats",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".beauty",
+    "uri": "socket://whois.nic.beauty",
+    "available": "the queried object does not exist"
+  },
+  {
+    "extensions": ".beer",
+    "uri": "socket://whois.nic.beer",
+    "available": "no data found"
+  },
+  {
+    "extensions": ".bestbuy",
+    "uri": "socket://whois.nic.bestbuy",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".bf",
+    "uri": "socket://whois.registre.bf",
+    "available": "no object found"
+  },
+  {
+    "extensions": ".bh",
+    "uri": "socket://whois.nic.bh",
+    "available": "is available for registration"
+  },
+  {
+    "extensions": ".bharti",
+    "uri": "socket://whois.nic.bharti",
+    "available": "no data found"
+  },
+  {
+    "extensions": ".bi",
+    "uri": "socket://whois1.nic.bi",
+    "available": "no object found"
+  },
+  {
+    "extensions": ".bible",
+    "uri": "socket://whois.nic.bible",
+    "available": "no data found"
+  },
+  {
+    "extensions": ".bj",
+    "uri": "socket://whois.nic.bj",
+    "available": "no object found"
+  },
+  {
+    "extensions": ".blockbuster",
+    "uri": "socket://whois.nic.blockbuster",
+    "available": "is available for registration"
+  },
+  {
+    "extensions": ".bloomberg",
+    "uri": "socket://whois.nic.bloomberg",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".bm",
+    "uri": "socket://whois.nic.bm",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".bms",
+    "uri": "socket://whois.nic.bms",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".bmw",
+    "uri": "socket://whois.nic.bmw",
+    "available": "the queried object does not exist"
+  },
+  {
+    "extensions": ".bn",
+    "uri": "socket://whois.bnnic.bn",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".bnpparibas",
+    "uri": "socket://whois.nic.bnpparibas",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".boats",
+    "uri": "socket://whois.nic.boats",
+    "available": "the queried object does not exist"
+  },
+  {
+    "extensions": ".boehringer",
+    "uri": "socket://whois.nic.boehringer",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".bofa",
+    "uri": "socket://whois.nic.bofa",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".bond",
+    "uri": "socket://whois.nic.bond",
+    "available": "the queried object does not exist"
+  },
+  {
+    "extensions": ".bosch",
+    "uri": "socket://whois.nic.bosch",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".bostik",
+    "uri": "socket://whois.nic.bostik",
+    "available": "not found"
+  },
+  {
+    "extensions": ".boston",
+    "uri": "socket://whois.nic.boston",
+    "available": "no data found"
+  },
+  {
+    "extensions": ".box",
+    "uri": "socket://whois.nic.box",
+    "available": "the queried object does not exist"
+  },
+  {
+    "extensions": ".bradesco",
+    "uri": "socket://whois.nic.bradesco",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".bzh",
+    "uri": "socket://whois.nic.bzh",
+    "available": "not found"
+  },
+  {
+    "extensions": ".capitalone",
+    "uri": "socket://whois.nic.capitalone",
+    "available": "no data found"
+  },
+  {
+    "extensions": ".car",
+    "uri": "socket://whois.nic.car",
+    "available": "the queried object does not exist"
+  },
+  {
+    "extensions": ".cars",
+    "uri": "socket://whois.nic.cars",
+    "available": "the queried object does not exist"
+  },
+  {
+    "extensions": ".casa",
+    "uri": "socket://whois.nic.casa",
+    "available": "no data found"
+  },
+  {
+    "extensions": ".case",
+    "uri": "socket://whois.nic.case",
+    "available": "the queried object does not exist"
+  },
+  {
+    "extensions": ".catholic",
+    "uri": "socket://whois.nic.catholic",
+    "available": "no data found"
+  },
+  {
+    "extensions": ".cba",
+    "uri": "socket://whois.nic.cba",
+    "available": "no data found"
+  },
+  {
+    "extensions": ".cern",
+    "uri": "socket://whois.nic.cern",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".cfa",
+    "uri": "socket://whois.nic.cfa",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".cfd",
+    "uri": "socket://whois.nic.cfd",
+    "available": "the queried object does not exist"
+  },
+  {
+    "extensions": ".chanel",
+    "uri": "socket://whois.nic.chanel",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".charity",
+    "uri": "socket://whois.nic.charity",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".chintai",
+    "uri": "socket://whois.nic.chintai",
+    "available": "no data found"
+  },
+  {
+    "extensions": ".ci",
+    "uri": "socket://whois.nic.ci",
+    "available": "the queried object does not exist"
+  },
+  {
+    "extensions": ".cipriani",
+    "uri": "socket://whois.nic.cipriani",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".citadel",
+    "uri": "socket://whois.nic.citadel",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".clinique",
+    "uri": "socket://whois.nic.clinique",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".clubmed",
+    "uri": "socket://whois.nic.clubmed",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".cologne,.koeln",
+    "uri": "socket://whois.ryce-rsp.com",
+    "available": "no information was found matching that query"
+  },
+  {
+    "extensions": ".commbank",
+    "uri": "socket://whois.nic.commbank",
+    "available": "no data found"
+  },
+  {
+    "extensions": ".compare",
+    "uri": "socket://whois.nic.compare",
+    "available": "no data found"
+  },
+  {
+    "extensions": ".comsec",
+    "uri": "socket://whois.nic.comsec",
+    "available": "no match for"
+  },
+  {
+    "extensions": ".cooking",
+    "uri": "socket://whois.nic.cooking",
+    "available": "no data found"
+  },
+  {
+    "extensions": ".corsica",
+    "uri": "socket://whois.nic.corsica",
+    "available": "not found"
+  },
+  {
+    "extensions": ".country,.diy,.food,.forum,.hiv,.lifestyle,.living,.pid,.trust,.vana",
+    "uri": "socket://whois.registry.click",
+    "available": "is available for registration"
+  },
+  {
+    "extensions": ".coupon",
+    "uri": "socket://whois.nic.coupon",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".cpa",
+    "uri": "socket://whois.nic.cpa",
+    "available": "no data found"
+  },
+  {
+    "extensions": ".cr",
+    "uri": "socket://whois.nic.cr",
+    "available": "no entries found"
+  },
+  {
+    "extensions": ".creditunion",
+    "uri": "socket://whois.nic.creditunion",
+    "available": "is available for registration"
+  },
+  {
+    "extensions": ".crown",
+    "uri": "socket://whois.nic.crown",
+    "available": "not found"
+  },
+  {
+    "extensions": ".crs",
+    "uri": "socket://whois.nic.crs",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".cruise",
+    "uri": "socket://whois.nic.cruise",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".cuisinella",
+    "uri": "socket://whois.nic.cuisinella",
+    "available": "no data found"
+  },
+  {
+    "extensions": ".cv",
+    "uri": "socket://whois.nic.cv",
+    "available": "the queried object does not exist"
+  },
+  {
+    "extensions": ".cyou",
+    "uri": "socket://whois.nic.cyou",
+    "available": "the queried object does not exist"
+  },
+  {
+    "extensions": ".data",
+    "uri": "socket://whois.nic.data",
+    "available": "is available for registration"
+  },
+  {
+    "extensions": ".dds",
+    "uri": "socket://whois.nic.dds",
+    "available": "no data found"
+  },
+  {
+    "extensions": ".dealer",
+    "uri": "socket://whois.nic.dealer",
+    "available": "the queried object does not exist"
+  },
+  {
+    "extensions": ".deloitte",
+    "uri": "socket://whois.nic.deloitte",
+    "available": "the queried object does not exist"
+  },
+  {
+    "extensions": ".delta",
+    "uri": "socket://whois.nic.delta",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".discover",
+    "uri": "socket://whois.nic.discover",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".dish",
+    "uri": "socket://whois.nic.dish",
+    "available": "is available for registration"
+  },
+  {
+    "extensions": ".do",
+    "uri": "socket://whois.nic.do",
+    "available": "no object found"
+  },
+  {
+    "extensions": ".dot",
+    "uri": "socket://whois.nic.dot",
+    "available": "is available for registration"
+  },
+  {
+    "extensions": ".dtv",
+    "uri": "socket://whois.nic.dtv",
+    "available": "is available for registration"
+  },
+  {
+    "extensions": ".dubai",
+    "uri": "socket://whois.nic.dubai",
+    "available": "no data found"
+  },
+  {
+    "extensions": ".dvag",
+    "uri": "socket://whois.nic.dvag",
+    "available": "the queried object does not exist"
+  },
+  {
+    "extensions": ".dvr",
+    "uri": "socket://whois.nic.dvr",
+    "available": "is available for registration"
+  },
+  {
+    "extensions": ".dz",
+    "uri": "socket://whois.nic.dz",
+    "available": "no match for"
+  },
+  {
+    "extensions": ".edeka",
+    "uri": "socket://whois.nic.edeka",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".emerck",
+    "uri": "socket://whois.nic.emerck",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".ericsson",
+    "uri": "socket://whois.nic.ericsson",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".erni",
+    "uri": "socket://whois.nic.erni",
+    "available": "the queried object does not exist"
+  },
+  {
+    "extensions": ".eurovision",
+    "uri": "socket://whois.nic.eurovision",
+    "available": "the queried object does not exist"
+  },
+  {
+    "extensions": ".extraspace",
+    "uri": "socket://whois.nic.extraspace",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".fage",
+    "uri": "socket://whois.nic.fage",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".fashion",
+    "uri": "socket://whois.nic.fashion",
+    "available": "no data found"
+  },
+  {
+    "extensions": ".fedex",
+    "uri": "socket://whois.nic.fedex",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".ferrari",
+    "uri": "socket://whois.nic.ferrari",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".fidelity",
+    "uri": "socket://whois.nic.fidelity",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".fido",
+    "uri": "socket://whois.nic.fido",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".firmdale",
+    "uri": "socket://whois.nic.firmdale",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".fishing",
+    "uri": "socket://whois.nic.fishing",
+    "available": "no data found"
+  },
+  {
+    "extensions": ".fit",
+    "uri": "socket://whois.nic.fit",
+    "available": "no data found"
+  },
+  {
+    "extensions": ".fox",
+    "uri": "socket://whois.nic.fox",
+    "available": "no data found"
+  },
+  {
+    "extensions": ".fresenius",
+    "uri": "socket://whois.nic.fresenius",
+    "available": "the queried object does not exist"
+  },
+  {
+    "extensions": ".frl",
+    "uri": "socket://whois.nic.frl",
+    "available": "the queried object does not exist"
+  },
+  {
+    "extensions": ".frogans",
+    "uri": "socket://whois.nic.frogans",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".gallo",
+    "uri": "socket://whois.nic.gallo",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".gallup",
+    "uri": "socket://whois.nic.gallup",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".garden",
+    "uri": "socket://whois.nic.garden",
+    "available": "no data found"
+  },
+  {
+    "extensions": ".gay",
+    "uri": "socket://whois.nic.gay",
+    "available": "no data found"
+  },
+  {
+    "extensions": ".ge",
+    "uri": "socket://whois.nic.ge",
+    "available": "no match for"
+  },
+  {
+    "extensions": ".gent",
+    "uri": "socket://whois.nic.gent",
+    "available": "the queried object does not exist"
+  },
+  {
+    "extensions": ".genting",
+    "uri": "socket://whois.nic.genting",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".george",
+    "uri": "socket://whois.nic.george",
+    "available": "no data found"
+  },
+  {
+    "extensions": ".gg",
+    "uri": "socket://whois.gg",
+    "available": "not found"
+  },
+  {
+    "extensions": ".gh",
+    "uri": "socket://whois.nic.gh",
+    "available": "no object found"
+  },
+  {
+    "extensions": ".gi",
+    "uri": "socket://whois.identitydigital.services",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".giving",
+    "uri": "socket://whois.nic.giving",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".gl",
+    "uri": "socket://whois.nic.gl",
+    "available": "the queried object does not exist"
+  },
+  {
+    "extensions": ".gmx",
+    "uri": "socket://whois.nic.gmx",
+    "available": "the queried object does not exist"
+  },
+  {
+    "extensions": ".gn",
+    "uri": "socket://whois.ande.gov.gn",
+    "available": "the queried object does not exist"
+  },
+  {
+    "extensions": ".godaddy",
+    "uri": "socket://whois.nic.godaddy",
+    "available": "no data found"
+  },
+  {
+    "extensions": ".goodyear",
+    "uri": "socket://whois.nic.goodyear",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".grocery",
+    "uri": "socket://whois.nic.grocery",
+    "available": "no data found"
+  },
+  {
+    "extensions": ".gy",
+    "uri": "socket://whois.registry.gy",
+    "available": "the queried object does not exist"
+  },
+  {
+    "extensions": ".hair",
+    "uri": "socket://whois.nic.hair",
+    "available": "the queried object does not exist"
+  },
+  {
+    "extensions": ".hamburg",
+    "uri": "socket://whois.nic.hamburg",
+    "available": "the queried object does not exist"
+  },
+  {
+    "extensions": ".hdfc",
+    "uri": "socket://whois.nic.hdfc",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".hdfcbank",
+    "uri": "socket://whois.nic.hdfcbank",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".helsinki",
+    "uri": "socket://whois.nic.helsinki",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".hermes",
+    "uri": "socket://whois.nic.hermes",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".hkt",
+    "uri": "socket://whois.nic.hkt",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".hn",
+    "uri": "socket://whois.nic.hn",
+    "available": "the queried object does not exist"
+  },
+  {
+    "extensions": ".homedepot",
+    "uri": "socket://whois.nic.homedepot",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".homes",
+    "uri": "socket://whois.nic.homes",
+    "available": "the queried object does not exist"
+  },
+  {
+    "extensions": ".horse",
+    "uri": "socket://whois.nic.horse",
+    "available": "no data found"
+  },
+  {
+    "extensions": ".hotels",
+    "uri": "socket://whois.nic.hotels",
+    "available": "no data found"
+  },
+  {
+    "extensions": ".hr",
+    "uri": "socket://whois.dns.hr",
+    "available": "no entries found"
+  },
+  {
+    "extensions": ".ht",
+    "uri": "socket://whois.nic.ht",
+    "available": "the queried object does not exist"
+  },
+  {
+    "extensions": ".hughes",
+    "uri": "socket://whois.nic.hughes",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".ibm",
+    "uri": "socket://whois.nic.ibm",
+    "available": "no data found"
+  },
+  {
+    "extensions": ".icbc",
+    "uri": "socket://whois.nic.icbc",
+    "available": "the queried object does not exist"
+  },
+  {
+    "extensions": ".ice",
+    "uri": "socket://whois.nic.ice",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".ifm",
+    "uri": "socket://whois.nic.ifm",
+    "available": "the queried object does not exist"
+  },
+  {
+    "extensions": ".ikano",
+    "uri": "socket://whois.nic.ikano",
+    "available": "the queried object does not exist"
+  },
+  {
+    "extensions": ".imamat",
+    "uri": "socket://whois.nic.imamat",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".inc",
+    "uri": "socket://whois.nic.inc",
+    "available": "the queried object does not exist"
+  },
+  {
+    "extensions": ".insurance",
+    "uri": "socket://whois.nic.insurance",
+    "available": "no data found"
+  },
+  {
+    "extensions": ".ismaili",
+    "uri": "socket://whois.nic.ismaili",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".ist",
+    "uri": "socket://whois.nic.ist",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".itv",
+    "uri": "socket://whois.nic.itv",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".jaguar",
+    "uri": "socket://whois.nic.jaguar",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".java",
+    "uri": "socket://whois.nic.java",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".je",
+    "uri": "socket://whois.je",
+    "available": "not found"
+  },
+  {
+    "extensions": ".jeep",
+    "uri": "socket://whois.nic.jeep",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".jio",
+    "uri": "socket://whois.nic.jio",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".jll",
+    "uri": "socket://whois.nic.jll",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".jprs",
+    "uri": "socket://whois.nic.jprs",
+    "available": "the queried object does not exist"
+  },
+  {
+    "extensions": ".juniper",
+    "uri": "socket://whois.nic.juniper",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".kerryhotels",
+    "uri": "socket://whois.nic.kerryhotels",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".kerryproperties",
+    "uri": "socket://whois.nic.kerryproperties",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".kfh",
+    "uri": "socket://whois.nic.kfh",
+    "available": "is available for registration"
+  },
+  {
+    "extensions": ".kg",
+    "uri": "socket://whois.kg",
+    "available": "is available for registration"
+  },
+  {
+    "extensions": ".ki",
+    "uri": "socket://whois.nic.ki",
+    "available": "the queried object does not exist"
+  },
+  {
+    "extensions": ".kids",
+    "uri": "socket://whois.nic.kids",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".kiwi",
+    "uri": "socket://whois.nic.kiwi",
+    "available": "not found"
+  },
+  {
+    "extensions": ".kn",
+    "uri": "socket://whois.nic.kn",
+    "available": "the queried object does not exist"
+  },
+  {
+    "extensions": ".kosher",
+    "uri": "socket://whois.nic.kosher",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".krd",
+    "uri": "socket://whois.nic.krd",
+    "available": "no data found"
+  },
+  {
+    "extensions": ".kuokgroup",
+    "uri": "socket://whois.nic.kuokgroup",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".ky",
+    "uri": "socket://whois.kyregistry.ky",
+    "available": "is available for registration"
+  },
+  {
+    "extensions": ".lacaixa",
+    "uri": "socket://whois.nic.lacaixa",
+    "available": "the queried object does not exist"
+  },
+  {
+    "extensions": ".lamborghini",
+    "uri": "socket://whois.nic.lamborghini",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".lamer",
+    "uri": "socket://whois.nic.lamer",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".landrover",
+    "uri": "socket://whois.nic.landrover",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".lasalle",
+    "uri": "socket://whois.nic.lasalle",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".latino",
+    "uri": "socket://whois.nic.latino",
+    "available": "is available for registration"
+  },
+  {
+    "extensions": ".latrobe",
+    "uri": "socket://whois.nic.latrobe",
+    "available": "no data found"
+  },
+  {
+    "extensions": ".law",
+    "uri": "socket://whois.nic.law",
+    "available": "no data found"
+  },
+  {
+    "extensions": ".lds",
+    "uri": "socket://whois.nic.lds",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".leclerc",
+    "uri": "socket://whois.nic.leclerc",
+    "available": "not found"
+  },
+  {
+    "extensions": ".lefrak",
+    "uri": "socket://whois.nic.lefrak",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".lego",
+    "uri": "socket://whois.nic.lego",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".lidl",
+    "uri": "socket://whois.nic.lidl",
+    "available": "the queried object does not exist"
+  },
+  {
+    "extensions": ".lifeinsurance",
+    "uri": "socket://whois.nic.lifeinsurance",
+    "available": "no data found"
+  },
+  {
+    "extensions": ".llp",
+    "uri": "socket://whois.nic.llp",
+    "available": "the queried object does not exist"
+  },
+  {
+    "extensions": ".locker",
+    "uri": "socket://whois.nic.locker",
+    "available": "is available for registration"
+  },
+  {
+    "extensions": ".lpl",
+    "uri": "socket://whois.nic.lpl",
+    "available": "the queried object does not exist"
+  },
+  {
+    "extensions": ".lplfinancial",
+    "uri": "socket://whois.nic.lplfinancial",
+    "available": "the queried object does not exist"
+  },
+  {
+    "extensions": ".ls",
+    "uri": "socket://whois.nic.ls",
+    "available": "no record found"
+  },
+  {
+    "extensions": ".lundbeck",
+    "uri": "socket://whois.nic.lundbeck",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".luxe",
+    "uri": "socket://whois.nic.luxe",
+    "available": "no data found"
+  },
+  {
+    "extensions": ".ly",
+    "uri": "socket://whois.nic.ly",
+    "available": "the queried object does not exist"
+  },
+  {
+    "extensions": ".madrid",
+    "uri": "socket://whois.nic.madrid",
+    "available": "the queried object does not exist"
+  },
+  {
+    "extensions": ".maif",
+    "uri": "socket://whois.nic.maif",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".makeup",
+    "uri": "socket://whois.nic.makeup",
+    "available": "the queried object does not exist"
+  },
+  {
+    "extensions": ".man",
+    "uri": "socket://whois.nic.man",
+    "available": "the queried object does not exist"
+  },
+  {
+    "extensions": ".mango",
+    "uri": "socket://whois.nic.mango",
+    "available": "the queried object does not exist"
+  },
+  {
+    "extensions": ".marriott",
+    "uri": "socket://whois.nic.marriott",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".mckinsey",
+    "uri": "socket://whois.nic.mckinsey",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".merck",
+    "uri": "socket://whois.nic.merck",
+    "available": "no information was found matching that query"
+  },
+  {
+    "extensions": ".merckmsd",
+    "uri": "socket://whois.nic.merckmsd",
+    "available": "no data found"
+  },
+  {
+    "extensions": ".mini",
+    "uri": "socket://whois.nic.mini",
+    "available": "the queried object does not exist"
+  },
+  {
+    "extensions": ".mit",
+    "uri": "socket://whois.nic.mit",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".ml",
+    "uri": "socket://whois.nic.ml",
+    "available": "the queried object does not exist"
+  },
+  {
+    "extensions": ".mls",
+    "uri": "socket://whois.nic.mls",
+    "available": "not found"
+  },
+  {
+    "extensions": ".mma",
+    "uri": "socket://whois.nic.mma",
+    "available": "not found"
+  },
+  {
+    "extensions": ".mo",
+    "uri": "socket://whois.monic.mo",
+    "available": "no match for"
+  },
+  {
+    "extensions": ".mobile",
+    "uri": "socket://whois.nic.mobile",
+    "available": "is available for registration"
+  },
+  {
+    "extensions": ".monash",
+    "uri": "socket://whois.nic.monash",
+    "available": "no data found"
+  },
+  {
+    "extensions": ".monster",
+    "uri": "socket://whois.nic.monster",
+    "available": "the queried object does not exist"
+  },
+  {
+    "extensions": ".mormon",
+    "uri": "socket://whois.nic.mormon",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".moscow",
+    "uri": "socket://whois.nic.moscow",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".moto",
+    "uri": "socket://whois.nic.moto",
+    "available": "no data found"
+  },
+  {
+    "extensions": ".motorcycles",
+    "uri": "socket://whois.nic.motorcycles",
+    "available": "the queried object does not exist"
+  },
+  {
+    "extensions": ".mr",
+    "uri": "socket://whois.nic.mr",
+    "available": "the queried object does not exist"
+  },
+  {
+    "extensions": ".msd",
+    "uri": "socket://whois.nic.msd",
+    "available": "no data found"
+  },
+  {
+    "extensions": ".mtr",
+    "uri": "socket://whois.nic.mtr",
+    "available": "has not been registered"
+  },
+  {
+    "extensions": ".mu",
+    "uri": "socket://whois.tld.mu",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".museum",
+    "uri": "socket://whois.nic.museum",
+    "available": "not found"
+  },
+  {
+    "extensions": ".music",
+    "uri": "socket://whois.registryservices.music",
+    "available": "is available for registration"
+  },
+  {
+    "extensions": ".mw",
+    "uri": "socket://whois.nic.mw",
+    "available": "no entries found"
+  },
+  {
+    "extensions": ".mz",
+    "uri": "socket://whois.nic.mz",
+    "available": "the queried object does not exist"
+  },
+  {
+    "extensions": ".nab",
+    "uri": "socket://whois.nic.nab",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".netbank",
+    "uri": "socket://whois.nic.netbank",
+    "available": "no data found"
+  },
+  {
+    "extensions": ".next",
+    "uri": "socket://whois.nic.next",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".nextdirect",
+    "uri": "socket://whois.nic.nextdirect",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".nf",
+    "uri": "socket://whois.nic.nf",
+    "available": "the queried object does not exist"
+  },
+  {
+    "extensions": ".nikon",
+    "uri": "socket://whois.nic.nikon",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".nissay",
+    "uri": "socket://whois.nic.nissay",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".nokia",
+    "uri": "socket://whois.nic.nokia",
+    "available": "the queried object does not exist"
+  },
+  {
+    "extensions": ".nowtv",
+    "uri": "socket://whois.nic.nowtv",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".nra",
+    "uri": "socket://whois.nic.nra",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".nrw",
+    "uri": "socket://whois.nic.nrw",
+    "available": "the queried object does not exist"
+  },
+  {
+    "extensions": ".ntt",
+    "uri": "socket://whois.nic.ntt",
+    "available": "the queried object does not exist"
+  },
+  {
+    "extensions": ".obi",
+    "uri": "socket://whois.nic.obi",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".observer",
+    "uri": "socket://whois.nic.observer",
+    "available": "is available for registration"
+  },
+  {
+    "extensions": ".ollo",
+    "uri": "socket://whois.nic.ollo",
+    "available": "is available for registration"
+  },
+  {
+    "extensions": ".om",
+    "uri": "socket://whois.registry.om",
+    "available": "no data found"
+  },
+  {
+    "extensions": ".ooo",
+    "uri": "socket://whois.nic.ooo",
+    "available": "the queried object does not exist"
+  },
+  {
+    "extensions": ".oracle",
+    "uri": "socket://whois.nic.oracle",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".orange",
+    "uri": "socket://whois.nic.orange",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".origins",
+    "uri": "socket://whois.nic.origins",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".ott",
+    "uri": "socket://whois.nic.ott",
+    "available": "is available for registration"
+  },
+  {
+    "extensions": ".ovh",
+    "uri": "socket://whois.nic.ovh",
+    "available": "not found"
+  },
+  {
+    "extensions": ".pccw",
+    "uri": "socket://whois.nic.pccw",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".pg",
+    "uri": "socket://whois.nic.pg",
+    "available": "the queried object does not exist"
+  },
+  {
+    "extensions": ".phone",
+    "uri": "socket://whois.nic.phone",
+    "available": "is available for registration"
+  },
+  {
+    "extensions": ".pictet",
+    "uri": "socket://whois.nic.pictet",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".pk",
+    "uri": "socket://whois.pknic.net.pk",
+    "available": "status: not registered"
+  },
+  {
+    "extensions": ".pnc",
+    "uri": "socket://whois.nic.pnc",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".pohl",
+    "uri": "socket://whois.nic.pohl",
+    "available": "the queried object does not exist"
+  },
+  {
+    "extensions": ".politie",
+    "uri": "socket://whois.nic.politie",
+    "available": "domain status: free"
+  },
+  {
+    "extensions": ".post",
+    "uri": "socket://whois.nic.post",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".pr",
+    "uri": "socket://whois.afilias-srs.net",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".progressive",
+    "uri": "socket://whois.nic.progressive",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".pwc",
+    "uri": "socket://whois.nic.pwc",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".qpon",
+    "uri": "socket://whois.nic.qpon",
+    "available": "the queried object does not exist"
+  },
+  {
+    "extensions": ".quest",
+    "uri": "socket://whois.nic.quest",
+    "available": "the queried object does not exist"
+  },
+  {
+    "extensions": ".radio",
+    "uri": "socket://whois.nic.radio",
+    "available": "the queried object does not exist"
+  },
+  {
+    "extensions": ".realty",
+    "uri": "socket://whois.nic.realty",
+    "available": "is available for registration"
+  },
+  {
+    "extensions": ".redumbrella",
+    "uri": "socket://whois.nic.redumbrella",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".reit",
+    "uri": "socket://whois.nic.reit",
+    "available": "the queried object does not exist"
+  },
+  {
+    "extensions": ".reliance",
+    "uri": "socket://whois.nic.reliance",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".ren",
+    "uri": "socket://whois.nic.ren",
+    "available": "the queried object does not exist"
+  },
+  {
+    "extensions": ".rexroth",
+    "uri": "socket://whois.nic.rexroth",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".richardli",
+    "uri": "socket://whois.nic.richardli",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".ril",
+    "uri": "socket://whois.nic.ril",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".rogers",
+    "uri": "socket://whois.nic.rogers",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".ruhr",
+    "uri": "socket://whois.nic.ruhr",
+    "available": "the queried object does not exist"
+  },
+  {
+    "extensions": ".rw",
+    "uri": "socket://whois.ricta.org.rw",
+    "available": "the queried object does not exist"
+  },
+  {
+    "extensions": ".rwe,.sener",
+    "uri": "socket://whois.nic.rwe",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".saarland",
+    "uri": "socket://whois.nic.saarland",
+    "available": "the queried object does not exist"
+  },
+  {
+    "extensions": ".sakura",
+    "uri": "socket://whois.nic.sakura",
+    "available": "the queried object does not exist"
+  },
+  {
+    "extensions": ".samsung",
+    "uri": "socket://whois.nic.samsung",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".sanofi",
+    "uri": "socket://whois.nic.sanofi",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".sap",
+    "uri": "socket://whois.nic.sap",
+    "available": "the queried object does not exist"
+  },
+  {
+    "extensions": ".saxo",
+    "uri": "socket://whois.nic.saxo",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".sbi",
+    "uri": "socket://whois.nic.sbi",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".sbs",
+    "uri": "socket://whois.nic.sbs",
+    "available": "the queried object does not exist"
+  },
+  {
+    "extensions": ".scb",
+    "uri": "socket://whois.nic.scb",
+    "available": "not found"
+  },
+  {
+    "extensions": ".scholarships",
+    "uri": "socket://whois.nic.scholarships",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".schwarz",
+    "uri": "socket://whois.nic.schwarz",
+    "available": "the queried object does not exist"
+  },
+  {
+    "extensions": ".sd",
+    "uri": "socket://whois.nic.sd",
+    "available": "the queried object does not exist"
+  },
+  {
+    "extensions": ".seat",
+    "uri": "socket://whois.nic.seat",
+    "available": "the queried object does not exist"
+  },
+  {
+    "extensions": ".sew",
+    "uri": "socket://whois.nic.sew",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".sfr",
+    "uri": "socket://whois.nic.sfr",
+    "available": "the queried object does not exist"
+  },
+  {
+    "extensions": ".shangrila",
+    "uri": "socket://whois.nic.shangrila",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".shouji,.xn--3ds443g,.xn--fiq228c5hs,.xn--vuq861b",
+    "uri": "socket://whois.teleinfo.cn",
+    "available": "no matching record"
+  },
+  {
+    "extensions": ".sina",
+    "uri": "socket://whois.nic.sina",
+    "available": "the queried object does not exist"
+  },
+  {
+    "extensions": ".skin",
+    "uri": "socket://whois.nic.skin",
+    "available": "the queried object does not exist"
+  },
+  {
+    "extensions": ".sling",
+    "uri": "socket://whois.nic.sling",
+    "available": "is available for registration"
+  },
+  {
+    "extensions": ".sm",
+    "uri": "socket://whois.nic.sm",
+    "available": "no entries found"
+  },
+  {
+    "extensions": ".smart",
+    "uri": "socket://whois.nic.smart",
+    "available": "the queried object does not exist"
+  },
+  {
+    "extensions": ".sn",
+    "uri": "socket://whois.nic.sn",
+    "available": "not found"
+  },
+  {
+    "extensions": ".sncf",
+    "uri": "socket://whois.nic.sncf",
+    "available": "not found"
+  },
+  {
+    "extensions": ".so",
+    "uri": "socket://whois.nic.so",
+    "available": "the queried object does not exist"
+  },
+  {
+    "extensions": ".song",
+    "uri": "socket://whois.nic.song",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".spa",
+    "uri": "socket://whois.nic.spa",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".sport",
+    "uri": "socket://whois.nic.sport",
+    "available": "the queried object does not exist"
+  },
+  {
+    "extensions": ".sr",
+    "uri": "socket://whois.sr",
+    "available": "no object found"
+  },
+  {
+    "extensions": ".ss",
+    "uri": "socket://whois.nic.ss",
+    "available": "the queried object does not exist"
+  },
+  {
+    "extensions": ".stada",
+    "uri": "socket://whois.nic.stada",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".star",
+    "uri": "socket://whois.nic.star",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".statebank",
+    "uri": "socket://whois.nic.statebank",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".stc",
+    "uri": "socket://whois.nic.stc",
+    "available": "the queried object does not exist"
+  },
+  {
+    "extensions": ".stcgroup",
+    "uri": "socket://whois.nic.stcgroup",
+    "available": "the queried object does not exist"
+  },
+  {
+    "extensions": ".stockholm",
+    "uri": "socket://whois.nic.stockholm",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".storage",
+    "uri": "socket://whois.nic.storage",
+    "available": "the queried object does not exist"
+  },
+  {
+    "extensions": ".sy",
+    "uri": "socket://whois.tld.sy",
+    "available": "no object found"
+  },
+  {
+    "extensions": ".taobao",
+    "uri": "socket://whois.nic.taobao",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".tatamotors",
+    "uri": "socket://whois.nic.tatamotors",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".tatar",
+    "uri": "socket://whois.nic.tatar",
+    "available": "the queried object does not exist"
+  },
+  {
+    "extensions": ".td",
+    "uri": "socket://whois.nic.td",
+    "available": "the queried object does not exist"
+  },
+  {
+    "extensions": ".temasek",
+    "uri": "socket://whois.nic.temasek",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".tg",
+    "uri": "socket://whois.nic.tg",
+    "available": "no object found"
+  },
+  {
+    "extensions": ".thd",
+    "uri": "socket://whois.nic.thd",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".tiaa",
+    "uri": "socket://whois.nic.tiaa",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".tickets",
+    "uri": "socket://whois.nic.tickets",
+    "available": "the queried object does not exist"
+  },
+  {
+    "extensions": ".tirol",
+    "uri": "socket://whois.nic.tirol",
+    "available": "no information was found matching that query"
+  },
+  {
+    "extensions": ".tl",
+    "uri": "socket://whois.nic.tl",
+    "available": "the queried object does not exist"
+  },
+  {
+    "extensions": ".tmall",
+    "uri": "socket://whois.nic.tmall",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".tn",
+    "uri": "socket://whois.ati.tn",
+    "available": "no object found"
+  },
+  {
+    "extensions": ".total",
+    "uri": "socket://whois.nic.total",
+    "available": "not found"
+  },
+  {
+    "extensions": ".travelers",
+    "uri": "socket://whois.nic.travelers",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".travelersinsurance",
+    "uri": "socket://whois.nic.travelersinsurance",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".trv",
+    "uri": "socket://whois.nic.trv",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".tui",
+    "uri": "socket://whois.nic.tui",
+    "available": "the queried object does not exist"
+  },
+  {
+    "extensions": ".tvs",
+    "uri": "socket://whois.nic.tvs",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".ubank",
+    "uri": "socket://whois.nic.ubank",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".ubs",
+    "uri": "socket://whois.nic.ubs",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".unicom",
+    "uri": "socket://whois.nic.unicom",
+    "available": "the queried object does not exist"
+  },
+  {
+    "extensions": ".ups",
+    "uri": "socket://whois.nic.ups",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".uz",
+    "uri": "socket://whois.cctld.uz",
+    "available": "not found in database"
+  },
+  {
+    "extensions": ".vanguard",
+    "uri": "socket://whois.nic.vanguard",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".verisign",
+    "uri": "socket://whois.nic.verisign",
+    "available": "no match for"
+  },
+  {
+    "extensions": ".versicherung",
+    "uri": "socket://whois.nic.versicherung",
+    "available": "the queried object does not exist"
+  },
+  {
+    "extensions": ".vig",
+    "uri": "socket://whois.nic.vig",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".viking",
+    "uri": "socket://whois.nic.viking",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".visa",
+    "uri": "socket://whois.nic.visa",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".viva",
+    "uri": "socket://whois.nic.viva",
+    "available": "the queried object does not exist"
+  },
+  {
+    "extensions": ".volvo",
+    "uri": "socket://whois.nic.volvo",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".wang,.xn--30rr7y,.xn--3bst00m,.xn--45q11c,.xn--6qq986b3xl,.xn--9et52u,.xn--czru2d,.xn--efvy88h,.xn--fiq64b,.xn--hxt814e",
+    "uri": "socket://whois.gtld.zdns.cn",
+    "available": "the queried object does not exist"
+  },
+  {
+    "extensions": ".weber",
+    "uri": "socket://whois.nic.weber",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".weibo",
+    "uri": "socket://whois.nic.weibo",
+    "available": "the queried object does not exist"
+  },
+  {
+    "extensions": ".weir",
+    "uri": "socket://whois.nic.weir",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".whoswho",
+    "uri": "socket://whois.nic.whoswho",
+    "available": "the queried object does not exist"
+  },
+  {
+    "extensions": ".wien",
+    "uri": "socket://whois.nic.wien",
+    "available": "no information was found matching that query"
+  },
+  {
+    "extensions": ".wme",
+    "uri": "socket://whois.nic.wme",
+    "available": "the queried object does not exist"
+  },
+  {
+    "extensions": ".xin",
+    "uri": "socket://whois.nic.xin",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".xn--11b4c3d",
+    "uri": "socket://whois.nic.xn--11b4c3d",
+    "available": "no match for"
+  },
+  {
+    "extensions": ".xn--1ck2e1b",
+    "uri": "socket://whois.nic.xn--1ck2e1b",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".xn--1qqw23a,.xn--55qx5d,.xn--io0a7i,.xn--xhq521b",
+    "uri": "socket://whois.ngtld.cn",
+    "available": "the queried object does not exist"
+  },
+  {
+    "extensions": ".xn--3e0b707e",
+    "uri": "socket://whois.kr",
+    "available": "not found"
+  },
+  {
+    "extensions": ".xn--3pxu8k",
+    "uri": "socket://whois.nic.xn--3pxu8k",
+    "available": "no match for"
+  },
+  {
+    "extensions": ".xn--42c2d9a",
+    "uri": "socket://whois.nic.xn--42c2d9a",
+    "available": "no match for"
+  },
+  {
+    "extensions": ".xn--4gbrim",
+    "uri": "socket://whois.nic.xn--4gbrim",
+    "available": "the queried object does not exist"
+  },
+  {
+    "extensions": ".xn--55qw42g",
+    "uri": "socket://whois.nic.xn--55qw42g",
+    "available": "the queried object does not exist"
+  },
+  {
+    "extensions": ".xn--5su34j936bgsg",
+    "uri": "socket://whois.nic.xn--5su34j936bgsg",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".xn--80adxhks",
+    "uri": "socket://whois.nic.xn--80adxhks",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".xn--80ao21a",
+    "uri": "socket://whois.nic.kz",
+    "available": "nothing found"
+  },
+  {
+    "extensions": ".xn--80asehdb",
+    "uri": "socket://whois.nic.xn--80asehdb",
+    "available": "the queried object does not exist"
+  },
+  {
+    "extensions": ".xn--80aswg",
+    "uri": "socket://whois.nic.xn--80aswg",
+    "available": "the queried object does not exist"
+  },
+  {
+    "extensions": ".xn--8y0a063a",
+    "uri": "socket://whois.nic.xn--8y0a063a",
+    "available": "the queried object does not exist"
+  },
+  {
+    "extensions": ".xn--9dbq2a",
+    "uri": "socket://whois.nic.xn--9dbq2a",
+    "available": "no match for"
+  },
+  {
+    "extensions": ".xn--9krt00a",
+    "uri": "socket://whois.nic.xn--9krt00a",
+    "available": "the queried object does not exist"
+  },
+  {
+    "extensions": ".xn--b4w605ferd",
+    "uri": "socket://whois.nic.xn--b4w605ferd",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".xn--bck1b9a5dre4c",
+    "uri": "socket://whois.nic.xn--bck1b9a5dre4c",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".xn--c1avg",
+    "uri": "socket://whois.nic.xn--c1avg",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".xn--c2br7g",
+    "uri": "socket://whois.nic.xn--c2br7g",
+    "available": "no match for"
+  },
+  {
+    "extensions": ".xn--cck2b3b",
+    "uri": "socket://whois.nic.xn--cck2b3b",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".xn--d1acj3b",
+    "uri": "socket://whois.nic.xn--d1acj3b",
+    "available": "the queried object does not exist"
+  },
+  {
+    "extensions": ".xn--d1alf",
+    "uri": "socket://whois.marnet.mk",
+    "available": "no entries found"
+  },
+  {
+    "extensions": ".xn--eckvdtc9d",
+    "uri": "socket://whois.nic.xn--eckvdtc9d",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".xn--fct429k",
+    "uri": "socket://whois.nic.xn--fct429k",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".xn--fhbei",
+    "uri": "socket://whois.nic.xn--fhbei",
+    "available": "no match for"
+  },
+  {
+    "extensions": ".xn--fiqs8s,.xn--fiqz9s",
+    "uri": "socket://whois.cnnic.cn",
+    "available": "no matching record"
+  },
+  {
+    "extensions": ".xn--fzys8d69uvgm",
+    "uri": "socket://whois.nic.xn--fzys8d69uvgm",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".xn--gckr3f0f",
+    "uri": "socket://whois.nic.xn--gckr3f0f",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".xn--gk3at1e",
+    "uri": "socket://whois.nic.xn--gk3at1e",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".xn--i1b6b1a6a2e",
+    "uri": "socket://whois.nic.xn--i1b6b1a6a2e",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".xn--j1aef",
+    "uri": "socket://whois.nic.xn--j1aef",
+    "available": "no match for"
+  },
+  {
+    "extensions": ".xn--jvr189m",
+    "uri": "socket://whois.nic.xn--jvr189m",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".xn--kput3i",
+    "uri": "socket://whois.nic.xn--kput3i",
+    "available": "no matching record"
+  },
+  {
+    "extensions": ".xn--mgbab2bd",
+    "uri": "socket://whois.nic.xn--mgbab2bd",
+    "available": "the queried object does not exist"
+  },
+  {
+    "extensions": ".xn--mgbca7dzdo",
+    "uri": "socket://whois.nic.xn--mgbca7dzdo",
+    "available": "no data found"
+  },
+  {
+    "extensions": ".xn--mk1bu44c",
+    "uri": "socket://whois.nic.xn--mk1bu44c",
+    "available": "no match for"
+  },
+  {
+    "extensions": ".xn--ngbe9e0a",
+    "uri": "socket://whois.nic.xn--ngbe9e0a",
+    "available": "is available for registration"
+  },
+  {
+    "extensions": ".xn--ngbrx",
+    "uri": "socket://whois.nic.xn--ngbrx",
+    "available": "no data found"
+  },
+  {
+    "extensions": ".xn--nqv7f",
+    "uri": "socket://whois.nic.xn--nqv7f",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".xn--nqv7fs00ema",
+    "uri": "socket://whois.nic.xn--nqv7fs00ema",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".xn--pssy2u",
+    "uri": "socket://whois.nic.xn--pssy2u",
+    "available": "no match for"
+  },
+  {
+    "extensions": ".xn--rovu88b",
+    "uri": "socket://whois.nic.xn--rovu88b",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".xn--t60b56a",
+    "uri": "socket://whois.nic.xn--t60b56a",
+    "available": "no match for"
+  },
+  {
+    "extensions": ".xn--tckwe",
+    "uri": "socket://whois.nic.xn--tckwe",
+    "available": "no match for"
+  },
+  {
+    "extensions": ".xn--vermgensberater-ctb",
+    "uri": "socket://whois.nic.xn--vermgensberater-ctb",
+    "available": "the queried object does not exist"
+  },
+  {
+    "extensions": ".xn--vermgensberatung-pwb",
+    "uri": "socket://whois.nic.xn--vermgensberatung-pwb",
+    "available": "the queried object does not exist"
+  },
+  {
+    "extensions": ".xn--w4r85el8fhu5dnra",
+    "uri": "socket://whois.nic.xn--w4r85el8fhu5dnra",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".xn--w4rs40l",
+    "uri": "socket://whois.nic.xn--w4rs40l",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".xn--zfr164b",
+    "uri": "socket://whois.nic.xn--zfr164b",
+    "available": "the queried object does not exist"
+  },
+  {
+    "extensions": ".yachts",
+    "uri": "socket://whois.nic.yachts",
+    "available": "the queried object does not exist"
+  },
+  {
+    "extensions": ".yahoo",
+    "uri": "socket://whois.nic.yahoo",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".yandex",
+    "uri": "socket://whois.nic.yandex",
+    "available": "is available for registration"
+  },
+  {
+    "extensions": ".ye",
+    "uri": "socket://whois.y.net.ye",
+    "available": "not found"
+  },
+  {
+    "extensions": ".zero",
+    "uri": "socket://whois.nic.zero",
+    "available": "domain not found"
+  },
+  {
+    "extensions": ".zm",
+    "uri": "socket://whois.zicta.zm",
+    "available": "the queried object does not exist"
+  },
+  {
+    "extensions": ".zuerich",
+    "uri": "socket://whois.nic.zuerich",
+    "available": "the queried object does not exist"
   }
 ]
