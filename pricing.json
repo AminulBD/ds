@@ -337,6 +337,23 @@
       }
     }
   ],
+  "ai.bd": [
+    {
+      "register": "get.bd",
+      "prices": {
+        "regular": 37.57,
+        "renew": 46.96
+      },
+      "quoted": {
+        "currency": "BDT",
+        "regular": 4600,
+        "renew": 5750,
+        "rate": 122.453121,
+        "as_of": "2026-08-25",
+        "source": "https://get.bd/pricing.php"
+      }
+    }
+  ],
   "airforce": [
     {
       "register": "101domain.com",
@@ -1024,6 +1041,21 @@
         "regular": 99.99,
         "renew": 109.99,
         "transfer": 99.99
+      }
+    },
+    {
+      "register": "get.bd",
+      "prices": {
+        "regular": 12.02,
+        "renew": 23.48
+      },
+      "quoted": {
+        "currency": "BDT",
+        "regular": 1472,
+        "renew": 2875,
+        "rate": 122.453121,
+        "as_of": "2026-08-25",
+        "source": "https://get.bd/pricing.php"
       }
     }
   ],
@@ -2958,6 +2990,23 @@
       }
     }
   ],
+  "co.bd": [
+    {
+      "register": "get.bd",
+      "prices": {
+        "regular": 46.96,
+        "renew": 51.65
+      },
+      "quoted": {
+        "currency": "BDT",
+        "regular": 5750,
+        "renew": 6325,
+        "rate": 122.453121,
+        "as_of": "2026-08-25",
+        "source": "https://get.bd/pricing.php"
+      }
+    }
+  ],
   "co.bz": [
     {
       "register": "namecheap.com",
@@ -3254,6 +3303,23 @@
         "regular": 7.87,
         "renew": 7.87,
         "transfer": 0
+      }
+    }
+  ],
+  "com.bd": [
+    {
+      "register": "get.bd",
+      "prices": {
+        "regular": 6.57,
+        "renew": 15.03
+      },
+      "quoted": {
+        "currency": "BDT",
+        "regular": 805,
+        "renew": 1840,
+        "rate": 122.453121,
+        "as_of": "2026-08-25",
+        "source": "https://get.bd/pricing.php"
       }
     }
   ],
@@ -4958,6 +5024,23 @@
         "regular": 59.73,
         "renew": 59.73,
         "transfer": 59.73
+      }
+    }
+  ],
+  "edu.bd": [
+    {
+      "register": "get.bd",
+      "prices": {
+        "regular": 6.57,
+        "renew": 15.03
+      },
+      "quoted": {
+        "currency": "BDT",
+        "regular": 805,
+        "renew": 1840,
+        "rate": 122.453121,
+        "as_of": "2026-08-25",
+        "source": "https://get.bd/pricing.php"
       }
     }
   ],
@@ -7819,6 +7902,23 @@
       }
     }
   ],
+  "id.bd": [
+    {
+      "register": "get.bd",
+      "prices": {
+        "regular": 10.33,
+        "renew": 15.03
+      },
+      "quoted": {
+        "currency": "BDT",
+        "regular": 1265,
+        "renew": 1840,
+        "rate": 122.453121,
+        "as_of": "2026-08-25",
+        "source": "https://get.bd/pricing.php"
+      }
+    }
+  ],
   "ie": [
     {
       "register": "101domain.com",
@@ -8028,6 +8128,23 @@
         "regular": 3.6,
         "renew": 22.14,
         "transfer": 22.14
+      }
+    }
+  ],
+  "info.bd": [
+    {
+      "register": "get.bd",
+      "prices": {
+        "regular": 6.57,
+        "renew": 15.03
+      },
+      "quoted": {
+        "currency": "BDT",
+        "regular": 805,
+        "renew": 1840,
+        "rate": 122.453121,
+        "as_of": "2026-08-25",
+        "source": "https://get.bd/pricing.php"
       }
     }
   ],
@@ -10847,6 +10964,23 @@
       }
     }
   ],
+  "net.bd": [
+    {
+      "register": "get.bd",
+      "prices": {
+        "regular": 6.57,
+        "renew": 15.03
+      },
+      "quoted": {
+        "currency": "BDT",
+        "regular": 805,
+        "renew": 1840,
+        "rate": 122.453121,
+        "as_of": "2026-08-25",
+        "source": "https://get.bd/pricing.php"
+      }
+    }
+  ],
   "net.bz": [
     {
       "register": "porkbun.com",
@@ -11579,6 +11713,23 @@
         "regular": 12.02,
         "renew": 12.02,
         "transfer": 0
+      }
+    }
+  ],
+  "org.bd": [
+    {
+      "register": "get.bd",
+      "prices": {
+        "regular": 6.57,
+        "renew": 15.03
+      },
+      "quoted": {
+        "currency": "BDT",
+        "regular": 805,
+        "renew": 1840,
+        "rate": 122.453121,
+        "as_of": "2026-08-25",
+        "source": "https://get.bd/pricing.php"
       }
     }
   ],
@@ -13715,6 +13866,23 @@
         "regular": 87.85,
         "renew": 87.85,
         "transfer": 87.85
+      }
+    }
+  ],
+  "sch.bd": [
+    {
+      "register": "get.bd",
+      "prices": {
+        "regular": 10.33,
+        "renew": 15.03
+      },
+      "quoted": {
+        "currency": "BDT",
+        "regular": 1265,
+        "renew": 1840,
+        "rate": 122.453121,
+        "as_of": "2026-08-25",
+        "source": "https://get.bd/pricing.php"
       }
     }
   ],
@@ -15903,6 +16071,23 @@
       }
     }
   ],
+  "tv.bd": [
+    {
+      "register": "get.bd",
+      "prices": {
+        "regular": 112.7,
+        "renew": 140.87
+      },
+      "quoted": {
+        "currency": "BDT",
+        "regular": 13800,
+        "renew": 17250,
+        "rate": 122.453121,
+        "as_of": "2026-08-25",
+        "source": "https://get.bd/pricing.php"
+      }
+    }
+  ],
   "tw": [
     {
       "register": "101domain.com",
@@ -17061,6 +17246,23 @@
       "register": "namecheap.com",
       "prices": {
         "renew": 35.98
+      }
+    }
+  ],
+  "xn--54b7fta0cc": [
+    {
+      "register": "get.bd",
+      "prices": {
+        "regular": 3.76,
+        "renew": 3.76
+      },
+      "quoted": {
+        "currency": "BDT",
+        "regular": 460,
+        "renew": 460,
+        "rate": 122.453121,
+        "as_of": "2026-08-25",
+        "source": "https://get.bd/pricing.php"
       }
     }
   ],

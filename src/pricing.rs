@@ -4,6 +4,13 @@
 //! mean over the registrars that quote one. Amounts are USD, as published by
 //! the registrars; they are a snapshot, not a quote.
 //!
+//! One source quotes in its own currency rather than USD: get.bd, which is the
+//! only place the `.bd` family is priced at all. Those offers are converted at
+//! harvest time and carry a `quoted` block — the original figure, the rate and
+//! its date — beside the USD `prices`. Nothing here reads it; it is there so a
+//! reader of the file can tell a derived number from a quoted one, and so a
+//! re-harvest converts the source figure again rather than a converted one.
+//!
 //! `regular` is a registrar's published *first-year* list price, which is
 //! routinely well below what the name costs to keep — `.site` is a couple of
 //! dollars to register and forty-odd to renew. That is the shelf price, not a
@@ -246,6 +253,53 @@ mod tests {
             "only {multi} TLDs have more than one registrar quoting them"
         );
         assert!(p.lookup("com").unwrap().registrars > 1);
+    }
+
+    /// A converted offer carries a `quoted` block recording what the source
+    /// actually published; nothing here reads it, and nothing here may choke
+    /// on it either.
+    #[test]
+    fn extra_provenance_fields_are_ignored() {
+        let p = Prices::parse(
+            r#"{"com.bd": [{"register": "get.bd", "prices": {"regular": 6.57, "renew": 15.03},
+                            "quoted": {"currency": "BDT", "regular": 805, "renew": 1840,
+                                       "rate": 122.453121, "as_of": "2026-08-25",
+                                       "source": "https://get.bd/pricing.php"}}]}"#,
+        )
+        .unwrap();
+
+        let bd = p.lookup("com.bd").unwrap();
+        assert_eq!(bd.register, 6.57);
+        assert_eq!(bd.currency, "USD", "the table reports the converted figure");
+        assert_eq!(p.offers("com.bd")[0].registrar, "get.bd");
+    }
+
+    /// The second-level .bd zones are what a Bangladeshi actually registers,
+    /// and until get.bd was harvested none of them had a price at all — only
+    /// bare `.bd` did, from one foreign reseller.
+    #[test]
+    fn bundled_table_prices_the_bd_family() {
+        let p = Prices::load().unwrap();
+        for tld in [
+            "bd",
+            "com.bd",
+            "net.bd",
+            "org.bd",
+            "edu.bd",
+            "co.bd",
+            "xn--54b7fta0cc",
+        ] {
+            let price = p
+                .lookup(tld)
+                .unwrap_or_else(|| panic!(".{tld} should be priced"));
+            assert!(price.register > 0.0, ".{tld} priced at {}", price.register);
+            // A second-level zone must have its own entry rather than
+            // inheriting `.bd`'s, which is a different price entirely.
+            assert!(
+                p.offers(tld).iter().any(|o| o.registrar == "get.bd"),
+                ".{tld} should carry the registry-set quote"
+            );
+        }
     }
 
     /// The point of harvesting more registrars: TLDs one of them does not

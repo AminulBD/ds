@@ -383,7 +383,7 @@ name and URL drop out.
 ## Prices
 
 The price column is the average first-year registration price for the TLD, in
-**USD**, from the bundled `pricing.json` — 870 TLDs, from `$5.33` to `$7138.99`.
+**USD**, from the bundled `pricing.json` — 881 TLDs, from `$3.76` to `$7138.99`.
 The file lists one entry per registrar per TLD, so where several registrars
 quote a price the column is the mean of them:
 
@@ -435,10 +435,35 @@ is the mean over the registrars that will actually sell you the name:
 | [101domain](https://www.101domain.com/pricing.htm) | 754 | one page per TLD, enumerated from their sitemap |
 | [Porkbun](https://api.porkbun.com/api/json/v3/pricing/get) | 634 | public JSON pricing endpoint, no key |
 | [Namecheap](https://www.namecheap.com/domains/full-domain-pricing-list/) | 569 | earlier manual snapshot; their list page and API are both closed to scripts |
+| [get.bd](https://get.bd/pricing.php) | 12 | the `.bd` family, at BTCL's own list prices; the only source that prices it |
 
-Everything is quoted in USD at the source; nothing is currency-converted, and a
-source that quoted anything else would be left out rather than mixed in. Coupon
-codes and banner promotions are not scraped — only standing shelf prices.
+Coupon codes and banner promotions are not scraped — only standing shelf prices.
+
+Three of those four sources quote USD and are taken as they come. get.bd quotes
+Bangladeshi taka, and is converted, because the alternative was that `ds` priced
+`.bd` off a single foreign reseller at eight times the registry's own list price
+and priced `.com.bd` — the zone a Bangladeshi actually registers — not at all.
+
+The conversion is not silent. A converted offer keeps what the source published
+beside the USD figure, so a derived number is always tellable from a quoted one:
+
+```json
+{
+  "com.bd": [
+    {
+      "register": "get.bd",
+      "prices": { "regular": 6.57, "renew": 15.03 },
+      "quoted": { "currency": "BDT", "regular": 805, "renew": 1840,
+                  "rate": 122.453121, "as_of": "2026-08-25",
+                  "source": "https://get.bd/pricing.php" }
+    }
+  ]
+}
+```
+
+The rate is fetched per run from a named source and the harvest fails rather
+than fall back to a stale constant, but a converted price still drifts between
+harvests in a way a USD one does not — `quoted.as_of` is what says how far.
 
 `scripts/harvest-prices.mjs` rebuilds the file, and documents each source and
 its limits at the top:
