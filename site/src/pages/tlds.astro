@@ -174,7 +174,7 @@ const SOURCE_LABEL: Record<string, string> = {
       <table id="tbl">
         <thead>
           <tr>
-            <th aria-sort="ascending"><button type="button" data-sort="tld">TLD</button></th>
+            <th aria-sort="ascending" data-active="1"><button type="button" data-sort="tld">TLD</button></th>
             <th class="num"><button type="button" data-sort="price">Register</button></th>
             <th class="num"><button type="button" data-sort="renew">Renew</button></th>
             <th><button type="button" data-sort="sellers">Register at</button></th>
@@ -255,6 +255,24 @@ const SOURCE_LABEL: Record<string, string> = {
       </table>
       <p class="empty" id="empty" hidden>Nothing matches that filter.</p>
     </div>
+
+    <nav class="pager" id="pager" aria-label="TLD table pages" hidden>
+      <label class="perpage">
+        <span class="visually-hidden">Rows per page</span>
+        <select id="perpage">
+          <option value="10">10 per page</option>
+          <option value="20">20 per page</option>
+          <option value="50">50 per page</option>
+          <option value="100">100 per page</option>
+          <option value="0">Show all {fmt(counts.total)}</option>
+        </select>
+      </label>
+      <div class="pagenav" id="pagenav">
+        <button type="button" id="prev">Previous</button>
+        <span class="pagelist" id="pagelist"></span>
+        <button type="button" id="next">Next</button>
+      </div>
+    </nav>
 
     <section class="who" id="who-can-register">
       <h2>Who can register</h2>
@@ -432,13 +450,39 @@ const SOURCE_LABEL: Record<string, string> = {
     const command = document.querySelector<HTMLElement>('#name-command')!;
     const count = document.querySelector<HTMLParagraphElement>('#count')!;
     const empty = document.querySelector<HTMLParagraphElement>('#empty')!;
+    const scroller = document.querySelector<HTMLElement>('.table-scroll')!;
+    const pager = document.querySelector<HTMLElement>('#pager')!;
+    const pagenav = document.querySelector<HTMLElement>('#pagenav')!;
+    const pagelist = document.querySelector<HTMLElement>('#pagelist')!;
+    const prevBtn = document.querySelector<HTMLButtonElement>('#prev')!;
+    const nextBtn = document.querySelector<HTMLButtonElement>('#next')!;
+    const perPageSel = document.querySelector<HTMLSelectElement>('#perpage')!;
 
     let sortKey = 'tld';
     let sortDir = 1;
 
-    const num = (v: string | undefined) => (v ? parseFloat(v) : NaN);
+    // Every row ships in the HTML, so the table is whole with JS off and the
+    // whole thing is still in the page source; paging is a view over those
+    // rows rather than a fetch. `order` is the current sort, `matched` the
+    // rows passing the filters in that order, and `shown` the slice actually
+    // on screen — kept so that turning a page touches twice the page size
+    // rather than all 1,808 rows.
+    let order = allRows.slice();
+    let matched = order;
+    let shown = order.slice();
+    let page = 1;
+    let perPage = Number(perPageSel.value);
 
-    function apply() {
+    // The smallest size on offer: under it there is nothing to page through at
+    // any setting, so the pager — the size select with it — goes away.
+    const smallest = Math.min(
+      ...Array.from(perPageSel.options).map((o) => Number(o.value)).filter(Boolean),
+    );
+
+    const num = (v: string | undefined) => (v ? parseFloat(v) : NaN);
+    const fmtN = (n: number) => n.toLocaleString('en-US');
+
+    function apply(reset = true) {
       const term = q.value.trim().toLowerCase();
       const src = source.value;
       const k = kind.value;
@@ -447,9 +491,8 @@ const SOURCE_LABEL: Record<string, string> = {
       const ds = dnssec.value;
       const sv = seller.value;
       const onlyPriced = priced.checked;
-      let shown = 0;
 
-      for (const row of allRows) {
+      matched = order.filter((row) => {
         const d = row.dataset;
         let ok = !term || (d.search ?? '').includes(term);
         if (ok && src === 'rdap') ok = d.rdap === '1';
@@ -463,22 +506,94 @@ const SOURCE_LABEL: Record<string, string> = {
         if (ok && ds) ok = d.dnssec === ds;
         if (ok && sv) ok = sv === 'none' ? d.sellcount === '0' : (d.sellers ?? '').split(' ').includes(sv);
         if (ok && onlyPriced) ok = d.price !== '';
-        row.hidden = !ok;
-        if (ok) shown++;
-      }
+        return ok;
+      });
 
+      // A narrower filter should show you its first results, not page 7 of
+      // whatever the last filter matched — and not halfway down that page.
+      if (reset) { page = 1; scroller.scrollTop = 0; }
+      render();
+    }
+
+    /** Page numbers worth a button: both ends, and a window around the current
+     *  page. `null` is a gap, drawn as an ellipsis. */
+    function pageNumbers(current: number, pages: number) {
+      const want = new Set([1, pages, current - 1, current, current + 1]);
+      // Pad whichever end we are at, so the strip keeps a steady width and the
+      // buttons do not shuffle under the cursor as you page through.
+      if (current <= 3) for (const n of [2, 3, 4]) want.add(n);
+      if (current >= pages - 2) for (const n of [pages - 3, pages - 2, pages - 1]) want.add(n);
+
+      const nums = [...want].filter((n) => n >= 1 && n <= pages).sort((a, b) => a - b);
+      const out: (number | null)[] = [];
+      for (const [i, n] of nums.entries()) {
+        if (i && n - nums[i - 1] > 1) out.push(null);
+        out.push(n);
+      }
+      return out;
+    }
+
+    function render() {
+      const size = perPage || Math.max(matched.length, 1);
+      const pages = Math.max(1, Math.ceil(matched.length / size));
+      // A filter narrower than the page you were on lands you on the last one.
+      page = Math.min(Math.max(1, page), pages);
+
+      const start = (page - 1) * size;
+      const slice = matched.slice(start, start + size);
+      // Put away only what is currently up, rather than all 1,808 rows a turn.
+      for (const row of shown) row.hidden = true;
+      for (const row of slice) row.hidden = false;
+      shown = slice;
+
+      const n = matched.length;
+      const filtered = n !== allRows.length;
       count.textContent =
-        shown === allRows.length
-          ? `${shown.toLocaleString('en-US')} TLDs`
-          : `${shown.toLocaleString('en-US')} of ${allRows.length.toLocaleString('en-US')} TLDs`;
-      empty.hidden = shown > 0;
+        slice.length === n
+          ? filtered
+            ? `${fmtN(n)} of ${fmtN(allRows.length)} TLDs`
+            : `${fmtN(n)} TLDs`
+          : `${fmtN(start + 1)}–${fmtN(start + slice.length)} of ${fmtN(n)}${filtered ? ' matches' : ' TLDs'}`;
+      empty.hidden = n > 0;
+
+      pager.hidden = n <= smallest;
+      pagenav.hidden = pages <= 1;
+      prevBtn.disabled = page === 1;
+      nextBtn.disabled = page === pages;
+      pagelist.replaceChildren(
+        ...pageNumbers(page, pages).map((p) => {
+          if (p === null) {
+            const gap = document.createElement('span');
+            gap.className = 'gap';
+            gap.textContent = '…';
+            return gap;
+          }
+          const b = document.createElement('button');
+          b.type = 'button';
+          b.className = 'pagenum';
+          b.textContent = fmtN(p);
+          b.setAttribute('aria-label', `Page ${p} of ${pages}`);
+          if (p === page) b.setAttribute('aria-current', 'page');
+          b.addEventListener('click', () => goTo(p));
+          return b;
+        }),
+      );
+    }
+
+    function goTo(p: number) {
+      page = p;
+      render();
+      // Land on the first row of the new page: the top of the rows inside the
+      // pane, and the top of the pane itself in the window.
+      scroller.scrollTop = 0;
+      scroller.scrollIntoView({ block: 'start' });
     }
 
     function sortBy(key: string) {
       sortDir = key === sortKey ? -sortDir : 1;
       sortKey = key;
 
-      const sorted = [...allRows].sort((a, b) => {
+      order = [...order].sort((a, b) => {
         const A = a.dataset, B = b.dataset;
         if (key === 'sellers') {
           const x = Number(A.sellcount), y = Number(B.sellcount);
@@ -498,8 +613,17 @@ const SOURCE_LABEL: Record<string, string> = {
       });
 
       const frag = document.createDocumentFragment();
-      for (const r of sorted) frag.appendChild(r);
+      for (const r of order) frag.appendChild(r);
       tbody.appendChild(frag);
+
+      // The filter has not changed, only the order — so re-order what already
+      // matched rather than re-reading every control.
+      const keep = new Set(matched);
+      matched = order.filter((r) => keep.has(r));
+      // Cheapest-first means the cheapest: page one, top of the rows.
+      page = 1;
+      scroller.scrollTop = 0;
+      render();
 
       document.querySelectorAll<HTMLButtonElement>('[data-sort]').forEach((b) => {
         const active = b.dataset.sort === key;
@@ -512,12 +636,24 @@ const SOURCE_LABEL: Record<string, string> = {
     document.querySelectorAll<HTMLButtonElement>('[data-sort]')
       .forEach((b) => b.addEventListener('click', () => sortBy(b.dataset.sort!)));
 
+    prevBtn.addEventListener('click', () => goTo(page - 1));
+    nextBtn.addEventListener('click', () => goTo(page + 1));
+    perPageSel.addEventListener('change', () => {
+      // Keep the row you were looking at on screen rather than throwing you
+      // back to the first page every time the size changes.
+      const first = (page - 1) * (perPage || Math.max(matched.length, 1));
+      perPage = Number(perPageSel.value);
+      page = perPage ? Math.floor(first / perPage) + 1 : 1;
+      render();
+    });
+
     let t: number;
     q.addEventListener('input', () => {
       clearTimeout(t);
-      t = window.setTimeout(apply, 90);
+      t = window.setTimeout(() => apply(), 90);
     });
-    [source, kind, level, priv, dnssec, seller, priced].forEach((el) => el.addEventListener('change', apply));
+    [source, kind, level, priv, dnssec, seller, priced]
+      .forEach((el) => el.addEventListener('change', () => apply()));
 
     // --- registrar links -------------------------------------------------
     // Each link points at the registrar's own site until a name is given, and
@@ -551,14 +687,18 @@ const SOURCE_LABEL: Record<string, string> = {
       nt = window.setTimeout(fillLinks, 150);
     });
 
-    // Deep-link support: /tlds?q=io&name=mybrand
+    // Deep-link support: /tlds?q=io&name=mybrand&page=3
     const params = new URLSearchParams(location.search);
     const initial = params.get('q');
     if (initial) { q.value = initial; }
     const initialName = params.get('name');
     if (initialName) { name.value = clean(initialName); }
+    const initialPage = Number(params.get('page'));
+    if (Number.isInteger(initialPage) && initialPage > 1) { page = initialPage; }
     fillLinks();
-    apply();
+    // Keep the page the URL asked for; render() clamps it if the filter turns
+    // out to be narrower than that.
+    apply(false);
   </script>
 </Base>
 
@@ -576,11 +716,11 @@ const SOURCE_LABEL: Record<string, string> = {
   .stats span { color: var(--fg-muted); font-size: .8rem; }
 
   .controls {
-    display: flex; flex-wrap: wrap; gap: .6rem; align-items: center;
-    margin-bottom: 1rem; position: sticky; top: 3.75rem; z-index: 20;
-    background: var(--bg); padding: .75rem 0;
+    display: flex; flex-wrap: wrap; gap: .4rem; align-items: center;
+    margin-bottom: .75rem; position: sticky; top: 3.75rem; z-index: 20;
+    background: var(--bg); padding: .6rem 0;
   }
-  .controls .search { flex: 1 1 18rem; }
+  .controls .search { flex: 1 1 14rem; }
   /* Four controls will not sit on one line on a phone. Pack them two to a row
      and stop pinning them, or the filter bar alone eats half the screen. */
   @media (max-width: 720px) {
@@ -592,25 +732,37 @@ const SOURCE_LABEL: Record<string, string> = {
     .count { margin-left: auto; }
   }
   .controls input[type="search"], .controls select {
-    width: 100%; font: inherit; font-size: .92rem;
-    padding: .5rem .7rem; border-radius: 6px;
+    width: 100%; font: inherit; font-size: .82rem;
+    /* A select and a search box do not agree on their own line box, so state
+       it — without this the filter sits a few pixels taller than the selects
+       beside it. */
+    line-height: 1.35; padding: .3rem .5rem; border-radius: 5px;
     border: 1px solid var(--border-strong); background: var(--surface); color: var(--fg);
   }
   /* Leave room for the native chevron, or long option labels run under it. */
-  .controls select { padding-right: 1.9rem; text-overflow: ellipsis; }
+  .controls select { padding-right: 1.6rem; text-overflow: ellipsis; }
   .controls select { width: auto; }
   .controls input[type="search"]:focus-visible, .controls select:focus-visible {
     outline: 2px solid var(--accent); outline-offset: 1px;
   }
-  .check { display: flex; align-items: center; gap: .4rem; font-size: .9rem; color: var(--fg-muted); white-space: nowrap; }
-  .count { margin: 0 0 0 auto; font-size: .85rem; white-space: nowrap; }
+  .check { display: flex; align-items: center; gap: .35rem; font-size: .82rem; color: var(--fg-muted); white-space: nowrap; }
+  .count { margin: 0 0 0 auto; font-size: .8rem; white-space: nowrap; }
 
-  .table-scroll { overflow-x: auto; border: 1px solid var(--border); border-radius: var(--radius); }
+  /* Bounding the height is what makes the header below actually stick.
+     `overflow-x: auto` already made this a scroll container on both axes, so
+     the header pins to this box rather than to the viewport — but while the
+     box was as tall as its contents it never scrolled, and the header simply
+     left with the page. Capped, the rows scroll inside it and the header
+     stays. The cap clears the site header, the pinned filter bar and the
+     pager. */
+  .table-scroll {
+    overflow: auto; max-height: calc(100vh - 11rem); min-height: 18rem;
+    border: 1px solid var(--border); border-radius: var(--radius);
+  }
   #tbl { font-size: .9rem; }
-  /* `overflow-x: auto` on .table-scroll makes it a scroll container on both
-     axes, so `top` here is measured from that box, not the viewport — 0 is the
-     only offset that lines up. The pinned TLD column below is what actually
-     keeps a long row readable. */
+  /* Measured from .table-scroll, not the viewport — 0 is the only offset that
+     lines up. The pinned TLD column below is what keeps a long row readable
+     sideways, as this does downwards. */
   #tbl thead th { position: sticky; top: 0; background: var(--bg-soft); z-index: 10; padding: 0; }
   #tbl thead th button {
     all: unset; box-sizing: border-box; display: block; width: 100%; cursor: pointer;
@@ -672,17 +824,17 @@ const SOURCE_LABEL: Record<string, string> = {
   /* The name box sits with the column it drives rather than in the filter bar:
      it changes where the links go, not which rows are shown. */
   .namebar {
-    display: flex; flex-wrap: wrap; align-items: baseline; gap: .5rem .75rem;
-    margin: 0 0 .75rem;
+    display: flex; flex-wrap: wrap; align-items: baseline; gap: .4rem .6rem;
+    margin: 0 0 .6rem;
   }
-  .namebar label { font-size: .85rem; font-weight: 600; color: var(--fg-muted); }
+  .namebar label { font-size: .8rem; font-weight: 600; color: var(--fg-muted); }
   .namebar input {
-    font: inherit; font-family: var(--mono); font-size: .88rem;
-    padding: .35rem .6rem; border-radius: 6px; width: 11rem;
+    font: inherit; font-family: var(--mono); font-size: .82rem;
+    line-height: 1.35; padding: .3rem .5rem; border-radius: 5px; width: 9.5rem;
     border: 1px solid var(--border-strong); background: var(--surface); color: var(--fg);
   }
   .namebar input:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
-  .namebar p { margin: 0; font-size: .82rem; flex: 1 1 20rem; }
+  .namebar p { margin: 0; font-size: .78rem; flex: 1 1 20rem; }
 
   /* Chips, not a list: four registrars on one line beats four lines per row
      across 1,800 rows. */
@@ -723,6 +875,54 @@ const SOURCE_LABEL: Record<string, string> = {
   }
 
   .empty { padding: 2rem; text-align: center; color: var(--fg-muted); }
+
+  /* The table is paged rather than dropping 1,808 rows on the page at once.
+     The pager is hidden in the markup and shown by the script, so with JS off
+     you still get every row — and `display: flex` in an author sheet beats the
+     UA's `[hidden] { display: none }`, hence the reset below. */
+  .pager {
+    display: flex; flex-wrap: wrap; align-items: center; gap: .6rem 1rem;
+    margin-top: 1rem;
+  }
+  .pagenav { display: flex; flex-wrap: wrap; align-items: center; gap: .3rem; margin-left: auto; }
+  .pager[hidden], .pagenav[hidden] { display: none; }
+  .pagelist { display: flex; align-items: center; gap: .2rem; }
+  .pager select {
+    font: inherit; font-size: .85rem; padding: .4rem 1.9rem .4rem .6rem;
+    border-radius: 6px; border: 1px solid var(--border-strong);
+    background: var(--surface); color: var(--fg);
+  }
+  /* The numbered buttons are built by the script, so they never carry Astro's
+     scoping attribute and a plain `.pagenav button` would miss them — hence
+     `:global`, kept under the scoped `.pagenav` so it still reaches no
+     further than this pager. */
+  .pagenav :global(button) {
+    font: inherit; font-family: var(--mono); font-size: .85rem;
+    padding: .4rem .6rem; min-width: 2.3rem; cursor: pointer;
+    border-radius: 6px; border: 1px solid var(--border-strong);
+    background: var(--surface); color: var(--fg-muted);
+  }
+  .pagenav :global(button:hover:not(:disabled)) { color: var(--fg); border-color: var(--fg-faint); }
+  .pager select:focus-visible, .pagenav :global(button:focus-visible) {
+    outline: 2px solid var(--accent); outline-offset: 1px;
+  }
+  .pagenav :global(button:disabled) { opacity: .45; cursor: default; }
+  /* The page you are on, marked the way the sorted column is. */
+  .pagenav :global(button[aria-current="page"]) {
+    color: var(--fg); border-color: var(--accent);
+    background: color-mix(in srgb, var(--accent) 12%, transparent);
+  }
+  .pagelist :global(.gap) { color: var(--fg-faint); padding: 0 .15rem; }
+  /* A page turn scrolls back here, so clear the site header and the pinned
+     filter bar — without this the first rows land underneath them. */
+  .table-scroll { scroll-margin-top: 9rem; }
+  @media (max-width: 720px) {
+    /* The filter bar stops being pinned at this width, so only the header is
+       in the way — which also gives the rows more room — and the pager has no
+       room to sit off to the right. */
+    .table-scroll { scroll-margin-top: 5rem; max-height: calc(100vh - 7rem); }
+    .pagenav { margin-left: 0; }
+  }
   .notes { margin-top: 3rem; max-width: var(--measure); }
   .notes li { margin-bottom: .75rem; }
 </style>
