@@ -79,6 +79,29 @@ function classify(tld) {
   return 'gtld';
 }
 
+/**
+ * The place a two-letter TLD's code is assigned to, from ICU's own ISO 3166-1
+ * table — `de` -> Germany. It names what the code stands for and nothing more:
+ * a registry's actual rule about who may register lives in eligibility.json,
+ * and plenty of ccTLDs (`.io`, `.tv`, `.co`) sell worldwide regardless.
+ *
+ * Codes ISO has since withdrawn are the trap: ICU quietly answers with the
+ * successor state, so `.su` — still a live TLD — would come back "Russia".
+ * Those are named here by hand instead.
+ */
+const REGION_NAMES = new Intl.DisplayNames(['en'], { type: 'region', fallback: 'none' });
+const REGION_OVERRIDE = { su: 'the former Soviet Union' };
+function region(tld) {
+  const apex = tld.split('.').pop();
+  if ([...apex].length !== 2) return null;
+  if (apex in REGION_OVERRIDE) return REGION_OVERRIDE[apex];
+  try {
+    return REGION_NAMES.of(apex.toUpperCase()) ?? null;
+  } catch {
+    return null;
+  }
+}
+
 const readJson = async (p) => JSON.parse(await readFile(p, 'utf8'));
 
 /**
@@ -114,7 +137,10 @@ for (const entry of await readJson(resolve(repo, 'whois.json'))) {
   const kind = uri.startsWith('http') ? 'http' : 'socket';
   for (const ext of entry.extensions.split(',')) {
     const tld = normalize(ext);
-    if (tld) whois.set(tld, { host, kind });
+    // `available` is the needle ds matches a WHOIS reply against, and
+    // `comment` is the caveat the table carries where one exists — both are
+    // how a WHOIS answer is reached, so the per-TLD page shows them.
+    if (tld) whois.set(tld, { host, kind, needle: entry.available ?? null, comment: entry.comment ?? null });
   }
 }
 
@@ -123,6 +149,7 @@ const pricing = new Map();
 for (const [key, offers] of Object.entries(await readJson(resolve(repo, 'pricing.json')))) {
   const tld = normalize(key);
   if (!tld) continue;
+  const num = (v) => (typeof v === 'number' && Number.isFinite(v) ? Math.round(v * 100) / 100 : null);
   const mean = (field) => {
     const xs = offers
       .map((o) => o?.prices?.[field])
@@ -131,6 +158,19 @@ for (const [key, offers] of Object.entries(await readJson(resolve(repo, 'pricing
   };
   pricing.set(tld, {
     price: mean('regular'),
+    // Every quote in the file, mean and all — the table needs one figure per
+    // TLD, the TLD's own page shows the three prices each registrar published,
+    // including the ones with no registration price behind the average.
+    offers: offers
+      .map((o) => ({
+        registrar: String(o?.register ?? '').trim().toLowerCase(),
+        register: num(o?.prices?.regular),
+        renew: num(o?.prices?.renew),
+        transfer: num(o?.prices?.transfer),
+      }))
+      .filter((o) => o.registrar)
+      .sort((a, b) => (a.register ?? Infinity) - (b.register ?? Infinity) || a.registrar.localeCompare(b.registrar))
+      .map((o) => ({ ...o, search: SEARCH_PAGES[o.registrar] ?? null, home: homepage(o.registrar) })),
     renew: mean('renew'),
     transfer: mean('transfer'),
     // Whoever quoted a *registration* price, which is what the column shows —
@@ -194,6 +234,12 @@ const rows = [...new Set([...whois.keys(), ...pricing.keys(), ...rdap.keys()])]
       // The readable form of a punycode TLD: xn--p1ai -> рф. null otherwise.
       unicode: classify(tld) === 'idn' ? domainToUnicode(tld) : null,
       cctld: classify(tld) === 'cctld',
+      // The last label — `uk` for co.uk. What IANA files the zone under, and
+      // what the type is measured on.
+      apex: tld.split('.').pop(),
+      // What ISO 3166-1 assigns the code to, for two-letter TLDs only. Not a
+      // statement about who may register — see eligibility.
+      region: region(tld),
       // 'brand' | 'infrastructure' | 'reserved', or null where nothing says the
       // zone is closed — which is not a claim that it is open. See src/private.rs.
       private: v?.kind ?? null,
@@ -205,6 +251,9 @@ const rows = [...new Set([...whois.keys(), ...pricing.keys(), ...rdap.keys()])]
       // cheapest first — what `--where` prints as `register at`. Empty means
       // nobody in the table quotes it, not that nobody sells it.
       sellers: p.sellers ?? [],
+      // Every published quote for the TLD, cheapest registration first, with
+      // the renewal and transfer prices behind the means above.
+      offers: p.offers ?? [],
       // The registry's own rule about who may register, plus `from`: the TLD
       // the rule was found under, which for com.au is au. null where the
       // hand-maintained list has no entry — which is not a claim of openness.
@@ -217,6 +266,10 @@ const rows = [...new Set([...whois.keys(), ...pricing.keys(), ...rdap.keys()])]
       rdapServer: r ?? null,
       whoisHost: w?.host ?? null,
       whoisKind: w?.kind ?? null,
+      // The string a WHOIS reply must contain for ds to call the name free,
+      // and the caveat whois.json attaches to the zone where it has one.
+      whoisNeedle: w?.needle ?? null,
+      whoisComment: w?.comment ?? null,
     };
   });
 

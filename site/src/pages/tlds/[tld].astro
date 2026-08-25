@@ -1,0 +1,744 @@
+---
+import Base from '../../layouts/Base.astro';
+import CopyCommand from '../../components/CopyCommand.astro';
+import data from '../../data/tlds.json';
+
+type Row = (typeof data.rows)[number];
+
+const { rows, counts, generated } = data;
+
+const money = (n: number | null) => (n === null ? '—' : `$${n.toFixed(2)}`);
+const fmt = (n: number) => n.toLocaleString('en-US');
+const host = (url: string | null) => {
+  if (!url) return null;
+  try { return new URL(url).host; } catch { return url; }
+};
+/** `.বাংলা` where there is one, `.com` otherwise — what a reader recognises. */
+const label = (r: Row) => `.${r.unicode ?? r.tld}`;
+
+// Every page is one row plus its neighbourhood, so the neighbourhood is worked
+// out once here rather than 1,808 times inside the page body.
+const sorted = [...rows].sort((a, b) => a.tld.localeCompare(b.tld));
+const priced = rows.filter((r) => r.price !== null).sort((a, b) => a.price! - b.price!);
+/** Which server answers for a TLD, RDAP preferred — the key that groups the
+ *  zones one registry runs. Null where nothing answers for it at all. */
+const registryOf = (r: Row) => host(r.rdapServer) ?? r.whoisHost ?? null;
+// TLDs sharing a lookup server: .co.uk beside every other zone whois.nic.uk
+// answers for, which is usually the rest of the registry's family.
+const byRegistry = new Map<string, Row[]>();
+for (const r of rows) {
+  const key = registryOf(r);
+  if (key) byRegistry.set(key, [...(byRegistry.get(key) ?? []), r]);
+}
+
+// Sub-zones, keyed on the zone they sit under: uk -> co.uk, org.uk, me.uk.
+const children = new Map<string, Row[]>();
+for (const r of rows) {
+  if (!r.tld.includes('.')) continue;
+  const parent = r.tld.slice(r.tld.indexOf('.') + 1);
+  children.set(parent, [...(children.get(parent) ?? []), r]);
+}
+
+/** The TLDs sitting either side of this one in the price list — what else the
+ *  same money buys. Same registration level, so .com is not answered with
+ *  .co.uk, and never the TLD itself. */
+function nearestInPrice(row: Row, want = 6): Row[] {
+  if (row.price === null) return [];
+  const pool = priced.filter((r) => r.level === row.level && r.tld !== row.tld);
+  const at = pool.findIndex((r) => r.price! >= row.price!);
+  const from = at < 0 ? pool.length : at;
+  const out: Row[] = [];
+  let lo = from - 1;
+  let hi = from;
+  while (out.length < want && (lo >= 0 || hi < pool.length)) {
+    const dLo = lo >= 0 ? Math.abs(pool[lo].price! - row.price!) : Infinity;
+    const dHi = hi < pool.length ? Math.abs(pool[hi].price! - row.price!) : Infinity;
+    out.push(dLo <= dHi ? pool[lo--] : pool[hi++]);
+  }
+  return out.sort((a, b) => a.price! - b.price!);
+}
+
+export function getStaticPaths() {
+  // The slug is the TLD as `ds` spells it — `com`, `co.uk`, `xn--54b7fta0cc`
+  // — so a URL can be typed from a result line without translation.
+  return data.rows.map((row) => ({ params: { tld: row.tld }, props: { row } }));
+}
+
+const { row } = Astro.props as { row: Row };
+
+const name = label(row);
+const idx = sorted.findIndex((r) => r.tld === row.tld);
+const prev = idx > 0 ? sorted[idx - 1] : null;
+const next = idx < sorted.length - 1 ? sorted[idx + 1] : null;
+const parent = row.tld.includes('.') ? rows.find((r) => r.tld === row.tld.slice(row.tld.indexOf('.') + 1)) ?? null : null;
+const subzones = (children.get(row.tld) ?? []).sort((a, b) => a.tld.localeCompare(b.tld));
+const siblings = parent ? (children.get(parent.tld) ?? []).filter((r) => r.tld !== row.tld).sort((a, b) => a.tld.localeCompare(b.tld)) : [];
+// Parent first, then everything beside or below it — the zones belonging to
+// the same name, in the order a reader looks for them.
+const family = [...(parent ? [parent] : []), ...siblings, ...subzones];
+const familySet = new Set(family.map((r) => r.tld));
+const near = nearestInPrice(row);
+// A brand TLD has no price and no sub-zones, so its neighbourhood is the rest
+// of the zones its operator runs — .google beside .gmail and .youtube.
+const sameOperator = row.privateOperator
+  ? rows.filter((r) => r.privateOperator === row.privateOperator && r.tld !== row.tld).sort((a, b) => a.tld.localeCompare(b.tld))
+  : [];
+// Everything else the same server answers for, minus whatever is already on
+// screen as family or as the operator's other zones — a registry that runs
+// forty brand TLDs would otherwise list the same chips twice.
+const registry = registryOf(row);
+const shown = new Set([...familySet, ...sameOperator.map((r) => r.tld)]);
+const sameRegistry = registry
+  ? (byRegistry.get(registry) ?? [])
+      .filter((r) => r.tld !== row.tld && !shown.has(r.tld))
+      .sort((a, b) => a.tld.localeCompare(b.tld))
+  : [];
+// How much of the priced table this TLD undercuts — one honest sentence about
+// where the figure sits, rather than "cheap" or "expensive".
+const cheaperThan = row.price === null ? null : Math.round((priced.filter((r) => r.price! > row.price!).length / priced.length) * 100);
+
+const offers = row.offers;
+const withPrice = offers.filter((o) => o.register !== null);
+const cheapest = withPrice[0] ?? null;
+// A registrar can publish a renewal price and no registration price; it is in
+// the file but is not evidence that it sells the TLD, so it is listed apart.
+const renewOnly = offers.filter((o) => o.register === null);
+
+const KIND_LABEL: Record<string, string> = {
+  gtld: 'Generic top-level domain',
+  cctld: 'Country-code top-level domain',
+  idn: 'Internationalised top-level domain',
+};
+const SOURCE_LABEL: Record<string, string> = {
+  both: 'RDAP + WHOIS',
+  rdap: 'RDAP',
+  whois: 'WHOIS',
+  none: 'neither',
+};
+// Two forms, because the same fact reads as a chip, as a title and as part of
+// a sentence — "brand tld" from a lowercased "Brand TLD" reads as a typo.
+const PRIVATE_LABEL: Record<string, string> = {
+  brand: 'Brand TLD',
+  infrastructure: 'Infrastructure zone',
+  reserved: 'Reserved by RFC',
+};
+const PRIVATE_PHRASE: Record<string, string> = {
+  brand: 'brand TLD',
+  infrastructure: 'infrastructure zone',
+  reserved: 'zone reserved by RFC',
+};
+
+// One line under the heading saying what kind of thing this TLD is: type,
+// where the name sits, and — for a two-letter code — what ISO assigns it to.
+const kicker = [
+  KIND_LABEL[row.kind],
+  row.region ? `for ${row.region}` : null,
+  row.level === 3 ? `— names are registered at the third level, under ${parent ? label(parent) : `.${row.apex}`}` : null,
+].filter(Boolean).join(' ');
+
+// One placeholder name, used by every command and example on the page, and
+// replaced live by whatever the visitor types into the name box.
+const stand = 'mybrand';
+const example = `${stand}${name}`;
+const asciiExample = `${stand}.${row.tld}`;
+
+// The title and description are the only things a search result shows, so both
+// carry this TLD's own numbers rather than a template about TLDs in general.
+const title = row.private
+  ? `${name} — a ${PRIVATE_PHRASE[row.private]}, closed to public registration`
+  : `${name} domain — ${row.price !== null ? `${money(row.price)} to register, ` : ''}registrars, WHOIS and RDAP`;
+const description = [
+  row.private
+    ? `${name} is a ${PRIVATE_PHRASE[row.private]}${row.privateOperator ? ` operated by ${row.privateOperator}` : ''}: nobody outside the registry can register a name in it.`
+    : row.price !== null
+      ? `${name} costs ${money(row.price)} to register and ${money(row.renew)} a year to renew${cheapest ? `, from ${offers.length} registrar${offers.length === 1 ? '' : 's'} including ${cheapest.registrar}` : ''}.`
+      : `${name} has no price in the table ds bundles.`,
+  row.eligibility ? `Registration is restricted: ${row.eligibility.note}.` : null,
+  row.rdapServer
+    ? `Availability is answered over RDAP at ${host(row.rdapServer)}.`
+    : row.whoisHost
+      ? `Availability is answered over WHOIS at ${row.whoisHost}.`
+      : `No registry publishes a public RDAP or WHOIS service for it.`,
+].filter(Boolean).join(' ');
+
+const crumbs = [
+  { name: 'ds', url: '/' },
+  { name: 'TLDs & prices', url: '/tlds/' },
+  { name, url: `/tlds/${row.tld}/` },
+];
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: crumbs.map((c, i) => ({
+    '@type': 'ListItem',
+    position: i + 1,
+    name: c.name,
+    item: new URL(c.url, Astro.site).href,
+  })),
+};
+---
+
+<Base title={title} description={description}>
+  <div class="wrap page">
+    <nav class="crumbs" aria-label="Breadcrumb">
+      <a href="/tlds">TLDs &amp; prices</a>
+      <span aria-hidden="true">/</span>
+      <span aria-current="page">{name}</span>
+    </nav>
+
+    <header class="head">
+      <h1>
+        {name}
+        {row.unicode && <span class="puny">.{row.tld}</span>}
+      </h1>
+      <p class="kicker muted">{kicker}</p>
+      <p class="tags">
+        <span class={`tag tag-${row.source}`}>{SOURCE_LABEL[row.source]}</span>
+        {row.private && <span class="tag tag-private">{PRIVATE_PHRASE[row.private]}</span>}
+        {row.eligibility && <a class="tag tag-restricted" href="#who">restricted</a>}
+        {row.sellers.length > 0 && (
+          <span class="tag">sold by {row.sellers.length} registrar{row.sellers.length === 1 ? '' : 's'}</span>
+        )}
+      </p>
+    </header>
+
+    {row.private && (
+      <p class="callout callout-private">
+        <strong>Nobody outside the registry can register here.</strong>{' '}
+        {row.private === 'brand' ? (
+          <>
+            {name} is a brand TLD{row.privateOperator ? <> run by <strong>{row.privateOperator}</strong></> : null}, which
+            under ICANN's Specification 13 means its operator is the only permitted registrant.
+          </>
+        ) : row.private === 'infrastructure' ? (
+          <>{name} is infrastructure, not a place names are sold.</>
+        ) : (
+          <>{name} is reserved by RFC and will never be delegated for public registration.</>
+        )}{' '}
+        <code>ds</code> reports names here as <code>PRIVATE</code> rather than <code>AVAILABLE</code>, and leaves the
+        zone out of <code>--tld all</code> unless you pass <code>--private include</code>. See{' '}
+        <a href="/docs/choosing-tlds#brand-and-reserved-tlds">Brand and reserved TLDs</a>.
+      </p>
+    )}
+
+    {/* A closed zone has no prices and never will, so four dashes would be a
+        row of nothing: it gets the facts it does have instead. */}
+    <dl class="facts">
+      {row.private ? (
+        <>
+          <div>
+            <dt>Registration</dt>
+            <dd class="small">Closed<span class="unit">no public names</span></dd>
+          </div>
+          <div class="wide">
+            <dt>Operator</dt>
+            <dd class="text">{row.privateOperator ?? PRIVATE_LABEL[row.private]}</dd>
+          </div>
+        </>
+      ) : (
+        <>
+          <div>
+            <dt>Register</dt>
+            <dd>{money(row.price)}<span class="unit">first year</span></dd>
+          </div>
+          <div>
+            <dt>Renew</dt>
+            <dd>{money(row.renew)}<span class="unit">a year</span></dd>
+          </div>
+          <div>
+            <dt>Transfer</dt>
+            <dd>{money(row.transfer)}<span class="unit">to move it</span></dd>
+          </div>
+          <div>
+            <dt>Registrars</dt>
+            <dd>{row.sellers.length || '—'}<span class="unit">quoting it</span></dd>
+          </div>
+        </>
+      )}
+      <div>
+        <dt>Lookup</dt>
+        <dd class="small">{SOURCE_LABEL[row.source]}<span class="unit">{row.source === 'none' ? 'no public service' : 'answers for it'}</span></dd>
+      </div>
+      <div>
+        <dt>Level</dt>
+        <dd class="small">{row.level === 3 ? 'Third' : 'Second'}<span class="unit">{example}</span></dd>
+      </div>
+    </dl>
+
+    <section class="check">
+      <h2 id="check">Check a name</h2>
+      <p class="muted">
+        {row.private ? (
+          <>Names under {name} cannot be registered, but <code>ds</code> will still tell you what the registry says.</>
+        ) : (
+          <>One command, straight against the registry — no account, no page to load.</>
+        )}
+      </p>
+      <div class="namebar">
+        <label for="name">Name</label>
+        <input
+          type="text" id="name" placeholder="mybrand" autocomplete="off" spellcheck="false"
+          data-tld={row.tld} aria-describedby="name-hint"
+        />
+        <p class="faint" id="name-hint">
+          Fills the command and the registrar links below in with your own name. The page is static — nothing is
+          looked up here, and nothing you type leaves the browser.
+        </p>
+      </div>
+      <CopyCommand command={`ds mybrand --tld ${row.tld}`} label={`Check a name under ${name}`} />
+      <p class="faint after">
+        Add <code>--where</code> for the registrars and the registry's rules, <code>--registry</code> for the server
+        that answered, or <code>--all-info</code> for everything at once.
+      </p>
+    </section>
+
+    <section class="prices">
+      <h2 id="prices">What it costs</h2>
+      {offers.length === 0 ? (
+        <p class="muted">
+          No registrar in the price table bundled with <code>ds</code> quotes {name}, so the CLI prints no figure
+          beside it — one of {fmt(counts.unsold)} such TLDs. That is a gap in the table as often as it is a TLD
+          nobody sells{row.private ? <>, though here it is neither: the zone is closed</> : null}. See{' '}
+          <a href="/docs/prices">Prices</a> for supplying your own table with <code>--pricing-file</code>.
+        </p>
+      ) : (
+        <>
+          <p class="muted intro">
+            Every published quote in the bundled table, cheapest registration first.{' '}
+            {row.price === null ? (
+              <>Not one of them carries a registration price, so <code>ds</code> prints no figure beside {name} —
+              only the renewals are known.</>
+            ) : (
+              <>The figure <code>ds</code> prints beside {name} is the mean of the registration column —{' '}
+              {money(row.price)}
+              {cheaperThan !== null && <>, which undercuts {cheaperThan}% of the {fmt(counts.priced)} priced TLDs</>}.</>
+            )}
+          </p>
+          <div class="table-scroll">
+            <table class="offers">
+              <thead>
+                <tr>
+                  <th>Registrar</th>
+                  <th class="num">Register</th>
+                  <th class="num">Renew</th>
+                  <th class="num">Transfer</th>
+                </tr>
+              </thead>
+              <tbody>
+                {offers.map((o) => (
+                  <tr>
+                    <th scope="row">
+                      {o.home ? (
+                        <a class="registrar" href={o.home} data-r={o.registrar} target="_blank" rel="noopener nofollow">{o.registrar}</a>
+                      ) : (
+                        <span class="registrar">{o.registrar}</span>
+                      )}
+                      {o === cheapest && withPrice.length > 1 && <span class="tag tag-cheap">cheapest</span>}
+                      {o.register === null && <span class="tag">renewal only</span>}
+                    </th>
+                    <td class="num">{money(o.register)}</td>
+                    <td class="num faint">{money(o.renew)}</td>
+                    <td class="num faint">{money(o.transfer)}</td>
+                  </tr>
+                ))}
+              </tbody>
+              <tfoot>
+                <tr>
+                  <th scope="row">Mean — what <code>ds</code> prints</th>
+                  <td class="num">{money(row.price)}</td>
+                  <td class="num">{money(row.renew)}</td>
+                  <td class="num">{money(row.transfer)}</td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+          <p class="faint after">
+            List prices in US dollars, bundled with the binary and last regenerated {generated}. Promotions, ICANN
+            fees, taxes and premium names all move the real number, and a registry may decline to sell you the name
+            at all. {renewOnly.length > 0 && (
+              <>{renewOnly.length === 1 ? 'One quote here carries' : `${renewOnly.length} quotes here carry`} a renewal
+              price and no registration price, which is not evidence of a name being for sale —{' '}
+              {row.sellers.length > 0
+                ? <>so {renewOnly.length === 1 ? 'it sits' : 'they sit'} behind neither the registration mean nor the
+                  registrars listed below.</>
+                : <>and here that is every quote there is, which is why {name} has no registration figure at all.</>}{' '}
+            </>
+            )}See <a href="/docs/prices">Prices</a>.
+          </p>
+        </>
+      )}
+    </section>
+
+    {row.sellers.length > 0 && (
+      <section class="where">
+        <h2 id="where">Where to register</h2>
+        <p class="muted intro">
+          {row.sellers.length === 1 ? 'One registrar' : `${row.sellers.length} registrars`} in the bundled table
+          publish{row.sellers.length === 1 ? 'es' : ''} a registration price for {name}, which is evidence
+          {row.sellers.length === 1 ? ' it sells' : ' they sell'} it — nobody prices what they cannot sell. Cheapest
+          first, exactly as <code>ds {stand} --tld {row.tld} --where</code> prints them.
+        </p>
+        <ul class="sellers">
+          {row.sellers.map((s) => (
+            <li>
+              {s.home ? (
+                <a class="seller" href={s.home} data-r={s.registrar} target="_blank" rel="noopener nofollow">
+                  <span class="seller-name">{s.registrar}</span>
+                  <span class="seller-price">{money(s.price)}</span>
+                </a>
+              ) : (
+                <span class="seller">
+                  <span class="seller-name">{s.registrar}</span>
+                  <span class="seller-price">{money(s.price)}</span>
+                </span>
+              )}
+            </li>
+          ))}
+        </ul>
+        <p class="faint after">
+          Put a name in the box above and each link becomes that registrar's search for{' '}
+          <code id="search-example">{asciiExample}</code>, where it publishes one. This list is what the price table
+          knows, not the whole market — see <a href="/docs/showing-more#where-to-register">Where to register</a>.
+        </p>
+      </section>
+    )}
+
+    <section class="who">
+      <h2 id="who">Who can register</h2>
+      {row.private ? (
+        <p class="muted">
+          Nobody outside {row.privateOperator ?? 'the registry'} — see the note at the top of this page.
+        </p>
+      ) : row.eligibility ? (
+        <>
+          <blockquote class="rule">
+            <p>{row.eligibility.note}.</p>
+            <footer>
+              {row.eligibility.from !== row.tld && (
+                <>The rule <code>.{row.eligibility.from}</code> sets, which {name} inherits as a zone beneath it. </>
+              )}
+              <a href={row.eligibility.source} target="_blank" rel="noopener">{host(row.eligibility.source)}</a>
+            </footer>
+          </blockquote>
+          <p class="muted">
+            Availability and eligibility are different questions, and <code>ds</code> answers the first: a name here
+            reported <code>AVAILABLE</code> means the label is free, not that this registry will sell it to you.
+            The note is hand-maintained and was last checked on {data.eligibilityChecked}; the registry page it links
+            to, not this one, is the authority. All {fmt(counts.restricted)} restricted TLDs are listed under{' '}
+            <a href="/tlds#who-can-register">Who can register</a>.
+          </p>
+        </>
+      ) : (
+        <p class="muted">
+          No eligibility rule is on file for {name}, which is not the same as a promise that it is open: the list is
+          hand-maintained and covers the restricted TLDs a registrar is likely to offer you. Check the registry's own
+          page before counting on a name. {fmt(counts.restricted)} TLDs do carry a rule — see{' '}
+          <a href="/tlds#who-can-register">Who can register</a>.
+        </p>
+      )}
+    </section>
+
+    <section class="lookup">
+      <h2 id="lookup">How <code>ds</code> answers for it</h2>
+      {row.source === 'none' ? (
+        <p class="muted">
+          Neither an RDAP endpoint nor a WHOIS server is on file for {name}: IANA's bootstrap does not list it and
+          the bundled <code>whois.json</code> has no entry. It is left out of <code>--tld all</code> for that reason,
+          and asking for it by name works only if IANA can name a server for it at the time. Anything{' '}
+          <code>ds</code> cannot answer comes back <code>UNKNOWN</code> with the reason attached, never guessed as
+          available.
+        </p>
+      ) : (
+        <>
+          <p class="muted intro">
+            RDAP first, WHOIS second — the same order for every TLD.{' '}
+            {row.source === 'both'
+              ? <>{name} has both, so RDAP answers and WHOIS is the fallback if it does not.</>
+              : row.source === 'rdap'
+                ? <>{name} has an RDAP service and no WHOIS entry, so every answer is authoritative RDAP.</>
+                : <>{name} has no RDAP service, so the answer comes from WHOIS text on port 43.</>}
+          </p>
+          <dl class="servers">
+            {row.rdapServer && (
+              <div>
+                <dt>RDAP</dt>
+                <dd>
+                  <code class="server">{row.rdapServer}</code>
+                  <span class="faint">
+                    From <a href="https://data.iana.org/rdap/dns.json">IANA's bootstrap</a>, refreshed when this page
+                    was built. The lookup is <code data-rdap-url>{row.rdapServer}/domain/{asciiExample}</code> — a 404
+                    means the name is free.
+                  </span>
+                </dd>
+              </div>
+            )}
+            {row.whoisHost && (
+              <div>
+                <dt>WHOIS</dt>
+                <dd>
+                  <code class="server">{row.whoisHost}</code>
+                  <span class="faint">
+                    {row.whoisKind === 'http' ? 'Queried over HTTP' : 'Queried on port 43'}, from the bundled{' '}
+                    <a href="/docs/the-bundled-whois-table">whois.json</a>.
+                    {row.whoisNeedle && (
+                      <> The name is called free when the reply contains <code>{row.whoisNeedle}</code> — text
+                      matching, which is why RDAP is preferred where it exists.</>
+                    )}
+                  </span>
+                </dd>
+              </div>
+            )}
+          </dl>
+          {row.whoisComment && (
+            <p class="callout callout-warn"><strong>Caveat from the table:</strong> {row.whoisComment}</p>
+          )}
+          <p class="faint after">
+            <code>ds {stand} --tld {row.tld} --registry</code> prints whichever of these
+            answered. If a bundled WHOIS host has gone stale, IANA is asked who serves {name} today. See{' '}
+            <a href="/docs/accuracy-notes">Accuracy notes</a>.
+          </p>
+        </>
+      )}
+    </section>
+
+    <section class="related">
+      <h2 id="related">Related zones</h2>
+      <div class="rel-grid">
+        {family.length > 0 && (
+          <div class="rel">
+            <h3>{parent ? <>Under {label(parent)}</> : <>Zones under {name}</>}</h3>
+            <ul class="chips">
+              {family.slice(0, 12).map((r) => (
+                <li><a class="chip" href={`/tlds/${r.tld}/`}>{label(r)}<span class="chip-price">{money(r.price)}</span></a></li>
+              ))}
+            </ul>
+            {family.length > 12 && (
+              <p class="faint after">and {family.length - 12} more.</p>
+            )}
+          </div>
+        )}
+        {sameOperator.length > 0 && (
+          <div class="rel">
+            <h3>Also run by {row.privateOperator}</h3>
+            <ul class="chips">
+              {sameOperator.slice(0, 12).map((r) => (
+                <li><a class="chip" href={`/tlds/${r.tld}/`}>{label(r)}</a></li>
+              ))}
+            </ul>
+            {sameOperator.length > 12 && (
+              <p class="faint after">and {sameOperator.length - 12} more.</p>
+            )}
+          </div>
+        )}
+        {sameRegistry.length > 0 && (
+          <div class="rel">
+            <h3>Also answered by {registry}</h3>
+            <ul class="chips">
+              {sameRegistry.slice(0, 12).map((r) => (
+                <li><a class="chip" href={`/tlds/${r.tld}/`}>{label(r)}<span class="chip-price">{money(r.price)}</span></a></li>
+              ))}
+            </ul>
+            {sameRegistry.length > 12 && (
+              <p class="faint after">and {sameRegistry.length - 12} more zones on the same server.</p>
+            )}
+          </div>
+        )}
+        {near.length > 0 && (
+          <div class="rel">
+            <h3>Priced near it</h3>
+            <ul class="chips">
+              {near.map((r) => (
+                <li><a class="chip" href={`/tlds/${r.tld}/`}>{label(r)}<span class="chip-price">{money(r.price)}</span></a></li>
+              ))}
+            </ul>
+          </div>
+        )}
+      </div>
+      <nav class="pager" aria-label="Alphabetical">
+        {prev ? <a class="pager-prev" href={`/tlds/${prev.tld}/`}>← {label(prev)}</a> : <span />}
+        <a href="/tlds/">All {fmt(counts.total)} TLDs</a>
+        {next ? <a class="pager-next" href={`/tlds/${next.tld}/`}>{label(next)} →</a> : <span />}
+      </nav>
+    </section>
+  </div>
+
+  <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+
+  <script>
+    // Progressive enhancement only: everything above is in the HTML already,
+    // and a name typed here just points the same links at the same registrars'
+    // searches — the page never looks anything up.
+    const input = document.querySelector<HTMLInputElement>('#name');
+    if (input) {
+      const tld = input.dataset.tld!;
+      const searchPages: Record<string, string> = {
+        'namecheap.com': 'https://www.namecheap.com/domains/registration/results/?domain={domain}',
+        'porkbun.com': 'https://porkbun.com/checkout/search?q={domain}',
+        'dynadot.com': 'https://www.dynadot.com/domain/search?domain={domain}',
+        'namesilo.com': 'https://www.namesilo.com/domain/search-domains?query={domain}',
+      };
+      const links = Array.from(document.querySelectorAll<HTMLAnchorElement>('a[data-r]'));
+      const command = document.querySelector<HTMLElement>('.copy-row code');
+      // The Copy button carries its own copy of the command, so it has to move
+      // with the text or the button hands over a stale one.
+      const copyBtn = document.querySelector<HTMLButtonElement>('.copy-row [data-copy]');
+      const searchExample = document.querySelector<HTMLElement>('#search-example');
+      const rdapUrl = document.querySelector<HTMLElement>('[data-rdap-url]');
+      const rdapBase = rdapUrl?.textContent?.replace(/\/domain\/.*$/, '') ?? '';
+
+      /** What a registrar's search will accept: a label, not a sentence. */
+      const clean = (s: string) => s.trim().toLowerCase().replace(/[^a-z0-9-]/g, '');
+
+      function fill() {
+        const n = clean(input!.value);
+        const domain = `${n || 'mybrand'}.${tld}`;
+        const cmd = `ds ${n || 'mybrand'} --tld ${tld}`;
+        if (command) command.textContent = cmd;
+        if (copyBtn) copyBtn.dataset.copy = cmd;
+        if (searchExample) searchExample.textContent = domain;
+        if (rdapUrl) rdapUrl.textContent = `${rdapBase}/domain/${domain}`;
+        for (const a of links) {
+          const tpl = searchPages[a.dataset.r!];
+          a.href = n && tpl ? tpl.replace('{domain}', domain) : `https://${a.dataset.r}/`;
+        }
+      }
+
+      let t: number;
+      input.addEventListener('input', () => {
+        clearTimeout(t);
+        t = window.setTimeout(fill, 150);
+      });
+
+      // /tlds/com?name=mybrand — the same deep link the table page takes.
+      const q = new URLSearchParams(location.search).get('name');
+      if (q) {
+        input.value = clean(q);
+        fill();
+      }
+    }
+  </script>
+</Base>
+
+<style>
+  .page { padding: 2.5rem 1.5rem 1rem; max-width: 62rem; }
+
+  .crumbs { display: flex; gap: .5rem; font-size: .85rem; color: var(--fg-muted); margin-bottom: 1.25rem; }
+  .crumbs a { color: var(--fg-muted); }
+  .crumbs a:hover { color: var(--fg); }
+
+  .head h1 { font-family: var(--mono); display: flex; align-items: baseline; gap: .75rem; flex-wrap: wrap; }
+  /* An IDN answers on its A-label, so the punycode stays visible beside the
+     readable form rather than being tucked away. */
+  .puny { font-size: 1rem; color: var(--fg-faint); font-weight: 400; letter-spacing: 0; }
+  .kicker { margin: .35rem 0 0; font-size: 1.05rem; max-width: var(--measure); }
+  .tags { display: flex; flex-wrap: wrap; gap: .4rem; margin: .9rem 0 0; }
+
+  .tag {
+    display: inline-block; font-size: .72rem; padding: .1rem .45rem;
+    border-radius: 4px; border: 1px solid var(--border-strong); color: var(--fg-muted);
+    white-space: nowrap;
+  }
+  .tag-both, .tag-rdap { color: var(--available); border-color: color-mix(in srgb, var(--available) 40%, transparent); }
+  .tag-whois { color: var(--unknown); border-color: color-mix(in srgb, var(--unknown) 40%, transparent); }
+  .tag-none { color: var(--fg-faint); }
+  .tag-private { color: var(--taken); border-color: color-mix(in srgb, var(--taken) 40%, transparent); }
+  .tag-restricted { color: var(--unknown); border-color: color-mix(in srgb, var(--unknown) 40%, transparent); text-decoration: none; }
+  .tag-cheap { color: var(--available); border-color: color-mix(in srgb, var(--available) 40%, transparent); margin-left: .5rem; }
+
+  .callout {
+    border: 1px solid var(--border); border-left: 3px solid var(--border-strong);
+    background: var(--bg-soft); border-radius: var(--radius);
+    padding: .9rem 1.1rem; margin: 1.75rem 0 0; font-size: .95rem; max-width: var(--measure);
+  }
+  .callout-private { border-left-color: var(--taken); }
+  .callout-warn { border-left-color: var(--unknown); }
+
+  /* Six cells on a priced TLD, four on a closed one — auto-fit sizes both
+     without a column count that only suits one of them. */
+  .facts {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(8.5rem, 1fr)); gap: 1rem;
+    padding: 1.25rem 0; border-block: 1px solid var(--border); margin: 1.75rem 0 0;
+  }
+  .facts .wide { grid-column: span 2; }
+  @media (max-width: 420px) { .facts .wide { grid-column: span 1; } }
+  .facts div { min-width: 0; }
+  .facts dt { color: var(--fg-muted); font-size: .78rem; text-transform: uppercase; letter-spacing: .04em; }
+  .facts dd {
+    margin: .15rem 0 0; font-family: var(--mono); font-size: 1.3rem;
+    letter-spacing: -.02em; font-variant-numeric: tabular-nums;
+  }
+  .facts dd.small { font-size: .95rem; }
+  .facts dd.text { font-family: var(--sans); font-size: .95rem; line-height: 1.4; letter-spacing: 0; }
+  .facts .unit { display: block; font-family: var(--sans); font-size: .75rem; color: var(--fg-faint); letter-spacing: 0; }
+
+  section { margin-top: 3rem; }
+  section > p, .intro, .after { max-width: var(--measure); }
+  .after { font-size: .88rem; margin-top: 1rem; }
+  h2 { margin-top: 0; }
+
+  .namebar { display: flex; flex-wrap: wrap; align-items: baseline; gap: .5rem .75rem; margin: 0 0 1rem; }
+  .namebar label { font-size: .85rem; font-weight: 600; color: var(--fg-muted); }
+  .namebar input {
+    font: inherit; font-family: var(--mono); font-size: .88rem;
+    padding: .35rem .6rem; border-radius: 6px; width: 11rem;
+    border: 1px solid var(--border-strong); background: var(--surface); color: var(--fg);
+  }
+  .namebar input:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+  .namebar p { margin: 0; font-size: .82rem; flex: 1 1 18rem; max-width: 34rem; }
+
+  .table-scroll { overflow-x: auto; border: 1px solid var(--border); border-radius: var(--radius); margin-top: 1.25rem; }
+  .offers { font-size: .92rem; }
+  .offers th[scope="row"] { font-weight: 500; text-transform: none; letter-spacing: normal; font-size: .92rem; color: var(--fg); }
+  .offers .registrar { font-family: var(--mono); font-size: .86rem; }
+  .offers .num { text-align: right; font-family: var(--mono); font-variant-numeric: tabular-nums; }
+  .offers thead th { background: var(--bg-soft); }
+  .offers tfoot th, .offers tfoot td { border-bottom: 0; border-top: 1px solid var(--border-strong); background: var(--bg-soft); }
+  .offers tfoot th { font-size: .82rem; color: var(--fg-muted); text-transform: none; letter-spacing: normal; font-weight: 500; }
+
+  .sellers { list-style: none; padding: 0; margin: 1.25rem 0 0; display: flex; flex-wrap: wrap; gap: .5rem; }
+  .seller {
+    display: inline-flex; align-items: baseline; gap: .5rem;
+    border: 1px solid var(--border); border-radius: 6px; padding: .4rem .7rem;
+    font-family: var(--mono); font-size: .85rem; text-decoration: none; color: var(--fg);
+    background: var(--surface);
+  }
+  a.seller:hover { border-color: var(--accent); }
+  a.seller:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+  .seller-price { color: var(--fg-muted); font-variant-numeric: tabular-nums; }
+
+  .rule {
+    margin: 1.25rem 0 1.25rem; padding: .1rem 0 .1rem 1rem;
+    border-left: 3px solid var(--unknown); color: var(--fg); max-width: var(--measure);
+  }
+  .rule p { margin: .6rem 0 .4rem; }
+  .rule footer { font-size: .84rem; color: var(--fg-muted); margin-bottom: .6rem; }
+
+  .servers { margin: 1.5rem 0 0; border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+  .servers > div { display: grid; grid-template-columns: 6rem 1fr; gap: 0 1rem; padding: .85rem 1rem; }
+  .servers > div + div { border-top: 1px solid var(--border); }
+  .servers dt { font-size: .78rem; text-transform: uppercase; letter-spacing: .04em; color: var(--fg-muted); padding-top: .15rem; }
+  .servers dd { margin: 0; min-width: 0; }
+  .servers .server { display: inline-block; font-size: .88rem; word-break: break-all; white-space: normal; }
+  .servers dd > span { display: block; font-size: .84rem; margin-top: .35rem; }
+  .servers code { white-space: normal; word-break: break-all; }
+  @media (max-width: 560px) { .servers > div { grid-template-columns: 1fr; gap: .3rem; } }
+
+  .rel-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr)); gap: 1.5rem 2rem; }
+  .rel h3 { margin: 0 0 .6rem; font-size: .82rem; text-transform: uppercase; letter-spacing: .04em; color: var(--fg-muted); }
+  .chips { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: .4rem; }
+  .chip {
+    display: inline-flex; align-items: baseline; gap: .4rem;
+    border: 1px solid var(--border); border-radius: 5px; padding: .2rem .5rem;
+    font-family: var(--mono); font-size: .82rem; text-decoration: none; color: var(--fg);
+  }
+  .chip:hover { border-color: var(--accent); }
+  .chip-price { color: var(--fg-faint); font-variant-numeric: tabular-nums; font-size: .78rem; }
+
+  .pager {
+    display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+    margin-top: 2.5rem; padding-top: 1.25rem; border-top: 1px solid var(--border);
+    font-family: var(--mono); font-size: .88rem;
+  }
+  .pager a { text-decoration: none; }
+  .pager a:hover { text-decoration: underline; }
+</style>
