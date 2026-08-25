@@ -78,6 +78,14 @@ const SOURCE_LABEL: Record<string, string> = {
           <option value="3">Third level — .co.uk ({fmt(counts.third)})</option>
         </select>
       </label>
+      <label>
+        <span class="visually-hidden">Registrability</span>
+        <select id="private">
+          <option value="">Any zone</option>
+          <option value="no">Excluding private ({fmt(counts.total - counts.private)})</option>
+          <option value="yes">Private only — .aws, .google ({fmt(counts.private)})</option>
+        </select>
+      </label>
       <label class="check">
         <input type="checkbox" id="priced" /> Priced only
       </label>
@@ -108,13 +116,22 @@ const SOURCE_LABEL: Record<string, string> = {
               data-whois={r.whoisHost ? '1' : ''}
               data-kind={r.kind}
               data-level={r.level}
-              data-search={`${r.tld} ${r.unicode ?? ''} ${host(r.rdapServer) ?? ''} ${r.whoisHost ?? ''}`.toLowerCase()}
+              data-private={r.private ? 'yes' : 'no'}
+              data-search={`${r.tld} ${r.unicode ?? ''} ${host(r.rdapServer) ?? ''} ${r.whoisHost ?? ''} ${r.privateOperator ?? ''}`.toLowerCase()}
             >
               <th scope="row" class="tld">
                 {r.unicode ? (
                   <><span class="tld-uni">.{r.unicode}</span><span class="tld-puny">.{r.tld}</span></>
                 ) : (
                   <>.{r.tld}</>
+                )}
+                {r.private && (
+                  <span
+                    class="tag tag-private"
+                    title={r.privateOperator
+                      ? `Brand TLD — only ${r.privateOperator} registers names here (ICANN Specification 13)`
+                      : 'Reserved — no public registrations'}
+                  >private</span>
                 )}
               </th>
               <td class="num">{money(r.price)}</td>
@@ -181,6 +198,20 @@ const SOURCE_LABEL: Record<string, string> = {
           IANA can name a server for it.
         </li>
         <li>
+          <strong>Private</strong> marks the {fmt(counts.private)} zones nobody outside the
+          registry can register in — brand TLDs like <code>.aws</code> and <code>.google</code>,
+          whose operator is the only permitted registrant, plus <code>.arpa</code> and the names
+          reserved by RFC. The flag is ICANN's{' '}
+          <a href="https://www.icann.org/resources/registries/gtlds/v2/gtlds.json">
+            published registry-agreement list
+          </a>, where a Specification 13 exemption means exactly that. <code>ds</code> reports
+          those <code>PRIVATE</code> instead of <code>AVAILABLE</code> and leaves them out of
+          <code>--tld all</code>; see{' '}
+          <a href="/docs/choosing-tlds#brand-and-reserved-tlds">Brand and reserved TLDs</a>. An
+          untagged row is not a promise that the TLD is on sale — only that nothing says it is
+          closed.
+        </li>
+        <li>
           A few registries answer nobody: <code>.li</code> and <code>.qa</code> refuse public
           WHOIS and have no RDAP, so <code>ds</code> reports them <code>UNKNOWN</code> rather
           than guessing.
@@ -200,6 +231,7 @@ const SOURCE_LABEL: Record<string, string> = {
     const source = document.querySelector<HTMLSelectElement>('#source')!;
     const kind = document.querySelector<HTMLSelectElement>('#kind')!;
     const level = document.querySelector<HTMLSelectElement>('#level')!;
+    const priv = document.querySelector<HTMLSelectElement>('#private')!;
     const priced = document.querySelector<HTMLInputElement>('#priced')!;
     const count = document.querySelector<HTMLParagraphElement>('#count')!;
     const empty = document.querySelector<HTMLParagraphElement>('#empty')!;
@@ -214,6 +246,7 @@ const SOURCE_LABEL: Record<string, string> = {
       const src = source.value;
       const k = kind.value;
       const lvl = level.value;
+      const pv = priv.value;
       const onlyPriced = priced.checked;
       let shown = 0;
 
@@ -225,6 +258,7 @@ const SOURCE_LABEL: Record<string, string> = {
         if (ok && src === 'none') ok = d.source === 'none';
         if (ok && k) ok = d.kind === k;
         if (ok && lvl) ok = d.level === lvl;
+        if (ok && pv) ok = d.private === pv;
         if (ok && onlyPriced) ok = d.price !== '';
         row.hidden = !ok;
         if (ok) shown++;
@@ -274,7 +308,7 @@ const SOURCE_LABEL: Record<string, string> = {
       clearTimeout(t);
       t = window.setTimeout(apply, 90);
     });
-    [source, kind, level, priced].forEach((el) => el.addEventListener('change', apply));
+    [source, kind, level, priv, priced].forEach((el) => el.addEventListener('change', apply));
 
     // Deep-link support: /tlds?q=io
     const initial = new URLSearchParams(location.search).get('q');
@@ -377,6 +411,7 @@ const SOURCE_LABEL: Record<string, string> = {
   .tag-rdap  { color: var(--available); border-color: color-mix(in srgb, var(--available) 30%, transparent); }
   .tag-whois { color: var(--unknown);   border-color: color-mix(in srgb, var(--unknown) 40%, transparent); }
   .tag-none  { color: var(--fg-faint); }
+  .tag-private { color: var(--taken); border-color: color-mix(in srgb, var(--taken) 40%, transparent); margin-left: .4rem; }
 
   .empty { padding: 2rem; text-align: center; color: var(--fg-muted); }
   .notes { margin-top: 3rem; max-width: var(--measure); }

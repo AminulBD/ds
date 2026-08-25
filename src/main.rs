@@ -8,6 +8,7 @@ mod dns;
 mod limit;
 mod model;
 mod pricing;
+mod private;
 mod rdap;
 mod tlds;
 mod whois;
@@ -28,6 +29,7 @@ use bootstrap::Bootstrap;
 use limit::HostLimiter;
 use model::{CheckResult, Details, Method, Register, Status};
 use pricing::Prices;
+use private::PrivateTlds;
 use tlds::Registry;
 use whois::TldInfo;
 
@@ -47,6 +49,7 @@ const USER_AGENT: &str = concat!("ds/", env!("CARGO_PKG_VERSION"), " (domain-sea
                   ds @names.txt --tld popular --available-only --save\n  \
                   ds apple --tld all --level second\n  \
                   ds apple --tld com,io --where\n  \
+                  ds apple --tld all --private only\n  \
                   ds apple google --tld popular --whois --dns-records\n  \
                   ds apple.com --details --registry"
 )]
@@ -140,6 +143,13 @@ struct Args {
     /// Shorthand for --tld-len 2.
     #[arg(long)]
     cctld: bool,
+
+    /// Brand and reserved TLDs, where the public cannot register at all
+    /// (`aws`, `google`, `arpa`): exclude them, include them, or check only
+    /// those. They are excluded from --tld all/rdap/popular unless you say
+    /// otherwise; a TLD you name yourself is always checked.
+    #[arg(long = "private", value_enum, value_name = "MODE")]
+    private: Option<PrivateMode>,
 
     /// Where to look: auto (RDAP, then the bundled WHOIS table, then an IANA
     /// referral), rdap (RDAP only), or whois (bundled whois.json only).
@@ -268,6 +278,18 @@ impl LenRange {
     }
 }
 
+/// What to do with TLDs the public cannot register in.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, ValueEnum)]
+enum PrivateMode {
+    /// Drop them from the TLD list. The default for `all`, `rdap` and
+    /// `popular`.
+    Exclude,
+    /// Keep them, still marked PRIVATE in the results.
+    Include,
+    /// Check nothing else — useful for seeing what a sweep is skipping.
+    Only,
+}
+
 /// How a custom server list relates to the built-in one.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, ValueEnum)]
 enum ListMode {
@@ -297,6 +319,8 @@ struct Ctx {
     bootstrap: Bootstrap,
     registry: Registry,
     prices: Prices,
+    /// TLDs with no public registrations, so an empty answer is not an offer.
+    private: PrivateTlds,
     /// Used for every RDAP/WHOIS connection.
     resolver: TokioAsyncResolver,
     /// Only for `--dns-records`.
@@ -457,7 +481,9 @@ async fn run() -> Result<()> {
 
     let records = args.dns_records.then(|| dns::resolver(timeout));
 
-    let targets = build_targets(&args, &registry, &bootstrap)?;
+    let private_tlds = PrivateTlds::load().context("loading the bundled private-tlds.json")?;
+
+    let targets = build_targets(&args, &registry, &bootstrap, &private_tlds)?;
     if targets.is_empty() {
         bail!("no domains to check");
     }
@@ -483,6 +509,7 @@ async fn run() -> Result<()> {
         bootstrap,
         registry,
         prices,
+        private: private_tlds,
         resolver,
         records,
         timeout,
@@ -538,20 +565,53 @@ struct Target {
     tld: String,
 }
 
-fn build_targets(args: &Args, registry: &Registry, bootstrap: &Bootstrap) -> Result<Vec<Target>> {
+fn build_targets(
+    args: &Args,
+    registry: &Registry,
+    bootstrap: &Bootstrap,
+    private_tlds: &PrivateTlds,
+) -> Result<Vec<Target>> {
     let tld_list: Option<Vec<String>> = match &args.tld {
         Some(spec) => {
-            let all = resolve_tlds(spec, registry, bootstrap)?;
+            let Selection { tlds: all, keyword } = resolve_tlds(spec, registry, bootstrap)?;
             let len = args.tld_len.as_deref().map(LenRange::parse).transpose()?;
+            // Naming a TLD is a request to check it, so the default exclusion
+            // only prunes the lists `ds` chose itself. An explicit --private
+            // filters either way.
+            let private = match args.private {
+                Some(mode) => Some(mode),
+                None if keyword => Some(PrivateMode::Exclude),
+                None => None,
+            };
+            let mut dropped = 0usize;
             let kept: Vec<String> = all
                 .iter()
                 .filter(|t| args.level.allows(t))
                 .filter(|t| len.is_none_or(|l| l.allows(t)))
+                .filter(|t| match private {
+                    Some(PrivateMode::Exclude) if private_tlds.contains(t) => {
+                        dropped += 1;
+                        false
+                    }
+                    Some(PrivateMode::Only) => private_tlds.contains(t),
+                    Some(PrivateMode::Exclude) | Some(PrivateMode::Include) | None => true,
+                })
                 .cloned()
                 .collect();
+            // A quieter list than last release deserves an explanation, and
+            // the flag that undoes it should be one line away.
+            if dropped > 0 && args.private.is_none() && !args.quiet && !args.json {
+                println!(
+                    "{} {dropped} brand/reserved TLD{} skipped ({} to check them too)",
+                    paint("private:", Color::Dim),
+                    if dropped == 1 { "" } else { "s" },
+                    paint("--private include", Color::Bold)
+                );
+            }
             if kept.is_empty() {
                 bail!(
-                    "nothing left to check: all {} TLDs were dropped by --level/--tld-len",
+                    "nothing left to check: all {} TLDs were dropped by \
+                     --level/--tld-len/--private",
                     all.len()
                 );
             }
@@ -653,13 +713,24 @@ fn expand_names(args: &[String]) -> Result<Vec<String>> {
     Ok(dedup(names))
 }
 
-fn resolve_tlds(spec: &str, registry: &Registry, bootstrap: &Bootstrap) -> Result<Vec<String>> {
+/// What a `--tld` spec expanded to, and whether `ds` chose the members itself
+/// (`all`, `rdap`, `popular`) rather than the user listing them.
+struct Selection {
+    tlds: Vec<String>,
+    keyword: bool,
+}
+
+fn resolve_tlds(spec: &str, registry: &Registry, bootstrap: &Bootstrap) -> Result<Selection> {
     let spec = spec.trim();
+    let listed = |tlds| Selection {
+        tlds,
+        keyword: false,
+    };
 
     if let Some(path) = spec.strip_prefix('@') {
         let text = std::fs::read_to_string(path)
             .with_context(|| format!("reading TLD list from {path}"))?;
-        return Ok(dedup(
+        return Ok(listed(dedup(
             text.lines()
                 .map(|l| l.split('#').next().unwrap_or("").to_string())
                 .flat_map(|l| {
@@ -669,17 +740,24 @@ fn resolve_tlds(spec: &str, registry: &Registry, bootstrap: &Bootstrap) -> Resul
                         .collect::<Vec<_>>()
                 })
                 .collect(),
-        ));
+        )));
     }
+
+    let keyword = |tlds| Selection {
+        tlds,
+        keyword: true,
+    };
 
     match spec.to_ascii_lowercase().as_str() {
         "all" => {
             let mut set = registry.all_tlds();
             set.extend(bootstrap.all_tlds());
-            Ok(set.into_iter().collect())
+            Ok(keyword(set.into_iter().collect()))
         }
-        "rdap" => Ok(bootstrap.all_tlds().into_iter().collect()),
-        "popular" => Ok(tlds::POPULAR.iter().map(|t| t.to_string()).collect()),
+        "rdap" => Ok(keyword(bootstrap.all_tlds().into_iter().collect())),
+        "popular" => Ok(keyword(
+            tlds::POPULAR.iter().map(|t| t.to_string()).collect(),
+        )),
         _ => {
             let list = dedup(
                 spec.split(',')
@@ -690,7 +768,7 @@ fn resolve_tlds(spec: &str, registry: &Registry, bootstrap: &Bootstrap) -> Resul
             if list.is_empty() {
                 bail!("--tld did not contain any usable TLD");
             }
-            Ok(list)
+            Ok(listed(list))
         }
     }
 }
@@ -849,13 +927,26 @@ async fn check(ctx: &Ctx, domain: String, tld: String) -> CheckResult {
         }
     }
 
-    // 3. DNS
+    // 3. Registrability. A brand or reserved TLD has no public registrations,
+    //    so "no such domain" there is not an offer — reporting it as AVAILABLE
+    //    would be exactly the dead end this tool exists to prevent. The reason
+    //    is attached whatever the status, because it is worth knowing for a
+    //    taken name too; it goes on last so the IANA-referral path above cannot
+    //    clear it.
+    if let Some(entry) = ctx.private.lookup(&tld) {
+        notes.push(entry.reason(&tld));
+        if status == Status::Available {
+            status = Status::Private;
+        }
+    }
+
+    // 4. DNS
     let dns = match &ctx.records {
         Some(r) => Some(dns::lookup(r, &domain).await),
         None => None,
     };
 
-    // 4. Where to register — only meaningful for a name that is still free.
+    // 5. Where to register — only meaningful for a name that is still free.
     let register = if args.show_where && status == Status::Available {
         let info = if args.no_iana {
             None
@@ -907,6 +998,7 @@ fn print_result(args: &Args, r: &CheckResult) {
     let (mark, color) = match r.status {
         Status::Available => ("+", Color::Green),
         Status::Taken => ("-", Color::Red),
+        Status::Private => ("!", Color::Cyan),
         Status::Unknown => ("?", Color::Yellow),
     };
 
@@ -927,7 +1019,8 @@ fn print_result(args: &Args, r: &CheckResult) {
         r.method.as_str(),
         r.elapsed_ms,
         match (&r.note, r.status) {
-            (Some(n), Status::Unknown) => format!("  {}", paint(n, Color::Dim)),
+            // PRIVATE without the reason attached is just a bare assertion.
+            (Some(n), Status::Unknown | Status::Private) => format!("  {}", paint(n, Color::Dim)),
             _ => String::new(),
         }
     );
@@ -1052,6 +1145,7 @@ fn save(args: &Args, results: &[CheckResult]) -> Result<Vec<(PathBuf, usize)>> {
     let groups = [
         (Status::Available, "available"),
         (Status::Taken, "unavailable"),
+        (Status::Private, "private"),
         (Status::Unknown, "unknown"),
     ];
 
@@ -1059,8 +1153,9 @@ fn save(args: &Args, results: &[CheckResult]) -> Result<Vec<(PathBuf, usize)>> {
     for (status, stem) in groups {
         let matching: Vec<&CheckResult> = results.iter().filter(|r| r.status == status).collect();
 
-        // Only create the unknown file when there is something to put in it.
-        if status == Status::Unknown && matching.is_empty() {
+        // Only create the unknown and private files when there is something
+        // to put in them; the other two are always written.
+        if matches!(status, Status::Unknown | Status::Private) && matching.is_empty() {
             continue;
         }
 
@@ -1125,10 +1220,22 @@ fn summarize(results: &[CheckResult], elapsed: Duration, written: &[(PathBuf, us
         .filter(|r| r.status == Status::Available)
         .count();
     let taken = results.iter().filter(|r| r.status == Status::Taken).count();
-    let unknown = results.len() - available - taken;
+    let private = results
+        .iter()
+        .filter(|r| r.status == Status::Private)
+        .count();
+    let unknown = results.len() - available - taken - private;
+
+    // Most runs have no private TLDs in them; a permanent `0 private` column
+    // would be noise for everyone else.
+    let private_part = if private == 0 {
+        String::new()
+    } else {
+        format!("  {} private", paint(&private.to_string(), Color::Cyan))
+    };
 
     println!(
-        "\n{} {} available  {} taken  {} unknown   ({} checked in {:.1}s)",
+        "\n{} {} available  {} taken{private_part}  {} unknown   ({} checked in {:.1}s)",
         paint("summary:", Color::Bold),
         paint(&available.to_string(), Color::Green),
         paint(&taken.to_string(), Color::Red),
@@ -1170,6 +1277,7 @@ enum Color {
     Green,
     Red,
     Yellow,
+    Cyan,
     Dim,
     Bold,
 }
@@ -1223,6 +1331,7 @@ fn paint(text: &str, color: Color) -> String {
         Color::Green => "32",
         Color::Red => "31",
         Color::Yellow => "33",
+        Color::Cyan => "36",
         Color::Dim => "2",
         Color::Bold => "1",
     };
@@ -1327,6 +1436,83 @@ mod tests {
     #[test]
     fn rejects_an_empty_list() {
         assert!(expand_names(&args(&[" ", ","])).is_err());
+    }
+
+    /// A bootstrap holding one open gTLD and two Specification 13 brands.
+    fn bootstrap_with_brands() -> Bootstrap {
+        // Unique per call: these tests run in parallel and would otherwise
+        // delete each other's copy of the file.
+        static N: std::sync::atomic::AtomicUsize = std::sync::atomic::AtomicUsize::new(0);
+        let n = N.fetch_add(1, Ordering::Relaxed);
+        let path = std::env::temp_dir().join(format!("ds-private-rdap-{n}.json"));
+        std::fs::write(
+            &path,
+            r#"{"services":[[["com","aws","google"],["https://rdap.example/"]]]}"#,
+        )
+        .unwrap();
+        let b = Bootstrap::from_file(&path).unwrap();
+        std::fs::remove_file(&path).ok();
+        b
+    }
+
+    fn selected(argv: &[&str]) -> Result<Vec<String>> {
+        let args = Args::try_parse_from(argv)?;
+        let targets = build_targets(
+            &args,
+            &Registry::default(),
+            &bootstrap_with_brands(),
+            &PrivateTlds::load().unwrap(),
+        )?;
+        Ok(targets.into_iter().map(|t| t.tld).collect())
+    }
+
+    #[test]
+    fn a_keyword_list_drops_private_tlds_by_default() {
+        assert_eq!(
+            selected(&["ds", "apple", "--tld", "rdap"]).unwrap(),
+            ["com"]
+        );
+    }
+
+    #[test]
+    fn private_include_and_only_select_the_brands() {
+        let mut all = selected(&["ds", "apple", "--tld", "rdap", "--private", "include"]).unwrap();
+        all.sort();
+        assert_eq!(all, ["aws", "com", "google"]);
+
+        let mut only = selected(&["ds", "apple", "--tld", "rdap", "--private", "only"]).unwrap();
+        only.sort();
+        assert_eq!(only, ["aws", "google"]);
+    }
+
+    #[test]
+    fn naming_a_private_tld_still_checks_it() {
+        // The default exclusion prunes lists `ds` chose; it must never silently
+        // discard a TLD the user typed out.
+        let mut named = selected(&["ds", "apple", "--tld", "aws,com"]).unwrap();
+        named.sort();
+        assert_eq!(named, ["aws", "com"]);
+
+        // Asking for the filter by hand does apply it to a hand-written list.
+        assert_eq!(
+            selected(&["ds", "apple", "--tld", "aws,com", "--private", "exclude"]).unwrap(),
+            ["com"]
+        );
+    }
+
+    #[test]
+    fn an_empty_selection_is_an_error_not_an_empty_run() {
+        assert!(selected(&["ds", "apple", "--tld", "aws", "--private", "exclude"]).is_err());
+        assert!(selected(&["ds", "apple", "--tld", "com", "--private", "only"]).is_err());
+    }
+
+    #[test]
+    fn private_is_its_own_status_in_json() {
+        assert_eq!(Status::Private.as_str(), "PRIVATE");
+        assert_eq!(
+            serde_json::to_string(&Status::Private).unwrap(),
+            "\"private\""
+        );
     }
 
     #[test]

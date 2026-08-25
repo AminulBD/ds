@@ -124,29 +124,30 @@ install -m755 target/release/ds ~/.local/bin/ds
 install -m644 ds.1 ~/.local/share/man/man1/ds.1     # then: man ds
 ```
 
-`whois.json` and `pricing.json` are embedded at compile time, so the binary runs
-from anywhere.
+`whois.json`, `pricing.json` and `private-tlds.json` are embedded at compile
+time, so the binary runs from anywhere.
 
 ## Usage
 
 ```sh
 ds apple --tld com,net             # a specific list
-ds apple --tld all                 # every known TLD (~1650 lookups)
+ds apple --tld all                 # every registrable TLD (~1290 lookups)
 ds apple --tld popular             # a curated set of ~38 common TLDs
 ds apple --tld rdap                # only TLDs that have an RDAP service
 ds apple --tld @tlds.txt           # one TLD per line, `,` and `#` comments ok
 ds apple.com                       # a full domain, checked as-is
 ```
 
-Results stream in as they arrive. `+` is available, `-` is taken, `?` could not
-be answered:
+Results stream in as they arrive. `+` is available, `-` is taken, `!` is a TLD
+you cannot register in, `?` could not be answered:
 
 ```
 + mybrand.dev                      AVAILABLE    $15.98 rdap      415ms
 - apple.com                        TAKEN        $14.98 rdap      978ms
+! mybrand.aws                      PRIVATE           - rdap      312ms  .aws is a brand TLD — only AWS Registry LLC registers names there (ICANN Spec 13)
 ? google.pt                        UNKNOWN           - -        3548ms  whois: connecting to whois.dns.pt:43: timed out
 
-summary: 1 available  1 taken  1 unknown   (3 checked in 3.5s)
+summary: 1 available  1 taken  1 private  1 unknown   (4 checked in 3.5s)
 ```
 
 The fourth column is the average yearly registration price for the TLD; `-`
@@ -187,12 +188,14 @@ ds mybrand --tld popular --append           # so does --append
 
 * `available.txt` — one domain per line
 * `unavailable.txt` — registered domains
+* `private.txt` — only when a [private TLD](#brand-and-reserved-tlds) was
+  checked: names that are unregistered but not for sale
 * `unknown.txt` — only when a registry could not be reached, so a failed lookup
   is never filed as "available"
 
-With `--json` the same three files are written as `available.json`,
-`unavailable.json` and `unknown.json`, each a JSON array of the full results
-rather than a list of names:
+With `--json` the same files are written as `available.json`,
+`unavailable.json`, `private.json` and `unknown.json`, each a JSON array of the
+full results rather than a list of names:
 
 ```sh
 ds mybrand --tld all --save --json          # available.json, unavailable.json
@@ -211,8 +214,8 @@ one valid JSON document.
 
 | Value | Keeps | Count under `--tld all` |
 | --- | --- | --- |
-| `any` (default) | everything | 1659 |
-| `second` | plain TLDs — `apple.com`, `apple.de` | 1274 |
+| `any` (default) | everything | 1290 |
+| `second` | plain TLDs — `apple.com`, `apple.de` | 905 |
 | `third` | multi-label suffixes — `apple.co.uk`, `apple.com.au` | 385 |
 
 Handy for `--tld all`, which otherwise sweeps hundreds of restricted zones
@@ -225,8 +228,8 @@ typed out by hand is always checked as given — `--level` only filters TLD list
 what ICANN reserves for ISO 3166-1 country codes:
 
 ```sh
-ds apple --tld all --cctld                  # 505 (includes co.uk, com.au, ...)
-ds apple --tld all --cctld --level second   # 140 bare ccTLDs: de, io, jp, ...
+ds apple --tld all --cctld                  # 504 (includes co.uk, com.au, ...)
+ds apple --tld all --cctld --level second   # 139 bare ccTLDs: de, io, jp, ...
 ```
 
 `--tld-len` is the general form, measured on the last label so `co.uk` counts
@@ -234,10 +237,62 @@ as 2:
 
 | Spec | Keeps | Count under `--tld all` |
 | --- | --- | --- |
-| `--tld-len 2` | two-letter (same as `--cctld`) | 505 |
-| `--tld-len 3` | `com`, `net`, `xyz`, ... | 236 |
-| `--tld-len -3` | three characters or fewer | 741 |
-| `--tld-len 4-` | four or more | 918 |
+| `--tld-len 2` | two-letter (same as `--cctld`) | 504 |
+| `--tld-len 3` | `com`, `net`, `xyz`, ... | 157 |
+| `--tld-len -3` | three characters or fewer | 661 |
+| `--tld-len 4-` | four or more | 629 |
+
+### Brand and reserved TLDs
+
+Some TLDs are not on sale to anybody. `.aws`, `.google`, `.bmw` and 364 others
+are **brand TLDs**: the registry operator is the only party that may hold a
+name in the zone, so a lookup for `mybrand.aws` truthfully answers "no such
+domain" — which reads as AVAILABLE and is worth nothing. `.arpa` and the names
+the IETF reserves (`.test`, `.example`, `.invalid`, `.localhost`, `.local`,
+`.onion`) are closed for the same practical reason.
+
+`ds` reports those as `PRIVATE` rather than `AVAILABLE`, with the reason and
+the operator attached:
+
+```sh
+ds mybrand --tld aws
+```
+
+```
+! mybrand.aws                      PRIVATE           - rdap      312ms  .aws is a brand TLD — only AWS Registry LLC registers names there (ICANN Spec 13)
+```
+
+**They are left out of `--tld all`, `--tld rdap` and `--tld popular` by
+default** — 368 of the 1658 TLDs in `all`, so a sweep is a fifth shorter and
+carries no dead ends. The run says so when it happens. A TLD you name yourself
+is always checked; the default only prunes the lists `ds` picks for you.
+
+| `--private` | Effect |
+| --- | --- |
+| *(unset)* | excluded from `all` / `rdap` / `popular`; a TLD you name is still checked |
+| `exclude` | excluded everywhere, a hand-written `--tld` list included |
+| `include` | checked, and still reported `PRIVATE` |
+| `only` | check nothing else — what a sweep is skipping |
+
+```sh
+ds mybrand --tld all --private include      # all 1658, brands marked PRIVATE
+ds mybrand --tld all --private only         # just the 368 closed ones
+```
+
+The classification is bundled as `private-tlds.json` and comes from ICANN's
+machine-readable [registry-agreement
+list](https://www.icann.org/resources/registries/gtlds/v2/gtlds.json). A
+registry that runs its TLD purely for itself applies for **Specification 13**,
+the ".brand TLD" exemption from the registrar non-discrimination rules, and
+that flag is what `ds` reads — a dated, first-party, checkable fact rather than
+a hand-picked list of famous names. Regenerate it with `node
+scripts/build-private-tlds.mjs`.
+
+The converse is deliberately *not* asserted. A TLD missing from that file is
+not thereby claimed to be registrable; `ds` simply makes no claim and reports
+whatever the registry said. So `.app` and `.dev` — Google-run, but with no
+Specification 13 and sold through ordinary registrars — are ordinary TLDs here,
+and every ccTLD is left exactly as it was.
 
 ## Showing more
 
@@ -473,6 +528,11 @@ bundled table has never heard of, or hold a corporate zone at nothing.
 ## Accuracy notes
 
 * RDAP is authoritative: `404` means the name is not registered.
+* "Not registered" and "you can register it" are not the same claim. In a brand
+  or reserved TLD every lookup comes back unregistered forever, so those are
+  reported `PRIVATE` — see [Brand and reserved
+  TLDs](#brand-and-reserved-tlds). Only Specification 13 brands and
+  RFC-reserved names are called that; nothing else is assumed either way.
 * WHOIS is text matching. The per-registry needle from `whois.json` is tried
   first, then generic markers. Anything unrecognised is `UNKNOWN` rather than a
   guess.
@@ -506,6 +566,8 @@ bundled table has never heard of, or hold a corporate zone at nothing.
 cargo test
 cargo clippy --all-targets
 man ./ds.1                 # preview the manual page
+
+node scripts/build-private-tlds.mjs    # refresh private-tlds.json from ICANN
 ```
 
 ## Releases
