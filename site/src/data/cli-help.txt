@@ -7,6 +7,7 @@ Examples:
   ds @names.txt --tld popular --available-only --save
   ds apple --tld all --level second
   ds apple --tld com,io --where
+  ds apple --tld all --private only
   ds apple google --tld popular --whois --dns-records
   ds apple.com --details --registry
 
@@ -86,6 +87,14 @@ Options:
 
       --cctld
           Only country-code TLDs — the two-letter ones (`de`, `io`, `co.uk`). Shorthand for --tld-len 2
+
+      --private <MODE>
+          Brand and reserved TLDs, where the public cannot register at all (`aws`, `google`, `arpa`): exclude them, include them, or check only those. They are excluded from --tld all/rdap/popular unless you say otherwise; a TLD you name yourself is always checked
+
+          Possible values:
+          - exclude: Drop them from the TLD list. The default for `all`, `rdap` and `popular`
+          - include: Keep them, still marked PRIVATE in the results
+          - only:    Check nothing else — useful for seeing what a sweep is skipping
 
       --source <SOURCE>
           Where to look: auto (RDAP, then the bundled WHOIS table, then an IANA referral), rdap (RDAP only), or whois (bundled whois.json only)

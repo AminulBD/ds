@@ -10,10 +10,14 @@ const host = (url: string | null) => {
   try { return new URL(url).host; } catch { return url; }
 };
 
-// Every priced entry in the bundled table comes from one registrar. Saying
-// "average" here would be false, so the column says whose list price it is.
-const registrars = [...new Set(rows.flatMap((r) => r.registrars))];
+// The column is a mean, but only over the registrars that actually sell the
+// TLD — so it says who those are, and how many TLDs more than one of them
+// quotes. If the table ever narrows back to a single registrar, saying
+// "average" would be false and the note says whose list price it is instead.
+const registrars = [...new Set(rows.flatMap((r) => r.registrars))].sort();
 const singleSource = registrars.length === 1 ? registrars[0] : null;
+const registrarList = new Intl.ListFormat('en', { type: 'conjunction' }).format(registrars);
+const multiPriced = rows.filter((r) => r.registrars.length > 1).length;
 
 const SOURCE_LABEL: Record<string, string> = {
   both: 'RDAP + WHOIS',
@@ -151,17 +155,25 @@ const SOURCE_LABEL: Record<string, string> = {
       <h2>About this data</h2>
       <ul>
         <li>
-          <strong>Prices are {singleSource ? <>{singleSource} list prices</> : <>registrar list prices</>}</strong>,
+          <strong>Prices are {singleSource ? <>{singleSource} list prices</> : <>list prices from {registrarList}</>}</strong>,
           bundled with the CLI and last regenerated {generated}. They cover {fmt(counts.priced)} of
           the {fmt(counts.total)} TLDs here, from {money(priceRange.min)} to {money(priceRange.max)} a
           year; the rest show <code>—</code> because nothing in the table prices them.{' '}
-          {singleSource && <> The file has room for several registrars per TLD and <code>ds</code> averages
-          across them, but every entry currently quotes {singleSource}, so treat these as one
-          registrar's list prices rather than a market average.</>}
+          {singleSource ? (
+            <> The file has room for several registrars per TLD and <code>ds</code> averages
+            across them, but every entry currently quotes {singleSource}, so treat these as one
+            registrar's list prices rather than a market average.</>
+          ) : (
+            <> Where more than one of them sells a TLD — {fmt(multiPriced)} of these rows —
+            the figure is the mean of their list prices. Where only one does, it is that
+            registrar's price alone, which is a quote rather than a market rate.</>
+          )}
         </li>
         <li>
-          Treat them as list prices, not quotes — first-year promotions, ICANN fees, taxes and
-          premium names all move the real number, and a registry may not sell you the TLD at
+          <strong>Register is the first year, Renew is every year after.</strong> The two often
+          differ by a lot — a name can be a couple of dollars to register and forty to keep.
+          Treat both as list prices, not quotes: promotions, ICANN fees, taxes and premium
+          names all move the real number, and a registry may not sell you the TLD at
           all. Supply your own table with <code>--pricing-file</code>; see{' '}
           <a href="/docs/choosing-the-source#your-own-prices">Your own prices</a>.
         </li>
@@ -192,8 +204,9 @@ const SOURCE_LABEL: Record<string, string> = {
           <strong>This table is slightly wider than <code>--tld all</code></strong>. That sweep
           covers the {fmt(counts.total - counts.none)} TLDs with a registry to ask;
           {counts.none} more are priced in the bundled table but have neither an RDAP endpoint
-          nor a WHOIS server on file — mostly resold third-level suffixes like
-          <code>.co.com</code> and <code>.de.com</code>. They are listed here, tagged
+          nor a WHOIS server on file — resold third-level suffixes like <code>.co.com</code>,
+          and country codes a registrar will sell you whose registry publishes no public
+          lookup at all, like <code>.al</code> and <code>.ao</code>. They are listed here, tagged
           <span class="tag tag-none">neither</span>, and asking for one by name still works if
           IANA can name a server for it.
         </li>
