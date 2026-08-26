@@ -8,6 +8,8 @@ on:
 
 permissions:
   contents: write
+  # Lets the publish job dispatch pages.yml; see "Refresh the site" below.
+  actions: write
 
 # Re-pushing a tag supersedes the run already going for it, rather than
 # racing it to publish the same release.
@@ -226,3 +228,19 @@ jobs:
             gh release create "$GITHUB_REF_NAME" --generate-notes --verify-tag
           fi
           gh release upload "$GITHUB_REF_NAME" dist/* --clobber
+
+      # pages.yml has a `release: [published]` trigger, but it never fires for
+      # a release cut here: GitHub will not start a workflow from an event
+      # raised by GITHUB_TOKEN, and the step above uses exactly that. The
+      # documented exception is workflow_dispatch, so ask for the deploy
+      # outright. Without this the site keeps serving the previous release's
+      # download links until something else happens to touch site/ or docs/.
+      #
+      # continue-on-error keeps pages.yml's independence intact: it is kept
+      # separate so a site failure cannot hold up a release, and a failed
+      # dispatch must not turn a published release red either.
+      - name: Refresh the site
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run pages.yml --ref main

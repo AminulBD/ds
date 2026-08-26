@@ -19,6 +19,10 @@ on:
       - "src/main.rs"
       - ".github/workflows/pages.yml"
   # Refreshes /install with the new asset list as soon as a release is out.
+  # This only covers a release published by hand through the GitHub UI. One
+  # cut by release.yml is created with GITHUB_TOKEN, and GitHub does not start
+  # workflows from events that token raises -- release.yml dispatches this
+  # workflow itself instead. Keep both: they cover different paths in.
   release:
     types: [published]
   workflow_dispatch:
