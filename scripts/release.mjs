@@ -9,6 +9,11 @@
 //   node scripts/release.mjs patch --dry-run    # print the plan, change nothing
 //   node scripts/release.mjs patch --push       # ...and push main and the tag
 //
+//   --skip-checks     skip cargo test/clippy/fmt and the two script tests
+//   --allow-branch    release from a branch other than main. Needed when main
+//                     is checked out in another worktree, since git will not
+//                     check it out twice. The commit is still pushed to main.
+//
 // WHY THIS EXISTS
 //
 // The tag does not set the version. Archive names are built from the tag, but
@@ -202,17 +207,37 @@ if (!dryRun) {
 
 // --- push, only when asked ------------------------------------------------
 
+// A release belongs on main whatever the local branch is called. With
+// --allow-branch the commit is sitting somewhere else -- most often because
+// main is held by another worktree and cannot be checked out here -- and
+// pushing that branch by its own name would publish a stray branch while
+// leaving main without the bump. Push the commit *at* main instead.
+const refspec = branch === 'main' ? 'main' : 'HEAD:main';
+
+// Two pushes rather than one --follow-tags, so the ordering is visible and
+// forced: the commit lands on main first, and only then does the tag go up.
+// A tag pushed first would, for as long as the second push took or if it
+// failed, point at a commit that is on no branch -- which is how v0.1.7 ended
+// up dangling off main's history.
+const pushes = [
+  ['push', 'origin', refspec],
+  ['push', 'origin', tag],
+];
+const asShell = pushes.map((p) => `    git ${p.join(' ')}`).join('\n');
+
 if (dryRun) {
   console.log('\nnothing was changed (--dry-run).\n');
 } else if (push) {
-  console.log(`\n$ git push origin ${branch} --follow-tags`);
-  execFileSync('git', ['push', 'origin', branch, '--follow-tags'], {
-    cwd: repo,
-    stdio: 'inherit',
-  });
+  for (const args of pushes) {
+    console.log(`\n$ git ${args.join(' ')}`);
+    execFileSync('git', args, { cwd: repo, stdio: 'inherit' });
+  }
   console.log(`\npushed. the release workflow is building ${tag}.`);
 } else {
-  console.log(`\nprepared locally. to publish:\n\n    git push origin ${branch} --follow-tags\n`);
+  if (refspec !== 'main') {
+    console.log(`\nnote: on ${branch}, so the first push puts the commit on main.`);
+  }
+  console.log(`\nprepared locally. to publish, in this order:\n\n${asShell}\n`);
   console.log(`to undo:\n\n    git tag -d ${tag} && git reset --hard HEAD~1\n`);
 }
 
