@@ -79,7 +79,7 @@ and what `--save` writes.
 | [Pacing](docs/pacing.md) | concurrency, timeouts and the quieter flags |
 | [Accuracy notes](docs/accuracy-notes.md) | what each status does and does not claim |
 | [The bundled WHOIS table](docs/the-bundled-whois-table.md) | how `whois.json` is generated and verified |
-| [HTTP API](docs/http-api.md) | `ds serve`, behind a cargo feature, and how to run one safely |
+| [HTTP API](docs/http-api.md) | `ds --serve`, in every build, and how to run one safely |
 
 The same pages are on [ds.aminul.dev](https://ds.aminul.dev/docs/usage), which
 generates them from this directory, and `man ds` carries the full option

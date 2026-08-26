@@ -1,14 +1,16 @@
 # HTTP API
 
 `ds` can answer the same checks over HTTP, for a web front end or anything else
-that would rather call an API than shell out. It is **not** in the released
-binaries or packages: the server is behind a cargo feature, so a default build
-stays the dependency-light static CLI it has always been.
+that would rather call an API than shell out. It is in every released binary and
+package — `--serve` is there in the `ds` you already have, and it stays off until
+you ask for it.
 
 ```sh
-cargo build --release --features serve
-ds serve                      # http://127.0.0.1:8080
+ds --serve                    # http://127.0.0.1:8080
 ```
+
+Building it out is still possible: `cargo build --release --no-default-features`
+drops the `serve` feature, and with it `--serve` and every server option below.
 
 | Endpoint | What it does |
 | --- | --- |
@@ -56,6 +58,7 @@ and throttled — and the defaults are the interesting part:
 
 | Flag | Default | Meaning |
 | --- | --- | --- |
+| `--serve` | | answer over HTTP instead of checking a name; required by all of the below |
 | `--host <ADDR>` | `127.0.0.1` | bind address; anything else prints a warning |
 | `-p, --port <N>` | 8080 | port |
 | `--max-lookups <N>` | 50 | most domains one request may ask about (names × TLDs) |
@@ -68,6 +71,13 @@ and throttled — and the defaults are the interesting part:
 | `--source <auto\|rdap\|whois>` | `auto` | as the CLI's `--source` |
 | `--details` `--registry` `--where` | | as the CLI's flags of the same name |
 | `--no-iana` | | never query `whois.iana.org` |
+
+Several of those are the CLI's own flags rather than server copies of them:
+`--concurrency`, `--per-host`, `--timeout`, `--source`, `--details`,
+`--registry`, `--where` and `--no-iana` mean the same thing and default the same
+way whether or not `--serve` is on the line. The server-only options go the
+other way and are refused without it, so `ds apple --port 9000` is an error
+rather than a port quietly thrown away.
 
 The pacing described under [Pacing](pacing.md) is process-wide, not per request:
 one `HostLimiter`, so a hundred clients asking about `.com` queue behind the
@@ -83,9 +93,4 @@ Behind a reverse proxy every client looks like the proxy, so `--rate-limit`
 becomes one budget for all of them — put the per-user limit in the proxy.
 `X-Forwarded-For` is deliberately not trusted: it is a header anyone can write,
 and honouring it would hand every client an unlimited supply of identities.
-
-One thing to know about the subcommand: `ds serve` is a name a domain could
-have had. In a build with the feature on it starts the server, so checking the
-*name* `serve` wants `ds serve.com` or `ds -- serve`. Default builds have no
-subcommand and are unaffected.
 

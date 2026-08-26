@@ -1,7 +1,7 @@
-//! `ds serve` — the same checks the CLI runs, over HTTP.
+//! `ds --serve` — the same checks the CLI runs, over HTTP.
 //!
-//! Behind the `serve` cargo feature, so a default build (and every shipped
-//! package) is byte-for-byte the CLI it was before.
+//! In every default build; `--no-default-features` drops the `serve` feature
+//! and leaves the CLI on its own.
 //!
 //! The thing to keep in mind here is that a `ds` server is an open proxy onto
 //! other people's registries. `src/limit.rs` exists because a single `--tld
@@ -35,7 +35,7 @@ use crate::pricing::Prices;
 use crate::private::PrivateTlds;
 use crate::registration::Rules;
 use crate::tlds::Registry;
-use crate::{check, dns, resolve_tlds, Ctx, Lookup, Selection, Source};
+use crate::{check, dns, resolve_tlds, Args, Ctx, Lookup, Selection, Source};
 
 /// Entries kept before the cache is swept. Small on purpose: this is a cache
 /// in front of a network, not a database.
@@ -53,72 +53,63 @@ const CLIENTS_MAX: usize = 8192;
 /// How long a client has to finish sending its request line and headers.
 const HEADER_TIMEOUT: Duration = Duration::from_secs(10);
 
+/// The options that only exist with `--serve`. What the server shares with
+/// the CLI — concurrency, per-host, timeout, source, no-iana, details,
+/// registry, where — it reads straight off `Args`, so a flag means the same
+/// thing on both sides of the program.
+///
+/// Each one `requires` the flag: `ds apple --port 9000` is a mistake, and
+/// silently ignoring the port would be a worse answer than refusing it.
 #[derive(clap::Args, Debug)]
+#[command(next_help_heading = "Server options")]
 pub struct ServeArgs {
     /// Address to bind. Loopback by default and deliberately: a reachable
     /// `ds` server queries registries on behalf of whoever asks it to.
-    #[arg(long, default_value = "127.0.0.1", value_name = "ADDR")]
+    #[arg(
+        long,
+        default_value = "127.0.0.1",
+        value_name = "ADDR",
+        requires = "serve"
+    )]
     host: String,
 
     /// Port to listen on.
-    #[arg(short, long, default_value_t = 8080)]
-    port: u16,
+    #[arg(short, long, default_value_t = 8080, requires = "serve")]
+    pub port: u16,
 
     /// Most domains one request may ask about (names × TLDs). The default
     /// leaves room for `tld=popular` and rules out `tld=all`.
-    #[arg(long = "max-lookups", default_value_t = 50, value_name = "N")]
+    #[arg(
+        long = "max-lookups",
+        default_value_t = 50,
+        value_name = "N",
+        requires = "serve"
+    )]
     max_lookups: usize,
 
     /// Requests per minute per client address; 0 turns the limit off.
-    #[arg(long = "rate-limit", default_value_t = 60, value_name = "N")]
+    #[arg(
+        long = "rate-limit",
+        default_value_t = 60,
+        value_name = "N",
+        requires = "serve"
+    )]
     rate_limit: u32,
 
     /// How long an answer is reused before the registry is asked again;
     /// 0 disables the cache.
-    #[arg(long = "cache-ttl", default_value_t = 300, value_name = "SECONDS")]
+    #[arg(
+        long = "cache-ttl",
+        default_value_t = 300,
+        value_name = "SECONDS",
+        requires = "serve"
+    )]
     cache_ttl: u64,
-
-    /// Lookups in flight across the whole server, however many clients are
-    /// connected.
-    #[arg(short, long, default_value_t = 20)]
-    concurrency: usize,
-
-    /// Parallel lookups against any single registry server.
-    #[arg(long = "per-host", default_value_t = 4)]
-    per_host: usize,
-
-    /// Per-request timeout in seconds.
-    #[arg(long, default_value_t = 10)]
-    timeout: u64,
 
     /// Send `Access-Control-Allow-Origin` with this value, so a browser page
     /// may call the API. An origin (`https://example.com`) or `*`.
-    #[arg(long, value_name = "ORIGIN")]
+    #[arg(long, value_name = "ORIGIN", requires = "serve")]
     cors: Option<String>,
-
-    /// Where to look: auto (RDAP, then the bundled WHOIS table, then an IANA
-    /// referral), rdap (RDAP only), or whois (bundled whois.json only).
-    #[arg(long, value_enum, default_value_t = Source::Auto)]
-    source: Source,
-
-    /// Never query whois.iana.org.
-    #[arg(long = "no-iana")]
-    no_iana: bool,
-
-    /// Include registration details (registrar, dates, status, nameservers)
-    /// in the response. Off by default: some registries answer with the
-    /// registrant's name and address.
-    #[arg(long)]
-    details: bool,
-
-    /// Include which registry answered (RDAP endpoint / WHOIS server).
-    #[arg(long)]
-    registry: bool,
-
-    /// For available domains, include the registry and where to register
-    /// them. Costs one extra IANA lookup per TLD, cached for the process.
-    #[arg(long = "where")]
-    show_where: bool,
 }
 
 /// Everything a request needs. One per process, shared by every connection —
@@ -133,7 +124,9 @@ struct State {
     cors: Option<String>,
 }
 
-pub async fn run(args: ServeArgs) -> Result<()> {
+pub async fn run(args: Args) -> Result<()> {
+    let opts = args.serve_opts;
+
     let timeout = Duration::from_secs(args.timeout.max(1));
     let resolver = dns::connect_resolver(timeout);
     let client = reqwest::Client::builder()
@@ -191,21 +184,21 @@ pub async fn run(args: ServeArgs) -> Result<()> {
 
     let state = Arc::new(State {
         ctx,
-        cache: Cache::new(Duration::from_secs(args.cache_ttl)),
-        rate: RateLimiter::new(args.rate_limit),
+        cache: Cache::new(Duration::from_secs(opts.cache_ttl)),
+        rate: RateLimiter::new(opts.rate_limit),
         slots: Semaphore::new(args.concurrency.max(1)),
-        max_lookups: args.max_lookups.max(1),
-        cors: args.cors,
+        max_lookups: opts.max_lookups.max(1),
+        cors: opts.cors,
     });
 
-    let addr: SocketAddr = format!("{}:{}", args.host, args.port)
+    let addr: SocketAddr = format!("{}:{}", opts.host, opts.port)
         .parse()
-        .with_context(|| format!("{}:{} is not an address to bind", args.host, args.port))?;
+        .with_context(|| format!("{}:{} is not an address to bind", opts.host, opts.port))?;
     let listener = TcpListener::bind(addr)
         .await
         .with_context(|| format!("binding {addr}"))?;
 
-    println!("ds serve listening on http://{addr}");
+    println!("ds --serve listening on http://{addr}");
     println!("  GET /v1/check?name=apple&tld=com,net");
     println!("  GET /healthz");
     println!(
@@ -213,7 +206,7 @@ pub async fn run(args: ServeArgs) -> Result<()> {
         state.max_lookups,
         args.concurrency.max(1),
         args.per_host,
-        match args.rate_limit {
+        match opts.rate_limit {
             0 => "no per-client rate limit".to_string(),
             n => format!("{n} requests/min per client"),
         }

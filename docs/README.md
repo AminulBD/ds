@@ -17,7 +17,7 @@ could drift.
 | [Pacing](pacing.md) | concurrency, timeouts and the quieter flags |
 | [Accuracy notes](accuracy-notes.md) | what each status does and does not claim |
 | [The bundled WHOIS table](the-bundled-whois-table.md) | how `whois.json` is generated and verified |
-| [HTTP API](http-api.md) | `ds serve`, behind a cargo feature, and how to run one safely |
+| [HTTP API](http-api.md) | `ds --serve`, in every build, and how to run one safely |
 
 `man ds` carries the full option reference offline, and
 [`ds.1`](../ds.1) is the same page in the repo.

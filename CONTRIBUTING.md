@@ -35,7 +35,7 @@ so. Under-claiming is the correct failure. See
 ```sh
 cargo build                     # debug build
 cargo run -- apple --tld com    # run it
-cargo build --release --features serve && ./target/release/ds serve
+cargo run -- --serve            # the HTTP API, on http://127.0.0.1:8080
 ```
 
 The site is a separate Astro project:
@@ -50,8 +50,7 @@ cd site && npm install && npm run dev
 cargo test
 cargo clippy --all-targets
 cargo fmt
-cargo test --features serve                # the HTTP API is off by default
-cargo clippy --all-targets --features serve
+cargo build --no-default-features          # the CLI without the HTTP API
 python3 scripts/test_whois_classify.py     # the harvest script's classifier
 node scripts/test-tld-facts-parse.mjs      # the IANA root database parser, offline
 man ./ds.1                                 # preview the manual page
@@ -76,7 +75,7 @@ makes an excellent fixture.
 | `src/tlds.rs` | the TLD lists, `--level`, `--cctld`, `--tld-len` |
 | `src/private.rs`, `src/pricing.rs`, `src/registration.rs` | brand TLDs, the price column, `--where` |
 | `src/dns.rs`, `src/limit.rs`, `src/model.rs` | DNS records, per-host pacing, the shared result type |
-| `src/serve.rs` | the HTTP API, behind the `serve` feature |
+| `src/serve.rs` | the HTTP API, `--serve`, in the default build |
 | `scripts/` | the harvesters that generate the data files, and their tests |
 | `docs/` | the documentation, canonical — see below |
 | `site/` | ds.aminul.dev, an Astro project generated from `docs/` and the data files |
