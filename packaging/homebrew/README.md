@@ -4,6 +4,11 @@
 [aminulbd/homebrew-tap](https://github.com/aminulbd/homebrew-tap) tap. There is
 no Homebrew core formula.
 
+The formula lives in the tap and only there. This repo used to carry a copy of
+it, which nothing built from and which sat two releases out of date before
+anyone noticed; please do not add another. This page is the pointer to the real
+one.
+
 The tap's `Formula/ds.rb` installs the matching prebuilt release archive for
 macOS (Apple Silicon or Intel) and Linux (ARM or Intel). `brew install --HEAD`
 builds the latest `main` branch from source using Rust.
