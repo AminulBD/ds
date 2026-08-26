@@ -183,11 +183,29 @@ becomes the test fixture that fixes it.
 ## Cutting a release
 
 Maintainers only. Pushing a `v*` tag builds ten targets, packages them and
-publishes everything with a `SHA256SUMS` file:
+publishes everything with a `SHA256SUMS` file.
+
+Do not tag by hand. The tag does not set the version — archive names come from
+the tag, but the binary's `--version` comes from `Cargo.toml`, so tagging
+without bumping first ships `ds-v0.1.8-*.tar.gz` around a binary that reports
+the previous version. `v0.1.6` and `v0.1.7` both went out that way.
 
 ```sh
-git tag -a v0.1.5 -m "ds 0.1.5" && git push origin v0.1.5
+node scripts/release.mjs patch --dry-run   # print the plan, change nothing
+node scripts/release.mjs patch             # prepare: edit, verify, commit, tag
+node scripts/release.mjs 0.2.0 --push      # ...and push main and the tag
 ```
+
+The script bumps `Cargo.toml`, refreshes the `ds` entry in `Cargo.lock`,
+rewrites the `.TH` line in `ds.1`, runs the whole check list above, then commits
+`Release <version>` and tags `v<version>`. It refuses a dirty tree, a non-`main`
+branch, a tag that already exists, or a version that is not ahead of the current
+one, and commits nothing if a check fails.
+
+`--push` is opt-in: without it you get a local commit and tag, plus the push
+command and the undo. Two things stay manual — `Formula/ds.rb` in the tap needs
+checksums the release does not have until it is built, and
+`site/src/data/release.json` is generated from the GitHub API.
 
 | OS | Targets | Artifacts |
 | --- | --- | --- |
