@@ -195,11 +195,17 @@ jobs:
           path: dist
           merge-multiple: true
 
+      # A mismatch ships archives named for the tag around a binary that
+      # reports the older version -- v0.1.6 and v0.1.7 both went out that way.
+      # Fail here rather than warn: nobody reads a warning in a green run, and
+      # the fix (bump Cargo.toml, move the tag) is only cheap before publishing.
       - name: Check the tag matches Cargo.toml
         run: |
           crate=$(sed -n 's/^version = "\(.*\)"/\1/p' Cargo.toml | head -1)
           if [ "${GITHUB_REF_NAME#v}" != "$crate" ]; then
-            echo "::warning::tag ${GITHUB_REF_NAME} does not match Cargo.toml version ${crate}"
+            echo "::error::tag ${GITHUB_REF_NAME} does not match Cargo.toml version ${crate}."
+            echo "::error::Run scripts/release.mjs instead of tagging by hand."
+            exit 1
           fi
 
       - name: Checksums
