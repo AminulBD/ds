@@ -10,14 +10,18 @@ Examples:
   ds apple --tld all --private only
   ds apple google --tld popular --whois --dns-records
   ds apple.com --details --registry
+  ds --serve --port 8080
 
-Usage: ds [OPTIONS] <NAMES>...
+Usage: ds [OPTIONS] [NAMES]...
 
 Arguments:
-  <NAMES>...
+  [NAMES]...
           Name(s) to check: `apple`, `apple,orange,bangla`, `@names.txt`, or several arguments. A full domain (`apple.com`) is checked as-is when --tld is omitted
 
 Options:
+      --serve
+          Serve the checks over HTTP instead of checking a name. See the "server options" below for the address, the limits and the cache
+
   -t, --tld <TLD>
           TLDs to check: comma separated list, `all`, `popular`, `rdap`, or `@file`
 
@@ -159,3 +163,32 @@ Options:
 
   -h, --help
           Print help (see a summary with '-h')
+
+Server options:
+      --host <ADDR>
+          Address to bind. Loopback by default and deliberately: a reachable `ds` server queries registries on behalf of whoever asks it to
+          
+          [default: 127.0.0.1]
+
+  -p, --port <PORT>
+          Port to listen on
+          
+          [default: 8080]
+
+      --max-lookups <N>
+          Most domains one request may ask about (names × TLDs). The default leaves room for `tld=popular` and rules out `tld=all`
+          
+          [default: 50]
+
+      --rate-limit <N>
+          Requests per minute per client address; 0 turns the limit off
+          
+          [default: 60]
+
+      --cache-ttl <SECONDS>
+          How long an answer is reused before the registry is asked again; 0 disables the cache
+          
+          [default: 300]
+
+      --cors <ORIGIN>
+          Send `Access-Control-Allow-Origin` with this value, so a browser page may call the API. An origin (`https://example.com`) or `*`

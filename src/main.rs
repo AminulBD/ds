@@ -40,9 +40,6 @@ use whois::TldInfo;
 const USER_AGENT: &str = concat!("ds/", env!("CARGO_PKG_VERSION"), " (domain-search)");
 
 #[derive(Parser, Debug)]
-// `ds serve` is a subcommand, but `names` is a required positional: without
-// this a subcommand would still be told to provide one.
-#[cfg_attr(feature = "serve", command(subcommand_negates_reqs = true))]
 #[command(
     name = "ds",
     version,
@@ -58,19 +55,21 @@ const USER_AGENT: &str = concat!("ds/", env!("CARGO_PKG_VERSION"), " (domain-sea
                   ds apple --tld com,io --where\n  \
                   ds apple --tld all --private only\n  \
                   ds apple google --tld popular --whois --dns-records\n  \
-                  ds apple.com --details --registry"
+                  ds apple.com --details --registry\n  \
+                  ds --serve --port 8080"
 )]
 struct Args {
-    /// Subcommands. Only `serve`, and only in a build with that feature on,
-    /// so a default build's parsing is exactly what it was before.
+    /// Serve the checks over HTTP instead of checking a name. See the
+    /// "server options" below for the address, the limits and the cache.
     #[cfg(feature = "serve")]
-    #[command(subcommand)]
-    command: Option<Command>,
+    #[arg(long)]
+    serve: bool,
 
     /// Name(s) to check: `apple`, `apple,orange,bangla`, `@names.txt`, or
     /// several arguments. A full domain (`apple.com`) is checked as-is when
     /// --tld is omitted.
-    #[arg(required = true)]
+    #[cfg_attr(feature = "serve", arg(required_unless_present = "serve"))]
+    #[cfg_attr(not(feature = "serve"), arg(required = true))]
     names: Vec<String>,
 
     /// TLDs to check: comma separated list, `all`, `popular`, `rdap`, or `@file`.
@@ -223,16 +222,14 @@ struct Args {
     /// Print the version and exit.
     #[arg(short = 'v', short_alias = 'V', long, action = clap::ArgAction::Version)]
     version: Option<bool>,
-}
 
-/// The one subcommand `ds` has. A bare name still parses as a name, so
-/// `ds apple --tld com` is untouched; the cost is that the *name* `serve`
-/// now needs `ds serve.com` or `ds -- serve`.
-#[cfg(feature = "serve")]
-#[derive(clap::Subcommand, Debug)]
-enum Command {
-    /// Serve the domain checks over HTTP instead of checking a name.
-    Serve(serve::ServeArgs),
+    /// The options that only mean anything with --serve. What the server
+    /// shares with the CLI — --concurrency, --per-host, --timeout, --source,
+    /// --no-iana, --details, --registry, --where — it reads off the fields
+    /// above instead, so a flag means the same thing on both sides.
+    #[cfg(feature = "serve")]
+    #[command(flatten)]
+    serve_opts: serve::ServeArgs,
 }
 
 /// Which level of the tree a name is registered at.
@@ -425,8 +422,8 @@ async fn run() -> Result<()> {
     // The server takes the process over, so it is dispatched before any of the
     // CLI's own setup runs.
     #[cfg(feature = "serve")]
-    if let Some(Command::Serve(serve_args)) = args.command.take() {
-        return serve::run(serve_args).await;
+    if args.serve {
+        return serve::run(args).await;
     }
 
     if args.all_info {
@@ -1627,32 +1624,34 @@ mod tests {
         assert_eq!(names, ["apple", "orange", "bangla", "english"]);
     }
 
-    /// Adding a subcommand to a command whose only positional is a required
-    /// list of names is the risky part of `ds serve`, so it is pinned here.
+    /// `--serve` makes `names` conditionally required, which is the risky
+    /// part of the flag, so it is pinned here.
     #[cfg(feature = "serve")]
     #[test]
-    fn the_serve_subcommand_leaves_name_parsing_alone() {
+    fn the_serve_flag_leaves_name_parsing_alone() {
         let a = Args::try_parse_from(["ds", "apple", "--tld", "com"]).unwrap();
-        assert!(a.command.is_none());
+        assert!(!a.serve);
         assert_eq!(a.names, ["apple"]);
         assert_eq!(a.tld.as_deref(), Some("com"));
 
-        // Names that happen to collide with a flag value are unaffected too.
-        let many = Args::try_parse_from(["ds", "apple", "serverless", "--tld", "com"]).unwrap();
-        assert_eq!(many.names, ["apple", "serverless"]);
+        // `serve` is a name like any other: no subcommand shadows it.
+        let many = Args::try_parse_from(["ds", "serve", "serverless", "--tld", "com"]).unwrap();
+        assert!(!many.serve);
+        assert_eq!(many.names, ["serve", "serverless"]);
 
         // `ds` with nothing at all still asks for a name rather than starting
         // a server or doing nothing.
         assert!(Args::try_parse_from(["ds"]).is_err());
 
-        let s = Args::try_parse_from(["ds", "serve", "--port", "9000"]).unwrap();
-        assert!(matches!(s.command, Some(Command::Serve(_))));
+        // ... but `--serve` alone is enough, and takes the shared options.
+        let s =
+            Args::try_parse_from(["ds", "--serve", "--port", "9000", "--per-host", "2"]).unwrap();
+        assert!(s.serve);
         assert!(s.names.is_empty());
+        assert_eq!(s.serve_opts.port, 9000);
+        assert_eq!(s.per_host, 2);
 
-        // The cost of the subcommand: checking the *name* `serve` needs `--`
-        // (or a TLD on the end).
-        let escaped = Args::try_parse_from(["ds", "--", "serve"]).unwrap();
-        assert!(escaped.command.is_none());
-        assert_eq!(escaped.names, ["serve"]);
+        // A server option without --serve is a mistake worth reporting.
+        assert!(Args::try_parse_from(["ds", "apple", "--port", "9000"]).is_err());
     }
 }

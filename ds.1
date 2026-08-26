@@ -6,7 +6,7 @@ ds \- domain search: check domain availability across many TLDs
 .RI [ OPTIONS ]
 .IR NAME .\|.\|.
 .br
-.B ds serve
+.B ds \-\-serve
 .RI [ OPTIONS ]
 .SH DESCRIPTION
 .B ds
@@ -307,17 +307,19 @@ Per-request timeout. Default 10.
 Plain output. Also honoured:
 .BR NO_COLOR .
 .SH HTTP API
-.B "ds serve"
+.B "ds \-\-serve"
 answers the same checks over HTTP, for a web front end or anything else that
-would rather call an API than run a command. It is not in the released binaries
-or packages: the server sits behind the
+would rather call an API than run a command. It is in every released binary and
+package, and does nothing until asked for. Building it out is still possible:
+.B \-\-no\-default\-features
+drops the
 .B serve
-cargo feature, so a default build carries none of it and none of its
-dependencies.
+cargo feature, and with it
+.B \-\-serve
+and every server option below.
 .PP
 .nf
-cargo build \-\-release \-\-features serve
-ds serve
+ds \-\-serve
 .fi
 .PP
 .B "GET /v1/check?name=apple&tld=com,net"
@@ -382,6 +384,10 @@ the loopback address only unless told otherwise, caps how much one request may
 ask for, throttles each client, and paces registries with the one limiter the
 whole process shares.
 .TP
+.B \-\-serve
+Answer over HTTP instead of checking a name. Every other option in this
+section requires it.
+.TP
 .BR \-\-host " " \fIADDR\fR
 Bind address. Default 127.0.0.1; any other address prints a warning.
 .TP
@@ -421,18 +427,12 @@ As the options of the same name, and off by default as they are there. Raw
 WHOIS and raw RDAP are never served.
 .PP
 .BR \-\-per\-host ", " \-\-timeout ", " \-\-source " and " \-\-no\-iana
-mean what they mean above.
-.PP
-One consequence of the subcommand: in a build with the feature on,
-.B "ds serve"
-starts the server, so checking the
-.I name
-.B serve
-wants
-.B "ds serve.com"
-or
-.BR "ds \-\- serve" .
-Default builds have no subcommand and are unaffected.
+are the options of the same name above, not server copies of them: they mean
+the same thing and default the same way with or without
+.BR \-\-serve .
+The options in this section go the other way and are refused without it, so
+.B "ds apple \-\-port 9000"
+is an error rather than a port quietly thrown away.
 .SH EXIT STATUS
 .TP
 .B 0
@@ -447,7 +447,7 @@ results do not count as available.
 A startup error, such as an unusable
 .B \-\-tld
 list, or a port
-.B serve
+.B \-\-serve
 could not bind.
 .SH FILES
 .TP

@@ -13,14 +13,14 @@ license = "MIT"
 name = "ds"
 path = "src/main.rs"
 
-# The HTTP server is off by default: `ds` is a CLI first, and the shipped
-# binaries and packages should stay as small and as dependency-free as they
-# are today. Enabling `serve` adds exactly one crate to the graph (httpdate,
-# for the `Date` header): hyper, hyper-util, http-body-util, bytes and
-# form_urlencoded are already there underneath reqwest, and the feature only
-# switches on the server halves of crates the client half already pulls in.
+# The HTTP server ships in every default build. It costs exactly one extra
+# crate in the graph (httpdate, for the `Date` header): hyper, hyper-util,
+# http-body-util, bytes and form_urlencoded are already there underneath
+# reqwest, and the feature only switches on the server halves of crates the
+# client half already pulls in. `--no-default-features` still builds the
+# CLI on its own, without `--serve` or any of its options.
 [features]
-default = []
+default = ["serve"]
 serve = [
     "dep:hyper",
     "dep:hyper-util",

@@ -81,14 +81,15 @@ jobs:
         if: matrix.test
         run: cargo test --release --locked --target ${{ matrix.target }}
 
-      # The HTTP API is off in every artifact this workflow publishes, so
-      # nothing else in the matrix ever compiles it. Build it once so it
-      # cannot rot unnoticed between releases.
-      - name: Test (serve)
+      # The HTTP API is in every artifact this workflow publishes, so the
+      # matrix compiles it throughout. What nothing else covers is the build
+      # without it: check that once, so `--no-default-features` cannot rot
+      # unnoticed between releases.
+      - name: Test (no default features)
         if: matrix.target == 'x86_64-unknown-linux-gnu'
         run: |
-          cargo test --release --locked --features serve --target ${{ matrix.target }}
-          cargo clippy --all-targets --locked --features serve --target ${{ matrix.target }}
+          cargo test --release --locked --no-default-features --target ${{ matrix.target }}
+          cargo clippy --all-targets --locked --no-default-features --target ${{ matrix.target }}
 
       - name: Build
         run: ${{ matrix.cross && 'cross' || 'cargo' }} build --release --locked --target ${{ matrix.target }}

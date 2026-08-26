@@ -18,7 +18,7 @@ CI does not run the tests, so please say which of these you ran:
     cargo test
     cargo clippy --all-targets
     cargo fmt
-    cargo test --features serve            # if you touched src/serve.rs
+    cargo test --no-default-features       # the CLI without the HTTP API
     python3 scripts/test_whois_classify.py # if you touched the WHOIS classifier
     node scripts/test-tld-facts-parse.mjs  # if you touched the TLD facts or categories
 -->
