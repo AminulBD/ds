@@ -35,22 +35,12 @@ for (const r of rows) {
 // four full hostnames per row costs more width than the suffix is worth.
 const shortName = (registrar: string) => registrar.replace(/\.com$/, '');
 
-// One entry per eligibility rule rather than per TLD, because sub-zones
-// inherit: .au's rule is also .com.au's, and printing it seven times would
-// suggest seven rules. `from` is the TLD the rule is written against.
-type Rule = { note: string; source: string; from: string };
-const groups = new Map<string, { from: string; rule: Rule; tlds: string[] }>();
-for (const r of rows) {
-  const rule = r.eligibility as Rule | null;
-  if (!rule) continue;
-  const g = groups.get(rule.from) ?? { from: rule.from, rule, tlds: [] };
-  g.tlds.push(r.tld);
-  groups.set(rule.from, g);
-}
-const ruleGroups = [...groups.values()].sort((a, b) => a.from.localeCompare(b.from));
-// .বাংলা reads better than .xn--54b7fta0cc in a list of rules.
-const readable = new Map(rows.map((r) => [r.tld, r.unicode]));
-const label = (tld: string) => `.${readable.get(tld) ?? tld}`;
+// The rules themselves live on /tlds/who-can-register, one entry per rule
+// rather than per TLD; all this page needs is how many there are, for the
+// sentence pointing at them. Sub-zones inherit, so the two counts differ.
+const ruleCount = new Set(
+  rows.filter((r) => r.eligibility).map((r) => r.eligibility!.from),
+).size;
 
 const SOURCE_LABEL: Record<string, string> = {
   both: 'RDAP + WHOIS',
@@ -69,7 +59,7 @@ const SOURCE_LABEL: Record<string, string> = {
     <p class="lede muted">
       Every TLD <code>ds</code> carries data for — {fmt(counts.total)} of them — with what
       each costs to register, <a href="#registering">where you can buy one</a>, whether the
-      registry <a href="#who-can-register">lets everyone register</a>, and which registry
+      registry <a href="/tlds/who-can-register/">lets everyone register</a>, and which registry
       answers for it. Every TLD's name links to <a href="/tlds/com/">its own page</a>, with each
       registrar's three prices, the registry's lookup server and the rest of what <code>ds</code>
       knows about it. All of it is read straight out of the binary's own tables, so a figure
@@ -219,7 +209,7 @@ const SOURCE_LABEL: Record<string, string> = {
                 {r.eligibility && (
                   <a
                     class="tag tag-restricted"
-                    href={`#rule-${r.eligibility.from}`}
+                    href={`/tlds/who-can-register/#rule-${r.eligibility.from}`}
                     title={`${r.eligibility.note}${
                       r.eligibility.from === r.tld ? '' : ` (the rule .${r.eligibility.from} sets)`
                     }`}
@@ -274,46 +264,14 @@ const SOURCE_LABEL: Record<string, string> = {
       </div>
     </nav>
 
-    <section class="who" id="who-can-register">
-      <h2>Who can register</h2>
-      <p class="muted intro">
-        {fmt(counts.restricted)} of these TLDs are not open to everyone: the registry asks
-        for residency, a local company, a trade licence or an accreditation before it will
-        sell you a name. A domain reported <code>AVAILABLE</code> under one of them means the
-        label is free, not that you may have it. {ruleGroups.length} rules cover the{' '}
-        {fmt(counts.restricted)}, because sub-zones inherit — <code>.com.au</code> is{' '}
-        <code>.au</code>'s rule.
-      </p>
-      <dl class="rules">
-        {ruleGroups.map((g) => (
-          <div class="rule" id={`rule-${g.from}`}>
-            <dt>
-              <span class="rule-tld">{label(g.from)}</span>
-              {g.tlds.length > 1 && (
-                <span class="rule-also faint">
-                  and {g.tlds.filter((t) => t !== g.from).slice(0, 6).map((t) => label(t)).join(', ')}
-                  {g.tlds.length > 7 && <> +{g.tlds.length - 7} more</>}
-                </span>
-              )}
-            </dt>
-            <dd>
-              {g.rule.note}
-              <a class="rule-src" href={g.rule.source} target="_blank" rel="noopener">
-                {host(g.rule.source)}
-              </a>
-            </dd>
-          </div>
-        ))}
-      </dl>
-      <p class="faint after">
-        These notes are hand-maintained — no registry publishes its rules in a form a program
-        can read — so each one carries the page it was taken from, and that page, not this
-        table, is the authority. They were last checked on {data.eligibilityChecked}, they say
-        what kind of gate exists rather than the exact legal test, and they cover the
-        restricted TLDs a registrar is likely to offer you. <strong>A TLD missing from this
-        list is not thereby open.</strong>
-      </p>
-    </section>
+    <p class="who-link">
+      <a href="/tlds/who-can-register/">Who can register &rarr;</a>
+      <span class="muted">
+        The {ruleCount} registry rules behind the {fmt(counts.restricted)} TLDs tagged{' '}
+        <span class="tag tag-restricted">restricted</span> above — who each one will sell to,
+        which TLDs it covers, and the registry page it was taken from.
+      </span>
+    </p>
 
     <section class="notes prose">
       <h2>About this data</h2>
@@ -357,7 +315,7 @@ const SOURCE_LABEL: Record<string, string> = {
           will not sell to just anyone — <code>.eu</code> wants an EU registrant,{' '}
           <code>.ca</code> a Canadian one, <code>.bank</code> a bank. The tag links to the
           rule and the registry page it came from, all of which are listed under{' '}
-          <a href="#who-can-register">Who can register</a>. Availability and eligibility are
+          <a href="/tlds/who-can-register/">Who can register</a>. Availability and eligibility are
           different questions, and <code>ds</code> answers the first: it prints the rule
           beside the name rather than filtering the TLD out.
         </li>
@@ -849,30 +807,12 @@ const SOURCE_LABEL: Record<string, string> = {
   a.seller:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
   .seller-price { color: var(--fg-faint); font-variant-numeric: tabular-nums; }
 
-  .who { margin-top: 3rem; }
-  .who .intro, .who .after { max-width: var(--measure); }
-  .who .after { font-size: .88rem; margin-top: 1.25rem; }
-  .rules {
-    margin: 1.5rem 0 0; border: 1px solid var(--border); border-radius: var(--radius);
-    overflow: hidden;
+  .who-link {
+    margin: 2.5rem 0 0; padding: 1rem 1.25rem; max-width: var(--measure);
+    border: 1px solid var(--border); border-radius: var(--radius); background: var(--bg-soft);
   }
-  /* The restricted tags in the table link down here, and the filter bar is
-     still pinned over the page — clear both it and the site header. */
-  .rule { display: grid; grid-template-columns: 14rem 1fr; gap: 0 1.25rem; padding: .8rem 1rem; scroll-margin-top: 9rem; }
-  .rule + .rule { border-top: 1px solid var(--border); }
-  .rule:target { background: var(--bg-soft); box-shadow: inset 3px 0 0 var(--accent); }
-  .rule dt { display: flex; flex-direction: column; gap: .15rem; min-width: 0; }
-  .rule dd { margin: 0; font-size: .92rem; }
-  .rule-tld { font-family: var(--mono); font-weight: 550; font-size: .92rem; }
-  .rule-also { font-size: .76rem; font-family: var(--mono); line-height: 1.4; }
-  .rule-src { display: block; margin-top: .3rem; font-size: .78rem; font-family: var(--mono); }
-  @media (max-width: 720px) {
-    /* The filter bar stops being sticky here, so only the header is in the way. */
-    .rule { scroll-margin-top: 5rem; }
-  }
-  @media (max-width: 640px) {
-    .rule { grid-template-columns: 1fr; gap: .35rem; }
-  }
+  .who-link > a { font-weight: 550; }
+  .who-link > span { display: block; margin-top: .35rem; font-size: .9rem; }
 
   .empty { padding: 2rem; text-align: center; color: var(--fg-muted); }
 

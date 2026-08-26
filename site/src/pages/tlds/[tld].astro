@@ -31,6 +31,12 @@ for (const r of rows) {
   if (key) byRegistry.set(key, [...(byRegistry.get(key) ?? []), r]);
 }
 
+// How many distinct eligibility rules there are — fewer than the TLDs they
+// cover, because sub-zones inherit. The same count /tlds/who-can-register lists.
+const ruleCount = new Set(
+  rows.filter((r) => r.eligibility).map((r) => r.eligibility!.from),
+).size;
+
 // Sub-zones, keyed on the zone they sit under: uk -> co.uk, org.uk, me.uk.
 const children = new Map<string, Row[]>();
 for (const r of rows) {
@@ -65,6 +71,18 @@ export function getStaticPaths() {
 }
 
 const { row } = Astro.props as { row: Row };
+
+// The rule this row carries is rarely written for it alone: .com.au inherits
+// .au's, and so do six other zones. Naming them here is the same grouping
+// /tlds/who-can-register makes, seen from one TLD.
+const sharesRule = row.eligibility
+  ? rows
+      .filter((r) => r.tld !== row.tld && r.eligibility?.from === row.eligibility!.from)
+      .sort((a, b) => a.tld.localeCompare(b.tld))
+  : [];
+const ruleHref = row.eligibility
+  ? `/tlds/who-can-register/#rule-${row.eligibility.from}`
+  : '/tlds/who-can-register/';
 
 const name = label(row);
 const idx = sorted.findIndex((r) => r.tld === row.tld);
@@ -509,12 +527,27 @@ const jsonLd = {
               <a href={row.eligibility.source} target="_blank" rel="noopener">{host(row.eligibility.source)}</a>
             </footer>
           </blockquote>
+          {sharesRule.length > 0 && (
+            <p class="shares muted">
+              The same rule governs{' '}
+              {sharesRule.length === 1 ? 'one other zone' : `${sharesRule.length} other zones`}:{' '}
+              {sharesRule.slice(0, 12).map((r, i) => (
+                <>
+                  {i > 0 && ', '}
+                  <a href={`/tlds/${r.tld}/`}><code>{label(r)}</code></a>
+                </>
+              ))}
+              {sharesRule.length > 12 ? (
+                <> and <a href={ruleHref}>{sharesRule.length - 12} more</a>.</>
+              ) : '.'}
+            </p>
+          )}
           <p class="muted">
             Availability and eligibility are different questions, and <code>ds</code> answers the first: a name here
             reported <code>AVAILABLE</code> means the label is free, not that this registry will sell it to you.
             The note is hand-maintained and was last checked on {data.eligibilityChecked}; the registry page it links
-            to, not this one, is the authority. All {fmt(counts.restricted)} restricted TLDs are listed under{' '}
-            <a href="/tlds#who-can-register">Who can register</a>.
+            to, not this one, is the authority. All {fmt(counts.restricted)} restricted TLDs, under{' '}
+            {ruleCount} rules, are listed on <a href={ruleHref}>Who can register</a>.
           </p>
         </>
       ) : (
@@ -522,7 +555,7 @@ const jsonLd = {
           No eligibility rule is on file for {name}, which is not the same as a promise that it is open: the list is
           hand-maintained and covers the restricted TLDs a registrar is likely to offer you. Check the registry's own
           page before counting on a name. {fmt(counts.restricted)} TLDs do carry a rule — see{' '}
-          <a href="/tlds#who-can-register">Who can register</a>.
+          <a href="/tlds/who-can-register/">Who can register</a>.
         </p>
       )}
     </section>
@@ -1042,6 +1075,8 @@ const jsonLd = {
   }
   .rule p { margin: .6rem 0 .4rem; }
   .rule footer { font-size: .84rem; color: var(--fg-muted); margin-bottom: .6rem; }
+  /* The other zones the same rule reaches, above the caveats about all of them. */
+  .shares { font-size: .9rem; max-width: var(--measure); margin: 0 0 .8rem; }
 
   .servers { margin: 1.5rem 0 0; border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
   .servers > div { display: grid; grid-template-columns: 6rem 1fr; gap: 0 1rem; padding: .85rem 1rem; }

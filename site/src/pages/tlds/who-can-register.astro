@@ -1,0 +1,260 @@
+---
+import Base from '../../layouts/Base.astro';
+import data from '../../data/tlds.json';
+
+// Split out of /tlds, which is the price table: this is the other question a
+// price does not answer — whether the registry will sell to you at all. Every
+// TLD page carries its own rule; this page is all of them at once.
+const { rows, counts } = data;
+
+type Row = (typeof rows)[number];
+type Rule = { note: string; source: string; from: string };
+
+const fmt = (n: number) => n.toLocaleString('en-US');
+const money = (n: number | null) => (n === null ? '—' : `$${n.toFixed(2)}`);
+const host = (url: string) => {
+  try { return new URL(url).host; } catch { return url; }
+};
+/** `.বাংলা` where there is one, `.com` otherwise — what a reader recognises. */
+const label = (r: Row) => `.${r.unicode ?? r.tld}`;
+const rowOf = new Map(rows.map((r) => [r.tld, r]));
+const nameOf = (tld: string) => `.${rowOf.get(tld)?.unicode ?? tld}`;
+
+// One entry per eligibility rule rather than per TLD, because sub-zones
+// inherit: .au's rule is also .com.au's, and printing it seven times would
+// suggest seven rules. `from` is the TLD the rule is written against.
+const groups = new Map<string, { from: string; rule: Rule; tlds: Row[] }>();
+for (const r of rows) {
+  const rule = r.eligibility as Rule | null;
+  if (!rule) continue;
+  const g = groups.get(rule.from) ?? { from: rule.from, rule, tlds: [] };
+  g.tlds.push(r);
+  groups.set(rule.from, g);
+}
+const ruleGroups = [...groups.values()].sort((a, b) => a.from.localeCompare(b.from));
+for (const g of ruleGroups) g.tlds.sort((a, b) => a.tld.localeCompare(b.tld));
+
+const restricted = rows.filter((r) => r.eligibility);
+// What the gate costs where you clear it: a rule is easier to weigh against a
+// price than on its own, and the TLD chips carry the same figure the table does.
+const pricedCount = restricted.filter((r) => r.price !== null).length;
+const soldCount = restricted.filter((r) => r.sellers.length > 0).length;
+
+const title = 'Who can register — eligibility rules for restricted TLDs';
+const description =
+  `The ${ruleGroups.length} registry eligibility rules covering ${fmt(counts.restricted)} restricted top-level ` +
+  `domains: which want residency, a local company, a trade licence or an accreditation before they will sell ` +
+  `you a name, which TLDs each rule covers, and the registry page it was taken from.`;
+---
+
+<Base title={title} description={description}>
+  <div class="wrap page">
+    <h1>Who can register</h1>
+    <p class="lede muted">
+      A price tells you what a name costs; it does not tell you whether the registry will sell
+      it to you. {fmt(counts.restricted)} of the {fmt(counts.total)} TLDs <code>ds</code> knows
+      are not open to everyone — the registry asks for residency, a local company, a trade
+      licence or an accreditation first. {ruleGroups.length} rules cover all
+      {' '}{fmt(counts.restricted)} of them, because sub-zones inherit: <code>.com.au</code> is{' '}
+      <code>.au</code>'s rule. Each one below lists the TLDs it applies to, and every TLD links
+      to <a href="/tlds/eu/">its own page</a>, where the same rule is printed beside that
+      registry's prices and lookup servers.
+    </p>
+
+    <div class="stats">
+      <div><strong>{fmt(counts.restricted)}</strong><span>restricted TLDs</span></div>
+      <div><strong>{ruleGroups.length}</strong><span>rules</span></div>
+      <div><strong>{fmt(soldCount)}</strong><span>a registrar sells</span></div>
+      <div><strong>{fmt(counts.private)}</strong><span>closed to everyone</span></div>
+    </div>
+
+    <div class="controls">
+      <label class="search">
+        <span class="visually-hidden">Filter rules</span>
+        <input
+          type="search" id="q" placeholder="Filter — try ca, Canadian, bank, or accreditation"
+          autocomplete="off" spellcheck="false"
+        />
+      </label>
+      <p class="count faint" id="count">{ruleGroups.length} rules</p>
+    </div>
+
+    <dl class="rules" id="rules">
+      {ruleGroups.map((g) => (
+        <div
+          class="rule" id={`rule-${g.from}`}
+          data-search={`${g.tlds.map((r) => `${r.tld} ${r.unicode ?? ''}`).join(' ')} ${g.rule.note} ${host(g.rule.source)}`.toLowerCase()}
+        >
+          <dt>
+            <span class="rule-tld">{nameOf(g.from)}</span>
+            <span class="rule-count faint">
+              {g.tlds.length === 1 ? 'this TLD' : `${g.tlds.length} TLDs`}
+            </span>
+          </dt>
+          <dd>
+            <p class="rule-note">{g.rule.note}.</p>
+            <ul class="rule-tlds">
+              {g.tlds.map((r) => (
+                <li>
+                  <a href={`/tlds/${r.tld}/`}>
+                    <span class="chip-tld">{label(r)}</span>
+                    {/* A dash on every unpriced chip is 42 dashes under .br — the
+                        price is there when the table has one, and absent otherwise. */}
+                    {r.price !== null && <span class="chip-price">{money(r.price)}</span>}
+                  </a>
+                </li>
+              ))}
+            </ul>
+            <a class="rule-src" href={g.rule.source} target="_blank" rel="noopener">
+              {host(g.rule.source)}
+            </a>
+          </dd>
+        </div>
+      ))}
+    </dl>
+    <p class="empty" id="empty" hidden>No rule matches that filter.</p>
+
+    <section class="notes prose">
+      <h2>How to read these</h2>
+      <ul>
+        <li>
+          <strong>Availability and eligibility are different questions</strong>, and{' '}
+          <code>ds</code> answers the first. A domain reported <code>AVAILABLE</code> under one
+          of these TLDs means the label is free, not that you may have it — so <code>ds</code>{' '}
+          prints the rule beside the name rather than filtering the TLD out. See{' '}
+          <a href="/docs/showing-more#where-to-register">Where to register</a>.
+        </li>
+        <li>
+          <strong>The registry's page, not this one, is the authority.</strong> These notes are
+          hand-maintained — no registry publishes its rules in a form a program can read — so
+          each one carries the page it was taken from and was last checked on{' '}
+          {data.eligibilityChecked}. They say what kind of gate exists rather than the exact
+          legal test, because the wording changes more often than the fact of a gate does.
+        </li>
+        <li>
+          <strong>A TLD missing from this list is not thereby open.</strong> The list covers the
+          restricted TLDs a registrar is likely to offer you; it is not exhaustive. Where no rule
+          is on file, <code>ds</code> says nothing about eligibility rather than promising there
+          is none.
+        </li>
+        <li>
+          <strong>Sub-zones inherit, longest suffix first.</strong> A rule written against{' '}
+          <code>.au</code> also governs <code>.com.au</code> and <code>.net.au</code>, which is
+          why {ruleGroups.length} rules cover {fmt(counts.restricted)} TLDs. Each rule heading is
+          the TLD the rule is written against; the chips under it are every zone it reaches.
+        </li>
+        <li>
+          <strong>Prices on the chips are the same figures the table carries</strong> —{' '}
+          {fmt(pricedCount)} of the {fmt(counts.restricted)} restricted TLDs are priced in the
+          bundled table, and {fmt(soldCount)} have at least one registrar whose published price
+          list proves it sells them. See <a href="/tlds">TLDs &amp; prices</a> for renewals and
+          which registrar is cheapest.
+        </li>
+      </ul>
+
+      <h2>Closed to everyone</h2>
+      <p>
+        A separate {fmt(counts.private)} zones take no outside registrations at all: brand TLDs
+        like <code>.aws</code> and <code>.google</code>, whose operator is the only permitted
+        registrant, plus <code>.arpa</code> and the names reserved by RFC. They have no
+        eligibility rule because there is nobody to be eligible — <code>ds</code> reports them{' '}
+        <code>PRIVATE</code> rather than <code>AVAILABLE</code> and leaves them out of{' '}
+        <code>--tld all</code>. See{' '}
+        <a href="/docs/choosing-tlds#brand-and-reserved-tlds">Brand and reserved TLDs</a>, or
+        filter the table to <a href="/tlds">private zones</a>.
+      </p>
+
+      <p>
+        Check any of these for real: <code>ds mybrand --tld ca,eu,bank --where</code>
+      </p>
+    </section>
+  </div>
+
+  <script>
+    // Every rule ships in the HTML, so the page is whole with JS off; the box
+    // only hides what does not match. Rules are few enough that filtering all
+    // of them on each keystroke costs nothing.
+    const q = document.querySelector<HTMLInputElement>('#q')!;
+    const count = document.querySelector<HTMLParagraphElement>('#count')!;
+    const empty = document.querySelector<HTMLParagraphElement>('#empty')!;
+    const rules = Array.from(document.querySelectorAll<HTMLElement>('#rules .rule'));
+
+    function apply() {
+      const term = q.value.trim().toLowerCase();
+      let shown = 0;
+      for (const rule of rules) {
+        const ok = !term || (rule.dataset.search ?? '').includes(term);
+        rule.hidden = !ok;
+        if (ok) shown++;
+      }
+      count.textContent = shown === rules.length
+        ? `${rules.length} rules`
+        : `${shown} of ${rules.length} rules`;
+      empty.hidden = shown > 0;
+    }
+
+    q.addEventListener('input', apply);
+    apply();
+  </script>
+</Base>
+
+<style>
+  .page { padding: 3rem 1.5rem; }
+  .lede { font-size: 1.05rem; max-width: 70ch; margin-top: -.5rem; }
+
+  .stats {
+    display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1rem;
+    padding: 1.25rem 0; border-block: 1px solid var(--border); margin: 1.75rem 0;
+  }
+  @media (max-width: 640px) { .stats { grid-template-columns: repeat(2, 1fr); } }
+  .stats div { display: flex; flex-direction: column; }
+  .stats strong { font-family: var(--mono); font-size: 1.35rem; letter-spacing: -.02em; }
+  .stats span { color: var(--fg-muted); font-size: .8rem; }
+
+  .controls { display: flex; flex-wrap: wrap; gap: .6rem 1rem; align-items: center; margin-bottom: .75rem; }
+  .controls .search { flex: 1 1 18rem; }
+  .controls input {
+    width: 100%; font: inherit; font-size: .9rem; padding: .45rem .65rem;
+    border: 1px solid var(--border-strong); border-radius: var(--radius);
+    background: var(--surface); color: var(--fg);
+  }
+  .controls input:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+  .count { margin: 0; font-size: .82rem; font-variant-numeric: tabular-nums; }
+
+  .rules { margin: 0; border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+  /* The restricted tags on /tlds and on each TLD page link straight to a rule
+     here — clear the site header so the anchor does not land under it. */
+  .rule { display: grid; grid-template-columns: 12rem 1fr; gap: 0 1.25rem; padding: 1rem; scroll-margin-top: 5rem; }
+  .rule + .rule { border-top: 1px solid var(--border); }
+  .rule:target { background: var(--bg-soft); box-shadow: inset 3px 0 0 var(--accent); }
+  .rule[hidden] { display: none; }
+  .rule dt { display: flex; flex-direction: column; gap: .15rem; min-width: 0; }
+  .rule dd { margin: 0; }
+  .rule-tld { font-family: var(--mono); font-weight: 550; font-size: 1rem; }
+  .rule-count { font-size: .76rem; }
+  .rule-note { margin: 0; font-size: .95rem; max-width: var(--measure); }
+  .rule-src { display: inline-block; margin-top: .6rem; font-size: .78rem; font-family: var(--mono); }
+
+  /* One chip per TLD the rule reaches, each its own page — the rule is the
+     answer to "may I", the chip is where the rest of the answer lives. */
+  .rule-tlds { list-style: none; display: flex; flex-wrap: wrap; gap: .3rem; margin: .7rem 0 0; padding: 0; }
+  .rule-tlds a {
+    display: inline-flex; gap: .4rem; align-items: baseline;
+    font-family: var(--mono); font-size: .78rem; white-space: nowrap;
+    padding: .12rem .45rem; border-radius: 4px;
+    border: 1px solid var(--border); color: var(--fg-muted); text-decoration: none;
+  }
+  .rule-tlds a:hover { border-color: var(--border-strong); color: var(--fg); background: var(--bg-soft); }
+  .rule-tlds a:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+  .chip-price { color: var(--fg-faint); font-variant-numeric: tabular-nums; }
+
+  .empty { padding: 2rem; text-align: center; color: var(--fg-muted); }
+
+  .notes { margin-top: 3rem; }
+  .notes ul { padding-left: 1.1rem; }
+  .notes li { margin-bottom: .8rem; }
+
+  @media (max-width: 640px) {
+    .rule { grid-template-columns: 1fr; gap: .35rem; }
+  }
+</style>
