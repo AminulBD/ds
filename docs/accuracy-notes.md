@@ -30,8 +30,8 @@
 * `--where` reports registrars from published prices, so it under-claims rather
   than over-claims: a registrar missing from the bundled `pricing.json` may well
   sell the TLD anyway. `eligibility.json` is the same shape of promise in the
-  other direction — the restrictions it lists are sourced, but a TLD it does not
-  list is not thereby unrestricted.
+  other direction — the restrictions and requirements it lists are sourced, but
+  a TLD it does not list is neither unrestricted nor free of obligations.
 * Large sweeps get rate-limited. `ds` paces itself per host, backs off on
   403/429, and stops querying a server that has refused it six times in a row
   (retrying it after 30s). Identity Digital runs ~250 gTLDs behind one RDAP

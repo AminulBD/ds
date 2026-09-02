@@ -92,8 +92,9 @@ struct Args {
     #[arg(long = "dns-records")]
     dns_records: bool,
 
-    /// For available domains, show the registry, any registration restriction,
-    /// and the registrars that sell the TLD.
+    /// For available domains, show the registry, any restriction on who may
+    /// register, anything the TLD requires of the name, and the registrars
+    /// that sell the TLD.
     #[arg(long = "where")]
     show_where: bool,
 
@@ -1020,6 +1021,7 @@ async fn check(ctx: &Ctx, domain: String, tld: String) -> CheckResult {
             registry: info.as_ref().and_then(|i| i.organisation.clone()),
             info_url: info.as_ref().and_then(|i| i.registration_url.clone()),
             eligibility: ctx.rules.lookup(&tld).cloned(),
+            requirement: ctx.rules.requirement(&tld).cloned(),
             registrars: registration::listings(&ctx.prices, &tld, &domain),
         })
     } else {
@@ -1159,6 +1161,17 @@ fn print_result(args: &Args, r: &CheckResult) {
             println!(
                 "    {:<12} {}",
                 paint("eligibility", Color::Dim),
+                paint(&rule.note, Color::Yellow)
+            );
+            println!("    {:<12} {}", "", rule.source);
+        }
+
+        // And what the TLD will expect of the name afterwards. Not a gate on
+        // buying it — .app sells to anyone — so it is said separately.
+        if let Some(rule) = &reg.requirement {
+            println!(
+                "    {:<12} {}",
+                paint("requirement", Color::Dim),
                 paint(&rule.note, Color::Yellow)
             );
             println!("    {:<12} {}", "", rule.source);
@@ -1531,6 +1544,16 @@ mod tests {
         // The two halves are independent: a TLD can be restricted and still
         // widely sold, which is exactly the case worth warning about.
         assert!(!registration::listings(&Prices::load().unwrap(), "eu", "apple.eu").is_empty());
+    }
+
+    #[test]
+    fn an_https_only_tld_is_still_sold_to_anyone() {
+        let rules = Rules::load().unwrap();
+        // .app is the case the two maps exist to tell apart: no gate on the
+        // buyer, but a condition on the name, and it is on sale everywhere.
+        assert!(rules.requirement("app").is_some());
+        assert!(rules.lookup("app").is_none());
+        assert!(!registration::listings(&Prices::load().unwrap(), "app", "apple.app").is_empty());
     }
 
     #[test]

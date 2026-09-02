@@ -151,8 +151,8 @@ Look up A, AAAA, NS, MX, TXT, CNAME and SOA records.
 .TP
 .B \-\-where
 For available domains, print the registry operator and its official registration
-page (both from IANA's record for the TLD), any registration restriction the
-TLD carries, and the registrars that sell it.
+page (both from IANA's record for the TLD), any restriction on who may register,
+anything the TLD requires of the name itself, and the registrars that sell it.
 .IP
 The registrars are those that publish a price for the TLD in the bundled
 .IR pricing.json ,
@@ -163,9 +163,20 @@ price says so rather than offering links that lead nowhere.
 A restriction is printed before them, from the bundled
 .IR eligibility.json ,
 together with the registry page it was taken from \(em a name being free says
-nothing about whether the registry would let you have it. That file is
-hand-maintained and not exhaustive: a TLD missing from it is not thereby open.
-Both tables are bundled, so this part of the output survives
+nothing about whether the registry would let you have it.
+.IP
+A requirement is printed on the same terms, from the
+.I requirements
+map of the same file. It is a condition on the name rather than a gate on the
+buyer: nobody is turned away from
+.BR .app ,
+but the zone is on the HSTS preload list and a site there does not load without
+a TLS certificate. Reporting that as a restriction would claim a gate that is
+not there, so the two are said separately.
+.IP
+That file is hand-maintained and not exhaustive: a TLD missing from either map
+is not thereby unencumbered. Both tables are bundled, so this part of the
+output survives
 .BR \-\-no\-iana .
 .TP
 .B \-\-raw
@@ -288,7 +299,8 @@ uses the custom table alone, so TLDs it does not price show
 Never query whois.iana.org: no referral when a bundled WHOIS host is stale, and
 no registry name or URL for
 .BR \-\-where ,
-which still prints the restrictions and registrars from its bundled tables.
+which still prints the restrictions, requirements and registrars from its
+bundled tables.
 .TP
 .B \-\-refresh
 Re-download the IANA RDAP bootstrap file.

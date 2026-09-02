@@ -119,8 +119,12 @@ and the point of generating them is that every row is traceable to a source.
 
 Two are hand-maintained, because nothing publishes them machine-readably:
 
-* `eligibility.json` — who may register in a restricted TLD. Every entry must
-  name the registry page it came from; a rule with no citable source stays out.
+* `eligibility.json` — two maps. `tlds` is who may register in a restricted
+  TLD; `requirements` is what the registry asks of the name afterwards, such as
+  an HTTPS-only zone or a rule about what the name must be used for. Every
+  entry in either must name the registry page it came from; a rule with no
+  citable source stays out. Keep them apart — a requirement reported as an
+  eligibility rule claims a gate on the buyer that is not there.
 * `tld-categories.json` — what a TLD is *for*. Listed only where the name plainly
   says so, brand TLDs excluded wholesale, a TLD may sit in several subjects.
 

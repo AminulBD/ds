@@ -10,7 +10,10 @@
 //! and the absence of one is the honest "we do not know".
 //!
 //! Who may buy it comes from `eligibility.json`, which is hand-maintained —
-//! see the note at the top of that file.
+//! see the note at the top of that file. That file answers a third question
+//! too: what the registry asks of the name once it is yours. `.app` is not
+//! restricted — anyone may register one — but it is HTTPS-only, and a buyer
+//! who does not know that has still been told the wrong thing.
 
 use std::collections::HashMap;
 
@@ -73,14 +76,32 @@ pub struct Eligibility {
     pub source: String,
 }
 
+/// What the registry asks of a name in this TLD once it is registered.
+///
+/// Kept apart from `Eligibility` because the two fail differently: failing an
+/// eligibility rule means you cannot buy the name, failing a requirement means
+/// you can buy it and still not get what you wanted. Reporting an HTTPS-only
+/// zone as a restriction would claim a gate that is not there.
+#[derive(Debug, Clone, Deserialize, Serialize)]
+pub struct Requirement {
+    /// What kind of obligation exists, in a line.
+    pub note: String,
+    /// The registry page the note was taken from, which is the authority.
+    pub source: String,
+}
+
 #[derive(Debug, Deserialize)]
 struct RawRules {
     tlds: HashMap<String, Eligibility>,
+    /// Absent in an older hand-written file, and an empty map is a fine answer.
+    #[serde(default)]
+    requirements: HashMap<String, Requirement>,
 }
 
-/// Registration restrictions, by TLD.
+/// Registration restrictions and obligations, by TLD.
 pub struct Rules {
     by_tld: HashMap<String, Eligibility>,
+    requirements: HashMap<String, Requirement>,
 }
 
 impl Rules {
@@ -89,6 +110,11 @@ impl Rules {
         Ok(Self {
             by_tld: raw
                 .tlds
+                .into_iter()
+                .map(|(tld, rule)| (normalize_tld(&tld), rule))
+                .collect(),
+            requirements: raw
+                .requirements
                 .into_iter()
                 .map(|(tld, rule)| (normalize_tld(&tld), rule))
                 .collect(),
@@ -101,9 +127,21 @@ impl Rules {
         lookup_suffix(tld, |s| self.by_tld.get(s))
     }
 
+    /// The same lookup for what the TLD asks of the name afterwards. An
+    /// HSTS-preloaded zone preloads the whole suffix, so inheritance is the
+    /// right default here too.
+    pub fn requirement(&self, tld: &str) -> Option<&Requirement> {
+        lookup_suffix(tld, |s| self.requirements.get(s))
+    }
+
     #[cfg(test)]
     fn all(&self) -> impl Iterator<Item = (&String, &Eligibility)> {
         self.by_tld.iter()
+    }
+
+    #[cfg(test)]
+    fn all_requirements(&self) -> impl Iterator<Item = (&String, &Requirement)> {
+        self.requirements.iter()
     }
 }
 
@@ -221,6 +259,56 @@ mod tests {
         let rules = Rules::load().unwrap();
         let au = rules.lookup("au").unwrap();
         assert_eq!(rules.lookup("com.au").unwrap().note, au.note);
+    }
+
+    #[test]
+    fn bundled_requirements_load_and_cite_a_source() {
+        let rules = Rules::load().unwrap();
+
+        let app = rules.requirement("app").unwrap();
+        assert!(app.note.contains("HTTPS"), "{}", app.note);
+
+        for tld in ["app", "dev", "page", "new", "bank"] {
+            assert!(rules.requirement(tld).is_some(), ".{tld}");
+        }
+
+        let mut seen = 0;
+        for (tld, rule) in rules.all_requirements() {
+            assert!(!rule.note.trim().is_empty(), ".{tld} has no note");
+            assert!(
+                rule.source.starts_with("https://"),
+                ".{tld}: {}",
+                rule.source
+            );
+            seen += 1;
+        }
+        assert!(seen >= 5, "{seen} requirements");
+    }
+
+    #[test]
+    fn a_requirement_is_not_a_restriction() {
+        let rules = Rules::load().unwrap();
+
+        // The whole point of the second map: anyone may register a .app, so
+        // saying it is HTTPS-only must not also say the registry would turn
+        // you away. Reported as an eligibility rule it would read as a gate.
+        for tld in ["app", "dev", "page", "new"] {
+            assert!(rules.requirement(tld).is_some(), ".{tld}");
+            assert!(rules.lookup(tld).is_none(), ".{tld} is open to everyone");
+        }
+
+        // And the converse: a restricted TLD does not gain a requirement it
+        // has no source for.
+        assert!(rules.lookup("eu").is_some());
+        assert!(rules.requirement("eu").is_none());
+    }
+
+    #[test]
+    fn a_tld_that_asks_nothing_says_nothing() {
+        let rules = Rules::load().unwrap();
+        for tld in ["com", "net", "io", "de", "nosuchtld12345"] {
+            assert!(rules.requirement(tld).is_none(), ".{tld}");
+        }
     }
 
     #[test]
