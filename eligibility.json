@@ -1,21 +1,29 @@
 {
   "_about": [
-    "TLDs that are not open to everyone. `ds --where` prints the note and the",
-    "source, so a name reported AVAILABLE under a restricted TLD does not read",
-    "as one you can simply go and buy.",
+    "What a TLD asks of you, in two kinds. `tlds` is who may register at all:",
+    "a name reported AVAILABLE under a restricted TLD should not read as one",
+    "you can simply go and buy. `requirements` is what the registry asks of",
+    "the name once it is yours — an HTTPS-only zone, a rule about what the",
+    "name must be used for. `ds --where` prints both, each with its source.",
+    "",
+    "The two are kept apart because they fail differently. Failing an",
+    "eligibility rule means the registry will not sell you the name; failing a",
+    "requirement means you can buy it and still not get what you wanted. So a",
+    ".app is not restricted — anyone may register one — and listing it as if",
+    "it were would be exactly the over-claiming the rest of this file avoids.",
     "",
     "Unlike whois.json and pricing.json this file is hand-maintained: no",
-    "registry publishes eligibility rules in a machine-readable form, so there",
-    "is nothing to generate it from. Every entry therefore carries the page it",
-    "was taken from, and that page — not this file — is the authority. The list",
-    "covers the restricted TLDs a registrar is likely to offer you; it is not",
-    "exhaustive, and a TLD missing from it is not thereby open.",
+    "registry publishes either kind of rule in a machine-readable form, so",
+    "there is nothing to generate it from. Every entry therefore carries the",
+    "page it was taken from, and that page — not this file — is the authority.",
+    "The list covers the TLDs a registrar is likely to offer you; it is not",
+    "exhaustive, and a TLD missing from either map is not thereby unencumbered.",
     "",
-    "Notes say what kind of gate exists, not the exact legal test: the wording",
-    "of an eligibility rule changes more often than the fact of one.",
+    "Notes say what kind of gate or obligation exists, not the exact legal",
+    "test: the wording of a rule changes more often than the fact of one.",
     "",
     "Sub-zones inherit, longest suffix first: com.au is looked up as com.au,",
-    "then au. Sources last checked 2026-08-25."
+    "then au. Sources last checked 2026-09-02."
   ],
 
   "tlds": {
@@ -126,6 +134,49 @@
     "insurance": {
       "note": "verified regulated insurance companies only",
       "source": "https://ftld.com/"
+    }
+  },
+
+  "requirements": {
+    "app": {
+      "note": "HTTPS only: the TLD is on the HSTS preload list, so browsers refuse plain HTTP and a site without a valid TLS certificate does not load",
+      "source": "https://get.app/"
+    },
+    "dev": {
+      "note": "HTTPS only: the TLD is on the HSTS preload list, so browsers refuse plain HTTP and a site without a valid TLS certificate does not load",
+      "source": "https://get.dev/"
+    },
+    "page": {
+      "note": "HTTPS only: the TLD is on the HSTS preload list, so browsers refuse plain HTTP and a site without a valid TLS certificate does not load",
+      "source": "https://get.page/"
+    },
+    "foo": {
+      "note": "HTTPS only: the TLD is on the HSTS preload list, so browsers refuse plain HTTP and a site without a valid TLS certificate does not load",
+      "source": "https://www.registry.google/tlds/tech/"
+    },
+    "zip": {
+      "note": "HTTPS only: the TLD is on the HSTS preload list, so browsers refuse plain HTTP and a site without a valid TLS certificate does not load",
+      "source": "https://www.registry.google/tlds/tech/"
+    },
+    "mov": {
+      "note": "HTTPS only: the TLD is on the HSTS preload list, so browsers refuse plain HTTP and a site without a valid TLS certificate does not load",
+      "source": "https://www.registry.google/tlds/tech/"
+    },
+    "nexus": {
+      "note": "HTTPS only: the TLD is on the HSTS preload list, so browsers refuse plain HTTP and a site without a valid TLS certificate does not load",
+      "source": "https://www.registry.google/tlds/tech/"
+    },
+    "new": {
+      "note": "HTTPS only, and the name must take a visitor straight into an action or creation flow rather than a home page; enforcement is waived for 100 days after registration while the name does not resolve",
+      "source": "https://www.registry.google/policies/registration/new/"
+    },
+    "bank": {
+      "note": "security requirements: a name that resolves must implement DNSSEC, TLS and email authentication",
+      "source": "https://ftld.com/security/"
+    },
+    "insurance": {
+      "note": "security requirements: a name that resolves must implement DNSSEC, TLS and email authentication",
+      "source": "https://ftld.com/security/"
     }
   }
 }

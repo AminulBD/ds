@@ -6,7 +6,7 @@
 | `--registry` | which RDAP endpoint and/or WHOIS server answered |
 | `--whois` | queries WHOIS as well and prints the raw record |
 | `--dns-records` | A, AAAA, NS, MX, TXT, CNAME and SOA records |
-| `--where` | for available domains: the registry, its official registration page, any eligibility rule, and the registrars whose published prices show they sell the TLD |
+| `--where` | for available domains: the registry, its official registration page, any eligibility rule, anything the TLD requires of the name, and the registrars whose published prices show they sell the TLD |
 | `--raw` | raw RDAP JSON |
 | `--json` | a JSON array instead of the text report |
 | `--all-info` | `--details --registry --whois --dns-records --where` |
@@ -77,6 +77,31 @@ publishes eligibility rules in a machine-readable form. Every entry names the
 page it was taken from, and that page, not `ds`, is the authority. The list
 covers the restricted TLDs a registrar is likely to offer you; **a TLD missing
 from it is not thereby open**.
+
+**`requirement` is what the TLD asks of the name.** Eligibility is a gate on
+the buyer; this is a condition on the name once it is yours, and the two fail
+in different ways. `.app` turns nobody away — anyone may register one — but it
+is on the HSTS preload list, so a browser refuses plain HTTP and the site does
+not load at all without a TLS certificate:
+
+```
++ mynewbrand.app                   AVAILABLE    $17.07 rdap     1983ms
+    registry     Charleston Road Registry Inc.
+    registry url https://www.registry.google
+    requirement  HTTPS only: the TLD is on the HSTS preload list, so browsers refuse plain HTTP and a site without a valid TLS certificate does not load
+                 https://get.app/
+    register at  porkbun.com       $8.75  https://porkbun.com/checkout/search?q=mynewbrand.app
+                 namecheap.com    $17.98  https://www.namecheap.com/domains/registration/results/?domain=mynewbrand.app
+                 101domain.com    $24.49
+```
+
+That is why it is a separate line rather than an eligibility note: printing it
+as a restriction would claim a gate that is not there. Some TLDs ask more than
+HTTPS — a `.new` must take a visitor straight into an action or creation flow,
+and a `.bank` that resolves must implement DNSSEC, TLS and email
+authentication. Requirements live in the same hand-maintained
+`eligibility.json`, under `requirements` rather than `tlds`, and carry a source
+on the same terms: **a TLD missing from the list is not thereby unencumbered**.
 
 Both halves are bundled, so `--where` still answers the useful part of the
 question with `--no-iana` or no route to `whois.iana.org` — only the registry

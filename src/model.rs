@@ -3,7 +3,7 @@
 use serde::Serialize;
 
 use crate::pricing::Price;
-use crate::registration::{Eligibility, Listing};
+use crate::registration::{Eligibility, Listing, Requirement};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
 #[serde(rename_all = "lowercase")]
@@ -100,6 +100,12 @@ pub struct Register {
     /// not prove open: the bundled list is not exhaustive.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub eligibility: Option<Eligibility>,
+    /// What the TLD asks of the name once it is registered — an HTTPS-only
+    /// zone, a rule about what the name must be used for. Separate from
+    /// `eligibility`: this one gates the name, not the buyer. Absent does not
+    /// prove there is nothing to do; the bundled list is not exhaustive.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub requirement: Option<Requirement>,
     /// Registrars whose published price for this TLD shows they sell it,
     /// cheapest first. Empty means the bundled price table names none — not
     /// that none exists.
