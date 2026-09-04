@@ -161,6 +161,22 @@ reach, a platform you could not test on — rather than leaving a reviewer to fi
 it. For a bug fix, include the reproducing command and what it printed before
 and after.
 
+## Changelog
+
+`CHANGELOG.md` is kept up to date as changes land, not reconstructed at release
+time from `git log`. A pull request that changes what somebody using `ds` sees
+adds a line under `## [Unreleased]`, in the same voice as the commit subjects —
+the outcome, not the files. Grouped **Added** / **Changed** / **Fixed**, with
+the PR number where there is one.
+
+Nothing user-visible, nothing to write: a harvester tweak, a test, a refactor
+that leaves every answer the same, or a data refresh that only moves rows all
+stay out of it.
+
+When a release is cut, `## [Unreleased]` becomes `## [<version>] — <date>`, a
+fresh empty `## [Unreleased]` goes above it, and the compare links at the foot
+of the file gain a row. `scripts/release.mjs` does not do this for you yet.
+
 ## Releases
 
 **Never tag by hand — run `scripts/release.mjs`.** The tag does not set the
