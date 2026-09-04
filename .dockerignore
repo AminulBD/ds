@@ -1,0 +1,15 @@
+# The build needs src/, Cargo.*, and the four JSON data files that
+# include_str! reaches for. Everything below is either build output, another
+# project entirely, or a cache that would be stale inside the image.
+.git
+.github
+target
+site
+wix
+packaging
+docs
+scripts/.iana-cache
+scripts/.whois-cache
+**/node_modules
+Dockerfile
+.dockerignore
