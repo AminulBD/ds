@@ -11,7 +11,13 @@ is where a feature lands and a patch is everything else.
 
 ## [Unreleased]
 
-Nothing yet.
+### Fixed
+
+- The Docker image stops when it is told to. `ds` ran as PID 1, and the kernel
+  discards a signal sent to PID 1 unless that process installed a handler for
+  it, so `Ctrl+C` did nothing and every `docker stop` sat through its ten-second
+  timeout before being killed outright. `tini` now takes PID 1 and forwards the
+  signal to `ds` as an ordinary child. Affects the published `0.1.9` image.
 
 ## [0.1.9] — 2026-09-04
 

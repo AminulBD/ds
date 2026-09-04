@@ -27,8 +27,9 @@ LABEL org.opencontainers.image.source="https://github.com/AminulBD/ds" \
       org.opencontainers.image.licenses="MIT"
 
 # ds talks TLS with webpki's bundled roots and WHOIS in the clear, so it needs
-# no ca-certificates; DNS comes from the resolv.conf Docker writes.
-RUN adduser -D -h /home/ds ds
+# no ca-certificates; DNS comes from the resolv.conf Docker writes. tini is the
+# one addition, and the ENTRYPOINT below says why.
+RUN apk add --no-cache tini && adduser -D -h /home/ds ds
 COPY --from=build /usr/local/bin/ds /usr/local/bin/ds
 
 USER ds
@@ -51,5 +52,10 @@ EXPOSE 8080
 # The API is then GET /v1/check?name=apple&tld=com,net, with GET /healthz for
 # a liveness probe. Overriding the whole command runs the CLI instead:
 #     docker run --rm ds apple --tld com
-ENTRYPOINT ["ds"]
+# tini runs as PID 1 rather than ds itself. The kernel discards a signal sent to
+# PID 1 unless that process installed a handler for it, and ds installs none, so
+# as PID 1 it ignored Ctrl+C outright and every `docker stop` sat through its
+# timeout before being SIGKILLed. Under tini, ds is an ordinary child: the
+# signal is forwarded, the default action applies, and it stops when told to.
+ENTRYPOINT ["/sbin/tini", "--", "ds"]
 CMD ["--serve", "--host", "0.0.0.0", "--port", "8080"]
