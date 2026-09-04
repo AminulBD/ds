@@ -20,6 +20,12 @@ RUN --mount=type=cache,target=/usr/local/cargo/registry,sharing=locked \
 
 FROM alpine:3.22
 
+# source is what makes ghcr link the package back to this repository and show
+# the README on its page; the rest is what `docker inspect` reports.
+LABEL org.opencontainers.image.source="https://github.com/AminulBD/ds" \
+      org.opencontainers.image.description="Check domain availability over RDAP with a WHOIS fallback" \
+      org.opencontainers.image.licenses="MIT"
+
 # ds talks TLS with webpki's bundled roots and WHOIS in the clear, so it needs
 # no ca-certificates; DNS comes from the resolv.conf Docker writes.
 RUN adduser -D -h /home/ds ds

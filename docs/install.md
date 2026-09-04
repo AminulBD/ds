@@ -89,6 +89,50 @@ Colours work in Windows Terminal, PowerShell and `cmd.exe` from Windows 10 1809
 onwards. An older console gets plain text rather than escape codes, and
 `--no-color` or `NO_COLOR` turns them off anywhere.
 
+## Docker
+
+Every release publishes a multi-architecture image — amd64 and arm64 — to the
+GitHub container registry:
+
+```sh
+docker run --rm ghcr.io/aminulbd/ds:latest apple --tld com
+```
+
+`:latest` follows the newest release; `ghcr.io/aminulbd/ds:0.1.8` pins one, and
+a prerelease never moves `:latest`. The image is Alpine with a static binary
+and nothing else in it, around 22 MB.
+
+Its default command is the [HTTP API](http-api.md), so with no arguments it
+serves rather than checking a name:
+
+```sh
+docker run --rm -p 8080:8080 ghcr.io/aminulbd/ds:latest
+curl -s 'http://127.0.0.1:8080/v1/check?name=apple&tld=com'
+```
+
+That default passes `--host 0.0.0.0`, which on the command line would print a
+warning and deserves one: loopback inside a container is reachable by nobody,
+so what keeps the server to yourself is the container's network and whether you
+publish the port. Publish it only where you would have been willing to bind
+`0.0.0.0` directly, and read [Running one](http-api.md#running-one)
+before you do. Every server option still works — append them and they replace
+the default command:
+
+```sh
+docker run --rm -p 8080:8080 ghcr.io/aminulbd/ds:latest \
+  --serve --host 0.0.0.0 --rate-limit 0 --cors 'https://example.com'
+```
+
+The IANA bootstrap is cached under `/home/ds/.cache`, so a volume there saves a
+restarted container refetching it:
+
+```sh
+docker run --rm -p 8080:8080 -v ds-cache:/home/ds/.cache ghcr.io/aminulbd/ds:latest
+```
+
+Building the image yourself is `docker build -t ds .` from a checkout — the
+`Dockerfile` at the repository root is the one the release workflow uses.
+
 Or build it yourself:
 
 ```sh
