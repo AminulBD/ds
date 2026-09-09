@@ -5,7 +5,7 @@ use std::net::SocketAddr;
 use std::time::Duration;
 
 use anyhow::{Context, Result};
-use hickory_resolver::TokioAsyncResolver;
+use hickory_resolver::TokioResolver;
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
 use tokio::net::TcpStream;
 
@@ -22,7 +22,7 @@ pub struct WhoisResponse {
 
 pub async fn query(
     client: &reqwest::Client,
-    resolver: &TokioAsyncResolver,
+    resolver: &TokioResolver,
     limiter: &HostLimiter,
     server: &WhoisServer,
     domain: &str,
@@ -86,7 +86,7 @@ pub async fn query(
 }
 
 async fn socket_query(
-    resolver: &TokioAsyncResolver,
+    resolver: &TokioResolver,
     host: &str,
     port: u16,
     domain: &str,
@@ -114,7 +114,7 @@ async fn socket_query(
 /// Every address the host has is tried, and the whole thing stays inside the
 /// single connect timeout it had before.
 async fn connect(
-    resolver: &TokioAsyncResolver,
+    resolver: &TokioResolver,
     host: &str,
     port: u16,
     timeout: Duration,
@@ -157,7 +157,7 @@ pub struct TldInfo {
 
 /// Only the last label is meaningful to IANA, so `co.za` is asked as `za`.
 pub async fn iana_tld_info(
-    resolver: &TokioAsyncResolver,
+    resolver: &TokioResolver,
     limiter: &HostLimiter,
     tld: &str,
     timeout: Duration,

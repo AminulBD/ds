@@ -128,7 +128,7 @@ pub async fn run(args: Args) -> Result<()> {
     let opts = args.serve_opts;
 
     let timeout = Duration::from_secs(args.timeout.max(1));
-    let resolver = dns::connect_resolver(timeout);
+    let resolver = dns::connect_resolver(timeout)?;
     let client = reqwest::Client::builder()
         .user_agent(crate::USER_AGENT)
         .timeout(timeout)
@@ -680,7 +680,7 @@ mod tests {
 
     fn state(max_lookups: usize, cache_ttl: u64, rate: u32) -> State {
         let timeout = Duration::from_secs(5);
-        let resolver = dns::connect_resolver(timeout);
+        let resolver = dns::connect_resolver(timeout).expect("a resolver builds");
         State {
             ctx: Arc::new(Ctx {
                 opts: Lookup::default(),
