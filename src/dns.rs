@@ -5,9 +5,13 @@ use std::net::SocketAddr;
 use std::sync::Arc;
 use std::time::Duration;
 
-use hickory_resolver::config::{NameServerConfigGroup, ResolverConfig, ResolverOpts};
+use anyhow::{Context, Result};
+use hickory_resolver::config::{
+    NameServerConfig, ResolverConfig, ResolverOpts, CLOUDFLARE, GOOGLE,
+};
+use hickory_resolver::net::runtime::TokioRuntimeProvider;
 use hickory_resolver::proto::rr::RecordType;
-use hickory_resolver::TokioAsyncResolver;
+use hickory_resolver::{Resolver, TokioResolver};
 
 use crate::model::DnsRecords;
 
@@ -21,12 +25,12 @@ const TYPES: &[RecordType] = &[
     RecordType::SOA,
 ];
 
-pub fn resolver(timeout: Duration) -> TokioAsyncResolver {
+pub fn resolver(timeout: Duration) -> Result<TokioResolver> {
     let mut opts = ResolverOpts::default();
     opts.timeout = timeout;
     opts.attempts = 1;
     // Cloudflare's resolver: consistent behaviour regardless of the local setup.
-    TokioAsyncResolver::tokio(ResolverConfig::cloudflare(), opts)
+    build(ResolverConfig::udp_and_tcp(&CLOUDFLARE), opts)
 }
 
 /// The resolver used to reach RDAP and WHOIS servers.
@@ -37,7 +41,7 @@ pub fn resolver(timeout: Duration) -> TokioAsyncResolver {
 /// reported UNKNOWN. Resolving in process avoids it. The system configuration
 /// is used whenever there is one, so split-horizon DNS and `/etc/hosts` keep
 /// working; only when there is none do the public resolvers answer.
-pub fn connect_resolver(timeout: Duration) -> TokioAsyncResolver {
+pub fn connect_resolver(timeout: Duration) -> Result<TokioResolver> {
     let (config, mut opts) = connect_config(hickory_resolver::system_conf::read_system_conf().ok());
     // A single DNS try has to fit inside the per-request budget with room left
     // for another server and for the connection itself.
@@ -48,7 +52,18 @@ pub fn connect_resolver(timeout: Duration) -> TokioAsyncResolver {
     // UDP port 53 — and the Android emulator, which mangles it — resolve
     // nothing without it.
     opts.try_tcp_on_error = true;
-    TokioAsyncResolver::tokio(config, opts)
+    build(config, opts)
+}
+
+/// The one place a resolver is actually constructed. Nothing here reaches the
+/// network, and with no TLS transport enabled there is nothing for `build()`
+/// to fail on — but it is fallible, so the error is carried rather than
+/// unwrapped.
+fn build(config: ResolverConfig, opts: ResolverOpts) -> Result<TokioResolver> {
+    Resolver::builder_with_config(config, TokioRuntimeProvider::default())
+        .with_options(opts)
+        .build()
+        .context("building the DNS resolver")
 }
 
 /// Whatever the system configured, or the public resolvers when it configured
@@ -59,9 +74,11 @@ fn connect_config(
     match system {
         Some((config, opts)) if !config.name_servers().is_empty() => (config, opts),
         _ => {
-            let mut servers = NameServerConfigGroup::cloudflare();
             // Two providers, so one being blocked or unreachable is not fatal.
-            servers.merge(NameServerConfigGroup::google());
+            let servers: Vec<NameServerConfig> = CLOUDFLARE
+                .udp_and_tcp()
+                .chain(GOOGLE.udp_and_tcp())
+                .collect();
             (
                 ResolverConfig::from_parts(None, Vec::new(), servers),
                 ResolverOpts::default(),
@@ -72,10 +89,10 @@ fn connect_config(
 
 /// Hands that resolver to reqwest, which otherwise calls `getaddrinfo` on a
 /// blocking thread and hits the same wall.
-pub struct Dns(TokioAsyncResolver);
+pub struct Dns(TokioResolver);
 
 impl Dns {
-    pub fn new(resolver: &TokioAsyncResolver) -> Arc<Self> {
+    pub fn new(resolver: &TokioResolver) -> Arc<Self> {
         Arc::new(Self(resolver.clone()))
     }
 }
@@ -93,7 +110,7 @@ impl reqwest::dns::Resolve for Dns {
     }
 }
 
-pub async fn lookup(resolver: &TokioAsyncResolver, domain: &str) -> DnsRecords {
+pub async fn lookup(resolver: &TokioResolver, domain: &str) -> DnsRecords {
     let mut records = Vec::new();
 
     for &rtype in TYPES {
@@ -102,9 +119,10 @@ pub async fn lookup(resolver: &TokioAsyncResolver, domain: &str) -> DnsRecords {
             Err(_) => continue,
         };
         let mut values: Vec<String> = answer
-            .record_iter()
+            .answers()
+            .iter()
             .filter(|r| r.record_type() == rtype)
-            .map(|r| r.data().map(|d| d.to_string()).unwrap_or_default())
+            .map(|r| r.data.to_string())
             .filter(|s| !s.is_empty())
             .collect();
         values.sort();
@@ -123,11 +141,7 @@ mod tests {
     use std::net::{IpAddr, Ipv4Addr};
 
     fn servers(config: &ResolverConfig) -> Vec<IpAddr> {
-        let mut ips: Vec<IpAddr> = config
-            .name_servers()
-            .iter()
-            .map(|n| n.socket_addr.ip())
-            .collect();
+        let mut ips: Vec<IpAddr> = config.name_servers().iter().map(|n| n.ip).collect();
         ips.sort();
         ips.dedup();
         ips
@@ -151,7 +165,7 @@ mod tests {
     /// A resolv.conf that parses but lists no nameserver is just as unusable.
     #[test]
     fn falls_back_when_the_system_config_names_no_servers() {
-        let empty = ResolverConfig::from_parts(None, Vec::new(), NameServerConfigGroup::new());
+        let empty = ResolverConfig::from_parts(None, Vec::new(), Vec::new());
         let (config, _) = connect_config(Some((empty, ResolverOpts::default())));
         assert!(!servers(&config).is_empty());
     }
@@ -162,7 +176,7 @@ mod tests {
         let system = ResolverConfig::from_parts(
             None,
             Vec::new(),
-            NameServerConfigGroup::from_ips_clear(&[quad9], 53, true),
+            vec![NameServerConfig::udp_and_tcp(quad9)],
         );
         let (config, _) = connect_config(Some((system, ResolverOpts::default())));
         assert_eq!(servers(&config), vec![quad9]);

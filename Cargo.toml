@@ -33,7 +33,7 @@ serve = [
 anyhow = "1"
 clap = { version = "4", features = ["derive"] }
 futures = "0.3"
-hickory-resolver = "0.24"
+hickory-resolver = "0.26"
 idna = "1"
 reqwest = { version = "0.12", default-features = false, features = ["rustls-tls", "json", "gzip"] }
 serde = { version = "1", features = ["derive"] }

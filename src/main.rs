@@ -26,7 +26,7 @@ use std::time::{Duration, Instant};
 use anyhow::{bail, Context, Result};
 use clap::{Parser, ValueEnum};
 use futures::stream::StreamExt;
-use hickory_resolver::TokioAsyncResolver;
+use hickory_resolver::TokioResolver;
 
 use bootstrap::Bootstrap;
 use limit::HostLimiter;
@@ -377,9 +377,9 @@ struct Ctx {
     /// Registration restrictions, for --where.
     rules: Rules,
     /// Used for every RDAP/WHOIS connection.
-    resolver: TokioAsyncResolver,
+    resolver: TokioResolver,
     /// Only for `--dns-records`.
-    records: Option<TokioAsyncResolver>,
+    records: Option<TokioResolver>,
     timeout: Duration,
     /// TLD -> what IANA says about it. One lookup per TLD, failures cached
     /// too: IANA's WHOIS rate-limits hard, and asking it again for every
@@ -451,7 +451,7 @@ async fn run() -> Result<()> {
     );
 
     let timeout = Duration::from_secs(args.timeout.max(1));
-    let resolver = dns::connect_resolver(timeout);
+    let resolver = dns::connect_resolver(timeout)?;
     let client = reqwest::Client::builder()
         .user_agent(USER_AGENT)
         .timeout(timeout)
@@ -542,7 +542,10 @@ async fn run() -> Result<()> {
         );
     }
 
-    let records = args.dns_records.then(|| dns::resolver(timeout));
+    let records = args
+        .dns_records
+        .then(|| dns::resolver(timeout))
+        .transpose()?;
 
     let private_tlds = PrivateTlds::load().context("loading the bundled private-tlds.json")?;
 
