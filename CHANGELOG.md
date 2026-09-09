@@ -11,6 +11,8 @@ is where a feature lands and a patch is everything else.
 
 ## [Unreleased]
 
+## [0.1.10] — 2026-09-09
+
 ### Fixed
 
 - The Docker image stops when it is told to. `ds` ran as PID 1, and the kernel
@@ -162,7 +164,8 @@ The first release, as `ds`.
 - A man page, an MIT licence, and binaries published whenever a `v*` tag is
   pushed.
 
-[Unreleased]: https://github.com/AminulBD/ds/compare/v0.1.9...HEAD
+[Unreleased]: https://github.com/AminulBD/ds/compare/v0.1.10...HEAD
+[0.1.10]: https://github.com/AminulBD/ds/compare/v0.1.9...v0.1.10
 [0.1.9]: https://github.com/AminulBD/ds/compare/v0.1.8...v0.1.9
 [0.1.8]: https://github.com/AminulBD/ds/compare/v0.1.7...v0.1.8
 [0.1.7]: https://github.com/AminulBD/ds/compare/v0.1.6...v0.1.7
